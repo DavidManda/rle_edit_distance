@@ -1,0 +1,6 @@
+Project title: Implementation of RLE edit distance in near optimal time
+Supervisor: Raphael Clifford
+Project area: Data structures and algorithms
+Summary: The edit distance is one of the most common distance measures on strings. This project will look at computing the edit distance between two strings encoded using run-length encoding (RLE). This encoding is a compression method used commonly for a variety of applications, including image processing and succinct data structures. 
+
+A line of research started in 1993 has proposed various algorithms for achieving this task. Earlier this year, Raphael Clifford et al. showed that the edit distance between two run-length encoded strings of compressed lengths m and n respectively can be computed in O(m*n*log(m*n)) time. This improves the previous record by a factor of O(n/log(m*n)). However, no implementation for this algorithm exists to date. This project will provide an implementation of this proposed algorithm and will analyse its efficiency in practice. Succeeding in this project will provide the most efficient algorithm for computing the edit distance between two RLE strings.
