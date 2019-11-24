@@ -4,3 +4,5 @@ clean:
 	rm edit_distance
 rle_string: rle_string.cpp
 	g++ rle_string.cpp -o rle_string.out
+lcs: LCS.cpp
+	g++ LCS.cpp -o LCS.out
