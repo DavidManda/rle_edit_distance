@@ -1,4 +1,6 @@
 edit: edit_distance.cpp
-	g++ edit_distance.cpp -o edit_distance.out
+	g++ edit_distance.cpp rle_string.cpp -o edit_distance.out
 clean:
 	rm edit_distance
+rle_string: rle_string.cpp
+	g++ rle_string.cpp -o rle_string.out
