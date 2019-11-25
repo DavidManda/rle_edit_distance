@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include "rle_string.h"
-#include <string.h>
+#include "LCS.h"
 
 using namespace std;
 
@@ -115,6 +114,35 @@ int get_rle_lcs(const vector<RLE_run> s0, const vector<RLE_run> s1){
     }
 
     return dyn[N-1][M-1];
+}
+
+void precompute(vector< map<char, int> >& vec, vector<RLE_run> s){
+    map<char, int> last_position;
+    char ch;
+    int len, prev_val;
+    for(int i = 1; i < s.size(); i++){
+        ch = s[i].ch;
+        len = s[i].len;
+        if(last_position.find(ch) == last_position.end()){
+            prev_val = 0;
+        }
+        else{
+            prev_val = vec[last_position[ch]][ch];
+        }
+        vec[i-1][ch] = prev_val;
+        vec[i][ch] = prev_val + len;
+        last_position[ch] = i;
+    }
+}
+
+int get_rle_lcs_fast(const vector<RLE_run> s0, const vector<RLE_run> s1){
+    const int M = s0.size();
+    const int N = s1.size();
+    vector< map<char, int> > TOP(N);
+    vector< map<char, int> > LEFT(M);
+    precompute(TOP, s1);
+    precompute(LEFT, s0);
+    return 0;
 }
 
 int main(){
