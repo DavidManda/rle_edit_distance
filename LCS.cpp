@@ -31,30 +31,17 @@ int get_LCS(const int N, const int M, const string& s0, const string& s1){
 }
 
 void forced_path_update(const vector<RLE_run> s0, const vector<RLE_run> s1, int i, int j, vector< vector<int> >& dyn){
-    int v_offset, h_offset;
+    int v_offset = 0, h_offset = 0;
 
-    if(s0[i].len < s1[j].len){
-        h_offset = s0[i].len;
-        v_offset = 0;
-    }
-    else if(s0[i].len > s1[j].len){
-        h_offset = 0;
-        v_offset = s1[j].len;
-    }
-    else{
+    if(s0[i].len == s1[j].len)
         return;
-    }
 
     while(i < s0.size() && j < s1.size()){
         // proceed vertically
-        if(s0[i].len < s1[j].len){
-            
-            if(v_offset != 0){
-            // this means I exited through the right-hand side and now I am going down, 
-            // which means I will exit through the corner
-                return;
-            }
-
+        if(s0[i].len - v_offset < s1[j].len - h_offset){
+            // exited through bottom
+            h_offset = s0[i].len - v_offset;
+            v_offset = 0;
             int next_i = i + 1;
             while(next_i < s0.size() && s0[next_i].ch != s1[j].ch){
                 ++next_i;
@@ -63,31 +50,15 @@ void forced_path_update(const vector<RLE_run> s0, const vector<RLE_run> s1, int 
             if(next_i >= s0.size()){
                 return;
             }
-            int d = min(s0[next_i].len, s1[j].len - h_offset);
+            int d = min(s0[next_i].len - v_offset, s1[j].len - h_offset);
             dyn[next_i][j] = max(dyn[next_i][j], dyn[i][j] + d);
             i = next_i;
-            if(s0[next_i].len < s1[j].len - h_offset){
-                // exit through the bottom
-                h_offset = h_offset + d;
-                v_offset = 0;
-            }
-            else if(s0[next_i].len > s1[j].len - h_offset){
-                // exit through the right-hand side
-                h_offset = 0;
-                v_offset = d;
-            }
-            else{
-                return;
-            }
         }
         // proceed horizontally
-        else{
-
-            if(h_offset != 0){
-                // this means I exited through the bottom side and now I am going right,
-                // which means I will exit through the corner
-                return; 
-            }
+        else if(s0[i].len - v_offset > s1[j].len - h_offset){
+            // exited through right-hand side
+            h_offset = 0;
+            v_offset = s1[j].len - h_offset;
             int next_j = j + 1;
             while(next_j < s1.size() && s0[i].ch != s1[next_j].ch){
                 ++next_j;
@@ -96,24 +67,15 @@ void forced_path_update(const vector<RLE_run> s0, const vector<RLE_run> s1, int 
             if(next_j >= s1.size()){
                 return;
             }
+
             int d = min(s0[i].len - v_offset, s1[next_j].len);
             dyn[i][next_j] = max(dyn[i][next_j], dyn[i][j] + d);
             j = next_j;
-            if(s0[i].len - v_offset < s1[next_j].len){
-                // exit through the bottom
-                h_offset = d;
-                v_offset = 0;
-            }
-            else if(s0[i].len - v_offset > s1[next_j].len){
-                // exit through the right-hand side
-                h_offset = 0;
-                v_offset = v_offset + d;
-            }
-            else{
-                return;
-            }
         }
-
+        else{
+            // exiting though corner
+            return;
+        }
     } 
     return;
 }
@@ -148,7 +110,7 @@ int get_rle_lcs(const vector<RLE_run> s0, const vector<RLE_run> s1){
             forced_path_update(s0, s1, i, j, dyn);
 
             dyn[i][j] = max(curr_val, dyn[i][j], max(dyn[i-1][j], dyn[i][j-1]));
-            print_2d_vect(dyn);
+            // print_2d_vect(dyn);
         }
     }
 
