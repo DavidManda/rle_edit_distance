@@ -6,3 +6,5 @@ rle_string: rle_string.cpp
 	g++ rle_string.cpp -o rle_string.out
 lcs: LCS.cpp
 	g++ LCS.cpp rle_string.cpp -o LCS.out
+gen_input: generate_inputs.cpp
+	g++ generate_inputs.cpp -o generate_inputs.out
