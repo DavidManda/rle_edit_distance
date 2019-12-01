@@ -1,9 +1,7 @@
 edit: edit_distance.cpp
 	g++ edit_distance.cpp rle_string.cpp -o edit_distance.o
 clean:
-	rm edit_distance
-rle_string: rle_string.cpp
-	g++ rle_string.cpp -o rle_string.o
+	rm *.o
 run_lcs: run_lcs.cpp
 	g++ run_lcs.cpp LCS.cpp rle_string.cpp -o run_lcs.o
 gen_input: generate_inputs.cpp

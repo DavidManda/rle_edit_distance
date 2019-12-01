@@ -1,11 +1,9 @@
 #include <fstream>
 #include <iostream>
 #include <algorithm>
-#include "rle_string.h"
+#include "rle_string.hpp"
 
-using namespace std;
-
-void read_string(istream& fin, int len, string& s){
+void read_string(std::istream& fin, int len, std::string& s){
     char ch;
     for(int i = 0; i < len; i++){
         fin >> ch;
@@ -14,10 +12,10 @@ void read_string(istream& fin, int len, string& s){
 }
 
 int min(int a, int b, int c){
-    return min(min(a,b),c);
+    return std::min(std::min(a,b),c);
 }
 
-int get_edit_dist(const int N, const int M, const string& s0, const string& s1){
+int get_edit_dist(const int N, const int M, const std::string& s0, const std::string& s1){
     int dyn[N + 1][M + 1];
 
     for(int i = 0; i <= N; i++){
@@ -37,11 +35,11 @@ int get_edit_dist(const int N, const int M, const string& s0, const string& s1){
 }
 
 int main() {
-    ifstream fin("input.in");
-    ofstream fout("output.out");
+    std::ifstream fin("input.in");
+    std::ofstream fout("output.out");
     int N, M;
     // The first element in the strings is a buffer element for use of implementation
-    string s0 = "0", s1 = "0";
+    std::string s0 = "0", s1 = "0";
     fin >> N >> M;
     read_string(fin, N, s0);
     read_string(fin, M, s1);
@@ -49,10 +47,10 @@ int main() {
     fout << sol << '\n';
 
     RLE_run my_run('a', 10);
-    cout << my_run.print() << '\n';
+    std::cout << my_run.print() << '\n';
     RLE_string_helper helper;
-    vector<RLE_run> rle_str = helper.get_rle_string("aaabbaatttttt");
-    cout << helper.print(rle_str) << '\n';
+    std::vector<RLE_run> rle_str = helper.get_rle_string("aaabbaatttttt");
+    std::cout << helper.print(rle_str) << '\n';
 
     return 0;
 }

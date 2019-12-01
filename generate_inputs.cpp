@@ -2,9 +2,7 @@
 #include <fstream>
 #include <cstdlib>
 
-using namespace std;
-
-void gen_random(string *s, const int len) {
+void gen_random(std::string *s, const int len) {
     *s = "";
     static const char alphanum[] = "ab";
         // "0123456789"
@@ -17,10 +15,10 @@ void gen_random(string *s, const int len) {
 }
 
 int main(){
-    ofstream fout("input.in");
+    std::ofstream fout("input.in");
     int nr_tests = 1000;
     fout << nr_tests << '\n';
-    string s0, s1;
+    std::string s0, s1;
     for(int i=0; i < nr_tests; ++i){
         int N = rand() % 10 + 1;
         int M = rand() % 10 + 1;

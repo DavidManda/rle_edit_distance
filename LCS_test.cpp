@@ -4,15 +4,13 @@
 #include <iostream>
 #include "LCS.hpp"
 
-using namespace std;
-
 TEST_CASE("Testing LCS precompute","[]"){
     // the * at the begginig is a buffer so we index at 1
-    string my_string = "*aaabbacd";
+    std::string my_string = "*aaabbacd";
     RLE_string_helper helper;
-    vector<RLE_run> rle_s = helper.get_rle_string(my_string);
-    vector< map<char, int> > vec(rle_s.size());
-    precompute(vec, rle_s);
+    std::vector<RLE_run> rle_s = helper.get_rle_string(my_string);
+    std::vector< std::map<char, int> > vec(rle_s.size());
+    LCS::precompute(vec, rle_s);
     REQUIRE(vec[1]['a'] == 3);
     REQUIRE(vec[0]['a'] == 0);
     REQUIRE(vec[2]['b'] == 2);

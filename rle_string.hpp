@@ -5,20 +5,18 @@
 #include <vector>
 #include <sstream>
 
-using namespace std;
-
 class RLE_run{
 public:
     char ch;
     int len;
     RLE_run(char _ch, int _len);
-    string print();
+    std::string print();
 };
 
 class RLE_string_helper{
 public:
-    vector<RLE_run> get_rle_string(string str);
+    std::vector<RLE_run> get_rle_string(std::string str);
 
-    string print(vector<RLE_run> rle_string);
+    std::string print(std::vector<RLE_run> rle_string);
 };
 #endif

@@ -1,16 +1,16 @@
 #ifndef LCS
 #define LCS
 
-#include "rle_string.h"
+#include "rle_string.hpp"
 #include <string.h>
 #include <map>
 
-void precompute(vector< map<char, int> >& vec, vector<RLE_run> s);
+void precompute(std::vector< std::map<char, int> >& vec, std::vector<RLE_run> s);
 
-void read_string(istream& fin, int len, string& s);
+void read_string(std::istream& fin, int len, std::string& s);
 
-int get_LCS(const int N, const int M, const string& s0, const string& s1);
+int get_LCS(const int N, const int M, const std::string& s0, const std::string& s1);
 
-int get_rle_lcs(const vector<RLE_run> s0, const vector<RLE_run> s1);
+int get_rle_lcs(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1);
 
 #endif

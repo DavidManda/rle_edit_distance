@@ -1,18 +1,18 @@
-#include "rle_string.h"
+#include "rle_string.hpp"
 
 RLE_run::RLE_run(char _ch, int _len){
     ch = _ch;
     len = _len;
 }
 
-string RLE_run::print(){
-    stringstream ss;
+std::string RLE_run::print(){
+    std::stringstream ss;
     ss << "(" << ch << ", " << len << ")";
     return ss.str();
 }
 
-vector<RLE_run> RLE_string_helper::get_rle_string(string str){
-    vector<RLE_run> rle_str;
+std::vector<RLE_run> RLE_string_helper::get_rle_string(std::string str){
+    std::vector<RLE_run> rle_str;
     if(str.length() > 0){
         char ch = str[0];
         int count = 1;
@@ -33,9 +33,9 @@ vector<RLE_run> RLE_string_helper::get_rle_string(string str){
     return rle_str;
 }
 
-string RLE_string_helper::print(vector<RLE_run> rle_str){
-    string str;
-    for(vector<RLE_run>::iterator it = rle_str.begin(); it != rle_str.end(); ++it){
+std::string RLE_string_helper::print(std::vector<RLE_run> rle_str){
+    std::string str;
+    for(std::vector<RLE_run>::iterator it = rle_str.begin(); it != rle_str.end(); ++it){
         str += it->print();
     }
     return str;
