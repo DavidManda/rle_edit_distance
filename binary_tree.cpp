@@ -69,6 +69,46 @@ treeNode* treeNode::find(int _key){
     return next_node->find(_key);
 }
 
+void _find_predec_succ(treeNode* root, int key, treeNode*& predec, treeNode*& succ){
+    // Base case 
+    if (root == NULL)  return; 
+  
+    // If key is present at root 
+    if (root->key == key) 
+    { 
+        // the maximum value in left subtree is predecessor 
+        if (root->left != NULL) 
+        { 
+            treeNode* tmp = root->left; 
+            while (tmp->right) 
+                tmp = tmp->right; 
+            predec = tmp; 
+        } 
+
+        // the minimum value in right subtree is successor 
+        if (root->right != NULL) 
+        { 
+            treeNode* tmp = root->right ; 
+            while (tmp->left) 
+                tmp = tmp->left ; 
+            succ = tmp ; 
+        } 
+        return ; 
+    } 
+  
+    // If key is smaller than root's key, go to left subtree 
+    if (root->key > key) 
+    { 
+        succ = root;
+        _find_predec_succ(root->left, key, predec, succ); 
+    } 
+    else // go to right subtree 
+    { 
+        predec = root ; 
+        _find_predec_succ(root->right, key, predec, succ); 
+    } 
+}
+
 binarySearchTree::binarySearchTree(){
     this->root = NULL;
 }
@@ -87,6 +127,24 @@ treeNode* binarySearchTree::find(int _key){
     }
     return this->root->find(_key);
 }
+
+// This returns the node with the biggest key that is smaller than _key
+treeNode* binarySearchTree::find_predec(int _key){
+    treeNode* predec = NULL;
+    treeNode* succ = NULL;
+    _find_predec_succ(this->root, _key, predec, succ);
+
+    return predec;
+}
+
+treeNode* binarySearchTree::find_succ(int _key){
+    treeNode* succ = NULL;
+    treeNode* predec = NULL;
+    _find_predec_succ(this->root, _key, predec, succ);
+
+    return succ;
+}
+
 // Given a non-empty binary search tree, return the node with minimum 
 // key value found in that tree. Note that the entire tree does not 
 // need to be searched.
@@ -183,3 +241,16 @@ void print_2D_util(treeNode *root, int space)
 void print_2D(treeNode *root){
     print_2D_util(root, 0);
 }
+
+// int main(){
+//     binarySearchTree my_bst;
+//     my_bst.insert(3,3,3,3);
+//     my_bst.insert(1,1,1,1);
+//     my_bst.insert(2,2,2,2);
+//     my_bst.insert(0,0,0,0);
+//     my_bst.insert(4,4,4,4);
+//     my_bst.insert(5,5,5,5);
+//     print_2D(my_bst.root);
+//     std::cout << my_bst.find_succ(3)->key << '\n';
+//     return 0;
+// }

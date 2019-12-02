@@ -25,6 +25,8 @@ public:
     void insert(int _key, int _val, int _x, int _y);
     std::string to_string();
     treeNode* find(int key);
+    treeNode* find_predec(int key);
+    treeNode* find_succ(int key);
     void delete_node(int key);
 };
 
