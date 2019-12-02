@@ -13,4 +13,5 @@ int get_LCS(const int N, const int M, const std::string& s0, const std::string& 
 
 int get_rle_lcs(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1);
 
+int get_rle_lcs_fast(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1);
 #endif

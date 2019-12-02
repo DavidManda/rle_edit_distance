@@ -3,7 +3,7 @@ edit: edit_distance.cpp
 clean:
 	rm *.o
 run_lcs: run_lcs.cpp
-	g++ run_lcs.cpp LCS.cpp rle_string.cpp -o run_lcs.o
+	g++ run_lcs.cpp LCS.cpp binary_tree.cpp rle_string.cpp -o run_lcs.o
 gen_input: generate_inputs.cpp
 	g++ generate_inputs.cpp -o generate_inputs.o
 test: LCS_test.cpp

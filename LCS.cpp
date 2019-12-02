@@ -1,5 +1,6 @@
 #include <iostream>
 #include "LCS.hpp"
+#include "binary_tree.hpp"
 
 int max(int a, int b, int c){
     return std::max(std::max(a,b),c);
@@ -132,13 +133,92 @@ void precompute(std::vector< std::map<char, int> >& vec, std::vector<RLE_run> s)
     }
 }
 
+void keep_tree_sorted(binarySearchTree& my_bst, int rank, int val, int x, int y, char ch, std::vector< std::map<char, int> > char_run_sum, std::string type){
+    treeNode* predec = my_bst.find_predec(rank);
+    if(predec){
+        int predec_val;
+        if(type == "column"){
+            predec_val = predec->val + char_run_sum[y][ch] - char_run_sum[predec->y - 1][ch];
+        }
+        else{
+            predec_val = predec->val + char_run_sum[x][ch] - char_run_sum[predec->x - 1][ch]; 
+        }
+        if(predec_val > val){
+            my_bst.delete_node(rank);
+        }
+    }
+    treeNode* succ = my_bst.find_succ(rank);
+    int succ_val;
+    while(succ){
+        if(type == "column"){
+            succ_val = succ->val + char_run_sum[y][ch] - char_run_sum[succ->y - 1][ch];
+        }
+        else{
+            succ_val = succ->val + char_run_sum[x][ch] - char_run_sum[succ->x - 1][ch];
+        }
+        if(succ_val <= val){
+            my_bst.delete_node(succ->key);
+            succ = my_bst.find_succ(rank);
+        }
+        else break;
+    }
+}
+
 int get_rle_lcs_fast(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1){
     const int M = s0.size();
     const int N = s1.size();
     std::vector< std::map<char, int> > TOP(N);
     std::vector< std::map<char, int> > LEFT(M);
+    std::vector< std::vector<int> > dyn(M, std::vector<int>(N));
     precompute(TOP, s1);
     precompute(LEFT, s0);
-    return 0;
+    std::map<char, binarySearchTree> column_paths;
+    std::map<char, binarySearchTree> row_paths;
+    for(int i = 1; i < M; i++){
+        for(int j = 1; j < N; j++){
+            // mismatch block
+            if(s0[i].ch != s1[j].ch){
+                dyn[i][j] = std::max(dyn[i-1][j], dyn[i][j-1]);
+                continue;
+            }
+            // match block
+            // Step I: Insert new path starting at this block
+            char ch = s0[i].ch;
+            // The rank is the order in which forced paths cross rows and columns respectively
+            // The column rank increases with the row number at which the columns are intersected, i.e.
+            // when LEFT increases, so does the row number. The row rank is the opposite, increasing with
+            // the column number
+            int rank_col = LEFT[i-1][ch] - TOP[j-1][ch];
+            int rank_row = TOP[j-1][ch] - LEFT[i-1][ch];
+            int val = dyn[i-1][j-1];
+            column_paths[ch].insert(rank_col, val, i, j);
+            row_paths[ch].insert(rank_row, val, i, j);
+            // print_2D(column_paths.root);
+            keep_tree_sorted(column_paths[ch], rank_col, val, i-1, j-1, ch, TOP, "column");
+            keep_tree_sorted(row_paths[ch], rank_row, val, i-1, j-1, ch, LEFT, "row");
+            int max_column_rank = LEFT[i][ch] - TOP[j][ch];
+            int max_row_rank = TOP[j][ch] - LEFT[i][ch];
+            int min_column_rank = LEFT[i-1][ch] - TOP[j][ch];
+            int min_row_rank = TOP[j-1][ch] - LEFT[i][ch];
+            treeNode* best_col_node = column_paths[ch].find_predec(max_column_rank + 1);
+            treeNode* best_row_node = row_paths[ch].find_predec(max_row_rank + 1);
+            int C = 0;
+            if(best_col_node && best_col_node->key >= min_column_rank){
+                C = best_col_node->val + TOP[j][ch] - TOP[best_col_node->y - 1][ch];
+            }
+            int R = 0;
+            if(best_row_node && best_row_node->key >= min_row_rank){
+                R = best_row_node->val + LEFT[i][ch] - LEFT[best_row_node->x - 1][ch];
+            }
+            // if(i == 6 && j == 1){
+            //     std::cout<<val<<" "<<best_col_node->x <<" "<<best_col_node->y<<"\n";
+            //     print_2D(column_paths[ch].root);
+            // }
+            dyn[i][j] = std::max(dyn[i-1][j],max(dyn[i][j-1], C, R));
+            // print_2d_vect(dyn);
+        }
+    }
+    // print_2d_vect(dyn);
+    return dyn[M-1][N-1];
 }
 
