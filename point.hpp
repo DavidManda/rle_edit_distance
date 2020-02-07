@@ -5,8 +5,8 @@
 
 class Point{
 public:
-  int x, y;
-  Point(int _x, int _y);
+  float x, y;
+  Point(float _x, float _y);
   std::string to_string();
 };
 

@@ -1,7 +1,7 @@
 #include "point.hpp"
 #include <sstream>
 
-Point::Point(int _x, int _y)
+Point::Point(float _x, float _y)
 {
   x = _x;
   y = _y;

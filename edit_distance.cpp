@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cmath> 
 #include "edit_distance.hpp"
 
 typedef std::vector<std::vector<std::vector<Point> > > border_type;
@@ -7,6 +8,15 @@ typedef std::vector<rle::RLE_run> rle_string;
 int min(int a, int b, int c)
 {
   return std::min(a, std::min(b, c));
+}
+
+Point min(Point p1, Point p2)
+{
+  if(p1.y < p2.y)
+  {
+    return p1;
+  }
+  return p2;
 }
 
 std::string traj_to_string(std::vector<Point> A)
@@ -19,6 +29,18 @@ std::string traj_to_string(std::vector<Point> A)
   }
   ss << "]\n";
   return ss.str();
+}
+
+float get_val_at_coord_(float coord, Point p1, Point p2)
+{
+  if(coord < p1.x || coord > p2.x)
+  {
+    std::cout<<"Coord should be between the two given points!\n";
+    return 0;
+  }
+  float slope = (p2.y - p1.y)/(p2.x - p1.x);
+  
+  return p1.y + slope * (coord - p1.x);
 }
 
 int get_edit_dist(const int M, const int N, const std::string &s0, const std::string &s1)
@@ -63,7 +85,7 @@ void add_point(std::vector<Point>& points, Point p)
     return;
   }
   int l = points.size() - 1;
-  if((points[l].y - points[l-1].y)*(p.x - points[l-1].x) == (p.y - points[l-1].y) * (points[l].x - points[l-1].x))
+  if(std::abs((points[l].y - points[l-1].y)*(p.x - points[l-1].x) - (p.y - points[l-1].y) * (points[l].x - points[l-1].x)) < 0.0001)
   {
     points.pop_back();
   }
@@ -317,6 +339,50 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
   }
   return S_CSWM;
 }
+
+// expects two trajectories and modifies them such that both have points at the same coordinates
+void normalise_trajectories(std::vector<Point>& A, std::vector<Point>& B)
+{
+  if(A.begin()->x != B.begin()->x || A.back().x != B.back().x)
+  {
+    std::cout<<"Both trajectories should have the same start and end points!\n";
+    return;
+  }
+  std::vector<Point> A_norm, B_norm;
+  int i = 0, j = 0;
+  while(i < A.size() && j < B.size())
+  {
+    if(A[i].x == B[j].x)
+    {
+      A_norm.push_back(A[i]);
+      B_norm.push_back(B[j]);
+      i++;
+      j++;
+    }
+    else if(A[i].x < B[j].x)
+    {
+      A_norm.push_back(A[i]);
+      float val = get_val_at_coord_(A[i].x, B[j-1], B[j]);
+      B_norm.push_back(Point(A[i].x, val));
+      i++;
+    }
+    else
+    {
+      B_norm.push_back(B[j]);
+      float val = get_val_at_coord_(B[j].x, A[i-1], A[i]);
+      A_norm.push_back(Point(B[j].x, val));
+      j++;
+    }
+  }
+  if(i != A.size() || j != B.size())
+  {
+    std::cout<<"Something is wrong with normalise!\n";
+    return;
+  }
+  A = A_norm;
+  B = B_norm;
+}
+
 // Returns the lower part of two trajectories
 std::vector<Point> get_lower_part(std::vector<Point> A, std::vector<Point> B)
 {
@@ -326,9 +392,14 @@ std::vector<Point> get_lower_part(std::vector<Point> A, std::vector<Point> B)
     std::cout<<"Both trajectories should have the same start and end points!\n";
     return sol;
   }
-  
-  
-  return A;
+  normalise_trajectories(A, B);
+  // here A and B should have the same length and have the same x-coordinates 
+  for(int i = 0; i < A.size(); i++)
+  {
+    add_point(sol, min(A[i], B[i]));
+  }
+
+  return sol;
 }
 
 void propagate_2(int h, int w, std::vector<Point> LEFT_CSWM, std::vector<Point> TOP_CSWM, std::vector<Point>& LEFT_OUT, std::vector<Point>& TOP_OUT)
@@ -415,8 +486,10 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
       int window = std::min(h, w);
       LEFT_CSWM = get_cswm(LEFT[i][j], window);
       TOP_CSWM = get_cswm(TOP[i][j], window);
+      std::cout<<traj_to_string(LEFT_CSWM)<<traj_to_string(TOP_CSWM);
       // Propagate 2
       propagate_2(h, w, LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT);
+      std::cout<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
       // Propagate 3
       OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);
       dyn[i][j] = get_val_at_coord(w-1, OUT[i][j]);
