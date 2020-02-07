@@ -327,7 +327,66 @@ std::vector<Point> get_lower_part(std::vector<Point> A, std::vector<Point> B)
     return sol;
   }
   
+  
   return A;
+}
+
+void propagate_2(int h, int w, std::vector<Point> LEFT_CSWM, std::vector<Point> TOP_CSWM, std::vector<Point>& LEFT_OUT, std::vector<Point>& TOP_OUT)
+{
+  if(h <= w)
+  {
+    for(int k = 0; k < LEFT_CSWM.size(); k++)
+    {
+      Point p = LEFT_CSWM[k];
+      if(p.x < h)
+      {
+        add_point(LEFT_OUT, Point(p.x, p.y + p.x - 1));
+      }
+      else
+      {
+        add_point(LEFT_OUT, Point(p.x + w - h, p.y + w - 1));
+      }          
+    }
+    for(int k = 0; k < TOP_CSWM.size(); k++)
+    {
+      Point p = TOP_CSWM[k];
+      if(p.x < w)
+      {
+        add_point(TOP_OUT, Point(p.x, p.y + h - 1));
+      }
+      else
+      {
+        add_point(TOP_OUT, Point(p.x, p.y + (w + h - 1) - p.x));
+      }
+    }
+  }
+  else
+  {
+    for(int k = 0; k < LEFT_CSWM.size(); k++)
+    {
+      Point p = LEFT_CSWM[k];
+      if(p.x < w)
+      {
+        add_point(LEFT_OUT, Point(p.x, p.y + p.x - 1));
+      }
+      else
+      {
+        add_point(LEFT_OUT, Point(p.x, p.y + w - 1));
+      }
+    }
+    for(int k = 0; k < TOP_CSWM.size(); k++)
+    {
+      Point p = TOP_CSWM[k];
+      if(p.x < w)
+      {
+        add_point(TOP_OUT, Point(p.x, p.y + h - 1));
+      }
+      else
+      {
+        add_point(TOP_OUT, Point(p.x + w - h, p.y + (w + h - 1) - p.x));
+      } 
+    }
+  }
 }
 
 int get_rle_edit_dist(rle_string s0, rle_string s1)
@@ -357,60 +416,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
       LEFT_CSWM = get_cswm(LEFT[i][j], window);
       TOP_CSWM = get_cswm(TOP[i][j], window);
       // Propagate 2
-      if(h <= w)
-      {
-        for(int k = 0; k < LEFT_CSWM.size(); k++)
-        {
-          Point p = LEFT_CSWM[k];
-          if(p.x < h)
-          {
-            add_point(LEFT_OUT, Point(p.x, p.y + p.x - 1));
-          }
-          else
-          {
-            add_point(LEFT_OUT, Point(p.x + w - h, p.y + w - 1));
-          }          
-        }
-        for(int k = 0; k < TOP_CSWM.size(); k++)
-        {
-          Point p = TOP_CSWM[k];
-          if(p.x < w)
-          {
-            add_point(TOP_OUT, Point(p.x, p.y + h - 1));
-          }
-          else
-          {
-            add_point(TOP_OUT, Point(p.x, p.y + (w + h - 1) - p.x));
-          }
-        }
-      }
-      else
-      {
-        for(int k = 0; k < LEFT_CSWM.size(); k++)
-        {
-          Point p = LEFT_CSWM[k];
-          if(p.x < w)
-          {
-            add_point(LEFT_OUT, Point(p.x, p.y + p.x - 1));
-          }
-          else
-          {
-            add_point(LEFT_OUT, Point(p.x, p.y + w - 1));
-          }
-        }
-        for(int k = 0; k < TOP_CSWM.size(); k++)
-        {
-          Point p = TOP_CSWM[k];
-          if(p.x < w)
-          {
-            add_point(TOP_OUT, Point(p.x, p.y + h - 1));
-          }
-          else
-          {
-            add_point(TOP_OUT, Point(p.x + w - h, p.y + (w + h - 1) - p.x));
-          } 
-        }
-      }
+      propagate_2(h, w, LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT);
       // Propagate 3
       OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);
       dyn[i][j] = get_val_at_coord(w-1, OUT[i][j]);
