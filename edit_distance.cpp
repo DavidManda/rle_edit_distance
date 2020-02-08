@@ -122,18 +122,19 @@ void get_input_border(border_type &LEFT, border_type &TOP, border_type OUT, int 
       return;
     }
 
-    add_point(LEFT[i][j], Point(0, dyn[i][j - 1]));
+    add_point(LEFT[i][j], Point(1, dyn[i][j - 1]));
     // width and height of block to the left
-    int w = s1[j - 1].len;
-    int h = s0[i].len;
-    for (int k = 0; k < w + h + 1; k++)
+    int w = s1[j - 1].len + 1;
+    int h = s0[i].len + 1;
+    for (int k = 0; k < OUT[i][j-1].size(); k++)
     {
+      Point p = OUT[i][j - 1][k];
       // These points are part of the left input border
       // The very last point should also be carried over here, TODO: check
-      if (OUT[i][j - 1][k].x > w)
+      if (p.x > w)
       {
-        int index = k - w;
-        int value = OUT[i][j - 1][k].y;
+        int index = p.x - w + 1;
+        int value = p.y;
         add_point(LEFT[i][j], Point(index, value));
       }
     }
@@ -147,12 +148,21 @@ void get_input_border(border_type &LEFT, border_type &TOP, border_type OUT, int 
       return;
     }
     // Width and height of block above
-    int w = s1[j].len;
-    int h = s0[i - 1].len;
+    int w = s1[j].len + 1;
+    int h = s0[i - 1].len + 1;
     // The first point should be added here automatically, TODO: check
-    for (int k = 0; k < w; k++)
+    for (int k = 0; k < OUT[i-1][j].size(); k++)
     {
-      add_point(TOP[i][j], OUT[i - 1][j][k]);
+      Point p = OUT[i-1][j][k];
+      if(p.x < w)
+      {
+        add_point(TOP[i][j], OUT[i - 1][j][k]);
+      }
+      else
+      {
+        break;
+      }
+      
     }
     // Adding the very last point
     add_point(TOP[i][j], Point(w, dyn[i - 1][j]));
@@ -161,30 +171,20 @@ void get_input_border(border_type &LEFT, border_type &TOP, border_type OUT, int 
 
 int get_val_at_coord(int coord, std::vector<Point> points)
 {
-  if (coord < points[0].x || coord > points.back().x)
+  int i = 0;
+  while(i < points.size() && points[i].x < coord)
   {
-    std::cout << "Coord should not be outside of the range of points given!\n";
-    return 0;
+    i++;
   }
-
-  int left = 0, right = points.size() - 1, middle;
-  // Leftmost binary search
-  while (left < right)
+  if(points[i].x == coord)
   {
-    middle = (left + right) / 2;
-    if (points[middle].x < coord)
-      left = middle + 1;
-    else
-      right = middle;
+    return points[i].y;
   }
-
-  if (points[left].x == coord)
+  else
   {
-    return points[left].y;
+    return get_val_at_coord_(coord, points[i-1], points[i]);
   }
-
-  int x1 = points[left].x, y1 = points[left].y, x2 = points[left + 1].x, y2 = points[left + 1].y;
-  return y1 + ((y2 - y1) / (x2 - x1)) * (coord - x1);
+  
 }
 
 int get_coord_for_val(int val, std::vector<Point> points)
@@ -218,43 +218,6 @@ int get_coord_for_val(int val, std::vector<Point> points)
     return 0;
   }
   return x1 + ((val - y1) / (y2 - y1)) * (x2 - x1);
-}
-
-Point get_intersection(std::vector<Point> points, Point p1, Point p2, int offset)
-{
-  if (p1.y == p2.y)
-  {
-    return Point(get_coord_for_val(p1.y, points) + offset, p1.y);
-  }
-  int slope = -1;
-  if (slope != (p2.y - p1.y) / (p2.x - p1.x))
-  {
-    std::cout << "Stope is wrong!\n";
-    return Point(0,0);
-  }
-  // move points left
-  p1.x -= offset;
-  p2.x -= offset;
-  int val_of_line;
-  for (int i = 0; i < points.size() - 1; i++)
-  {
-    val_of_line = p1.y + slope * (points[i].x - p1.x);
-    if (points[i].y == val_of_line)
-    {
-      return Point(points[i].x + offset, val_of_line);
-    }
-    if (points[i + 1].y > val_of_line)
-    {
-      return Point(get_coord_for_val(val_of_line, points) + offset, val_of_line);
-    }
-  }
-  val_of_line = p2.y;
-  if (points.back().y == val_of_line)
-  {
-    return Point(points.back().x + offset, val_of_line);
-  }
-  std::cout << "Something not right in get_intersection_coord. Intersection not found!\n";
-  return Point(0,0);
 }
 
 std::vector<Point> get_cswm(std::vector<Point> S, int h)
@@ -311,7 +274,7 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
       else
       {
         int x = get_coord_for_val(next.y, L);
-        while (L.back().x >= x)
+        while (!L.empty() && L.back().x >= x)
         {
           L.pop_back();
         }
@@ -345,7 +308,7 @@ void normalise_trajectories(std::vector<Point>& A, std::vector<Point>& B)
 {
   if(A.begin()->x != B.begin()->x || A.back().x != B.back().x)
   {
-    std::cout<<"Both trajectories should have the same start and end points!\n";
+    std::cout<<"Both trajectories should have the same start and end points in normalise!\n";
     return;
   }
   std::vector<Point> A_norm, B_norm;
@@ -402,66 +365,94 @@ std::vector<Point> get_lower_part(std::vector<Point> A, std::vector<Point> B)
   return sol;
 }
 
+void split_traj(std::vector<Point> L, std::vector<Point>& L1, std::vector<Point>& L2, int val)
+{
+  int k = 0;
+  while(k < L.size() && L[k].x < val)
+  {
+    add_point(L1, L[k]);
+    k++;
+  }
+  float y = get_val_at_coord_(val, L[k-1], L[k]);
+  add_point(L1, Point(val, y));
+  add_point(L2, Point(val, y));
+  while(k < L.size())
+  {
+    add_point(L2, L[k]);
+    k++;
+  }
+}
 void propagate_2(int h, int w, std::vector<Point> LEFT_CSWM, std::vector<Point> TOP_CSWM, std::vector<Point>& LEFT_OUT, std::vector<Point>& TOP_OUT)
 {
   if(h <= w)
   {
-    for(int k = 0; k < LEFT_CSWM.size(); k++)
+    std::vector<Point> L1, L2, T1, T2;
+
+    split_traj(LEFT_CSWM, L1, L2, h);
+    split_traj(TOP_CSWM, T1, T2, w);
+    for(int k = 0; k < L1.size(); k++)
     {
-      Point p = LEFT_CSWM[k];
-      if(p.x < h)
-      {
-        add_point(LEFT_OUT, Point(p.x, p.y + p.x - 1));
-      }
-      else
-      {
-        add_point(LEFT_OUT, Point(p.x + w - h, p.y + w - 1));
-      }          
+      Point p = L1[k];
+      add_point(LEFT_OUT, Point(p.x, p.y + p.x - 1));
     }
-    for(int k = 0; k < TOP_CSWM.size(); k++)
+    for(int k = 0; k < L2.size();k++)
     {
-      Point p = TOP_CSWM[k];
-      if(p.x < w)
-      {
-        add_point(TOP_OUT, Point(p.x, p.y + h - 1));
-      }
-      else
-      {
-        add_point(TOP_OUT, Point(p.x, p.y + (w + h - 1) - p.x));
-      }
+      Point p = L2[k];
+      add_point(LEFT_OUT, Point(p.x + w - h, p.y + w - 1));
+    }
+                
+    
+    for(int k = 0; k < T1.size(); k++)
+    {
+      Point p = T1[k];
+      add_point(TOP_OUT, Point(p.x, p.y + h - 1));
+    }
+
+    for(int k = 0; k < T2.size(); k++)
+    {
+      Point p = T2[k];
+      add_point(TOP_OUT, Point(p.x, p.y + (w + h - 1) - p.x));
     }
   }
   else
   {
-    for(int k = 0; k < LEFT_CSWM.size(); k++)
+    std::vector<Point> L1, L2, T1, T2;
+
+    split_traj(LEFT_CSWM, L1, L2, w);
+    split_traj(TOP_CSWM, T1, T2, w);
+    for(int k = 0; k < L1.size(); k++)
     {
-      Point p = LEFT_CSWM[k];
-      if(p.x < w)
-      {
-        add_point(LEFT_OUT, Point(p.x, p.y + p.x - 1));
-      }
-      else
-      {
-        add_point(LEFT_OUT, Point(p.x, p.y + w - 1));
-      }
+      Point p = L1[k];
+      add_point(LEFT_OUT, Point(p.x, p.y + p.x - 1));
     }
-    for(int k = 0; k < TOP_CSWM.size(); k++)
+    for(int k = 0; k < L2.size(); k++)
     {
-      Point p = TOP_CSWM[k];
-      if(p.x < w)
-      {
-        add_point(TOP_OUT, Point(p.x, p.y + h - 1));
-      }
-      else
-      {
-        add_point(TOP_OUT, Point(p.x + w - h, p.y + (w + h - 1) - p.x));
-      } 
+      Point p = L2[k];
+      add_point(LEFT_OUT, Point(p.x, p.y + w - 1));
+    }
+
+    for(int k = 0; k < T1.size(); k++)
+    {
+      Point p = T1[k];
+      add_point(TOP_OUT, Point(p.x, p.y + h - 1));
+    }
+    for(int k = 0; k < T2.size(); k++)
+    {
+      Point p = T2[k];
+      add_point(TOP_OUT, Point(p.x - w + h, p.y + (w + h - 1) - p.x));
     }
   }
 }
 
 int get_rle_edit_dist(rle_string s0, rle_string s1)
 {
+  // std::vector<Point> T_CSWM, T;
+  // T.push_back(Point(1, 1));
+  // T.push_back(Point(2, 1));
+  // T.push_back(Point(3, 2));
+  // T_CSWM = get_cswm(T, 2);
+  // return 0;
+
   const int M = s0.size();
   const int N = s1.size();
   std::vector< std::vector< int > > dyn(M, std::vector<int>(N));
@@ -477,22 +468,35 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
   {
     for (int j = 1; j < N; j++)
     {
-      // Retrieve input border for current block
-      get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1);
-
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
-      std::vector<Point> LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT;
-      int window = std::min(h, w);
-      LEFT_CSWM = get_cswm(LEFT[i][j], window);
-      TOP_CSWM = get_cswm(TOP[i][j], window);
-      std::cout<<traj_to_string(LEFT_CSWM)<<traj_to_string(TOP_CSWM);
-      // Propagate 2
-      propagate_2(h, w, LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT);
-      std::cout<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
-      // Propagate 3
-      OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);
-      dyn[i][j] = get_val_at_coord(w-1, OUT[i][j]);
+      // Retrieve input border for current block
+      get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1);
+      if(s0[i].ch == s1[j].ch)
+      {
+        for(int k = 0; k < LEFT[i][j].size(); k++)
+        {
+          add_point(OUT[i][j], LEFT[i][j][k]);
+        }
+        for(int k = 0; k < TOP[i][j].size(); k++)
+        {
+          add_point(OUT[i][j], Point(TOP[i][j][k].x + h - 1, TOP[i][j][k].y));
+        }
+      }
+      else
+      {
+        std::vector<Point> LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT;
+        int window = std::min(h, w);
+        LEFT_CSWM = get_cswm(LEFT[i][j], window);
+        TOP_CSWM = get_cswm(TOP[i][j], window);
+        // Propagate 2
+        propagate_2(h, w, LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT);
+        // Propagate 3
+        OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);
+      }
+      dyn[i][j] = get_val_at_coord(w, OUT[i][j]);
+      // std::cout<<dyn[i][j]<<'\n';
+      // std::cout<<traj_to_string(OUT[i][j]);
     }
   }
 

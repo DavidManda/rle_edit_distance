@@ -21,8 +21,14 @@ int main()
     std::vector<RLE_run> rle_s1 = rle_helper.get_rle_string(s1);
     int sol_rle = edit_distance::get_rle_edit_dist(rle_s0, rle_s1);
     int sol = edit_distance::get_edit_dist(M, N, s0, s1);
-    std::cout << "Edit distance for strings " + s0 + " and " + s1 + " is: " << sol << '\n';
-    std::cout << "RLE edit distance for strings " + s0 + " and " + s1 + " is: " << sol_rle << '\n';
+    
+    if(sol != sol_rle)
+    {
+      std::cout<<"Test " << test << "/"<<T<<" failed for strings " + s0 + " and " + s1 + "\n";
+      std::cout << "Edit distance is: " << sol << '\n';
+      std::cout << "RLE edit distance for strings is: " << sol_rle << '\n';
+      break;
+    }
   }
   return 0;
 }
