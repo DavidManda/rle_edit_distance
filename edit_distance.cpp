@@ -399,7 +399,12 @@ std::vector<Point> get_lower_part(std::vector<Point> A, std::vector<Point> B)
     if(intersects(A[i], A[i+1], B[i], B[i+1]))
     {
       Point intersection = get_intersection(A[i], A[i+1], B[i], B[i+1]);
-      add_point(sol, intersection);
+      // It can be the case that the intersection happens at the end of the segment because 
+      // we take the ceiling of the coordinate. In that case we shoul not add it
+      if(intersection.x < A[i+1].x)
+      {
+        add_point(sol, intersection);
+      }
     }
   }
   add_point(sol, min(A.back(), B.back()));  
@@ -532,13 +537,12 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
         propagate_2(h, w, LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT);
         // Propagate 3
         OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);
-        if(i == 4 && j == 2)
-        {
-          std::cout<<traj_to_string(LEFT[i][j])<<traj_to_string(TOP[i][j]);
-          std::cout<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
-          std::cout<<traj_to_string(OUT[i][j]);
-        }
-        // std::cout<<"Left out and top out:\n"<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
+
+        // if(i == 2 && j == 2)
+        // {
+        //   std::cout<<traj_to_string(LEFT[i][j])<<traj_to_string(TOP[i][j])<<traj_to_string(OUT[i][j]);
+        //   std::cout<<"Left out and top out:\n"<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
+        // }
       }
       dyn[i][j] = get_val_at_coord(w, OUT[i][j]);
       // std::cout<<dyn[i][j]<<'\n';
