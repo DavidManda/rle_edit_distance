@@ -399,7 +399,7 @@ std::vector<Point> get_lower_part(std::vector<Point> A, std::vector<Point> B)
       add_point(sol, intersection);
     }
   }
-
+  add_point(sol, min(A.back(), B.back()));  
   return sol;
 }
 
