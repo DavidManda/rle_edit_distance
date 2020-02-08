@@ -378,8 +378,36 @@ Point get_intersection(Point a1, Point a2, Point b1, Point b2)
     return Point(0,0);
   }
   // Taking ceiling because we only want values at integer locations
-  float x = ceil((b1.y - a1.y)/(s1 - s2) + a1.x);
+  float x = ((b1.y - a1.y)/(s1 - s2) + a1.x);
   float y = a1.y + (x - a1.x) * s1;
+  return Point(x, y);
+}
+
+Point get_floor_point(Point p, Point a1, Point a2, Point b1, Point b2)
+{
+  int x = floor(p.x), y;
+  if(a1.y < b1.y)
+  {
+    y = get_val_at_coord_(x, a1, a2);
+  }
+  else
+  {
+    y = get_val_at_coord_(x, b1, b2);
+  }
+  return Point(x, y);
+}
+
+Point get_ceil_point(Point p, Point a1, Point a2, Point b1, Point b2)
+{
+  int x = ceil(p.x), y;
+  if(a2.y < b2.y)
+  {
+    y = get_val_at_coord_(x, a1, a2);
+  }
+  else
+  {
+    y = get_val_at_coord_(x, b1, b2);
+  }
   return Point(x, y);
 }
 // Returns the lower part of two trajectories
@@ -399,11 +427,17 @@ std::vector<Point> get_lower_part(std::vector<Point> A, std::vector<Point> B)
     if(intersects(A[i], A[i+1], B[i], B[i+1]))
     {
       Point intersection = get_intersection(A[i], A[i+1], B[i], B[i+1]);
+      Point floor_p = get_floor_point(intersection, A[i], A[i+1], B[i], B[i+1]);
+      Point ceil_p = get_ceil_point(intersection, A[i], A[i+1], B[i], B[i+1]);
       // It can be the case that the intersection happens at the end of the segment because 
       // we take the ceiling of the coordinate. In that case we shoul not add it
-      if(intersection.x < A[i+1].x)
+      if(floor_p.x > A[i].x)
       {
-        add_point(sol, intersection);
+        add_point(sol, floor_p);
+      }
+      if(ceil_p.x < A[i+1].x)
+      {
+        add_point(sol, ceil_p);
       }
     }
   }
@@ -492,7 +526,7 @@ void propagate_2(int h, int w, std::vector<Point> LEFT_CSWM, std::vector<Point> 
 
 int get_rle_edit_dist(rle_string s0, rle_string s1)
 {
-  // Point a1 = Point(1, 6), a2 = Point(3,4), b1 = Point(1, 5), b2 = Point(3, 7);
+  // Point a1 = Point(2, 11), a2 = Point(7,6), b1 = Point(2, 2), b2 = Point(7, 7);
   // Point p = get_intersection(a1, a2, b1, b2);
   // std::cout<<p.to_string()<<'\n';
   // return 0;
