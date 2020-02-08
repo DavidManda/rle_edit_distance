@@ -27,8 +27,9 @@ int main()
       std::cout<<"Test " << test << "/"<<T<<" failed for strings " + s0 + " and " + s1 + "\n";
       std::cout << "Edit distance is: " << sol << '\n';
       std::cout << "RLE edit distance for strings is: " << sol_rle << '\n';
-      break;
+      return 0;
     }
   }
+  std::cout<<"All "<<T<<" tests passed!\n";
   return 0;
 }

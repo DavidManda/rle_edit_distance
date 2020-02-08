@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath> 
+#include <math.h>
 #include "edit_distance.hpp"
 
 typedef std::vector<std::vector<std::vector<Point> > > border_type;
@@ -273,6 +274,7 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
       }
       else
       {
+        // TODO fix this
         int x = get_coord_for_val(next.y, L);
         while (!L.empty() && L.back().x >= x)
         {
@@ -368,15 +370,16 @@ Point get_intersection(Point a1, Point a2, Point b1, Point b2)
     std::cout<<"Line segments should have the same start and end coordinates in intersection!\n";
     return Point(0,0);
   }
-  int s1 = (a2.y - a1.y)/(a2.x - a1.x);
-  int s2 = (b2.y - b1.y)/(b2.x - b1.x);
+  float s1 = (a2.y - a1.y)/(a2.x - a1.x);
+  float s2 = (b2.y - b1.y)/(b2.x - b1.x);
   if(s1 == s2)
   {
     std::cout<<"Slopes should not be equal!\n";
     return Point(0,0);
   }
-  int x = (b1.y - a1.y)/(s1 - s2) + a1.x;
-  int y = a1.y + (x - a1.x) * s1;
+  // Taking ceiling because we only want values at integer locations
+  float x = ceil((b1.y - a1.y)/(s1 - s2) + a1.x);
+  float y = a1.y + (x - a1.x) * s1;
   return Point(x, y);
 }
 // Returns the lower part of two trajectories
@@ -477,13 +480,17 @@ void propagate_2(int h, int w, std::vector<Point> LEFT_CSWM, std::vector<Point> 
     for(int k = 0; k < T2.size(); k++)
     {
       Point p = T2[k];
-      add_point(TOP_OUT, Point(p.x - w + h, p.y + (w + h - 1) - p.x));
+      add_point(TOP_OUT, Point(p.x - w + h, p.y + (w + h - 1) - (p.x - w + h)));
     }
   }
 }
 
 int get_rle_edit_dist(rle_string s0, rle_string s1)
 {
+  // Point a1 = Point(1, 6), a2 = Point(3,4), b1 = Point(1, 5), b2 = Point(3, 7);
+  // Point p = get_intersection(a1, a2, b1, b2);
+  // std::cout<<p.to_string()<<'\n';
+  // return 0;
   const int M = s0.size();
   const int N = s1.size();
   std::vector< std::vector< int > > dyn(M, std::vector<int>(N));
@@ -503,6 +510,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
       int w = s1[j].len + 1;
       // Retrieve input border for current block
       get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1);
+      // std::cout<<traj_to_string(LEFT[i][j])<<traj_to_string(TOP[i][j]);
       if(s0[i].ch == s1[j].ch)
       {
         for(int k = 0; k < LEFT[i][j].size(); k++)
@@ -524,7 +532,13 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
         propagate_2(h, w, LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT);
         // Propagate 3
         OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);
-        // std::cout<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
+        if(i == 4 && j == 2)
+        {
+          std::cout<<traj_to_string(LEFT[i][j])<<traj_to_string(TOP[i][j]);
+          std::cout<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
+          std::cout<<traj_to_string(OUT[i][j]);
+        }
+        // std::cout<<"Left out and top out:\n"<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
       }
       dyn[i][j] = get_val_at_coord(w, OUT[i][j]);
       // std::cout<<dyn[i][j]<<'\n';

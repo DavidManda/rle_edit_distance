@@ -24,8 +24,8 @@ int main()
   std::string s0, s1;
   for (int i = 0; i < nr_tests; ++i)
   {
-    int N = rand() % 5 + 1;
-    int M = rand() % 5 + 1;
+    int N = rand() % 10 + 1;
+    int M = rand() % 10 + 1;
     gen_random(&s0, N);
     gen_random(&s1, M);
     fout << N << ' ' << M << '\n'
