@@ -19,7 +19,7 @@ void gen_random(std::string *s, const int len)
 int main()
 {
   std::ofstream fout("input.in");
-  int nr_tests = 1000;
+  int nr_tests = 10000;
   fout << nr_tests << '\n';
   std::string s0, s1;
   for (int i = 0; i < nr_tests; ++i)

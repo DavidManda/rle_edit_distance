@@ -300,10 +300,10 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
       // std::cout<<"After:\n"<<traj_to_string(L)<<'\n';
     }
   }
-
+  // std::cout<<traj_to_string(L)<<traj_to_string(S_CSWM);
   for(int i = 0; i < L.size(); i++)
   {
-    if(L[i].x + h - 1 > S.back().x && L[i].x + h - 1 <= S.back().x + h - 1)
+    if(L[i].x + h - 1 >= S.back().x && L[i].x + h - 1 <= S.back().x + h - 1)
     {
       add_point(S_CSWM, Point(L[i].x + h - 1, L[i].y));
     }
@@ -533,11 +533,11 @@ void propagate_2(int h, int w, std::vector<Point> LEFT_CSWM, std::vector<Point> 
 int get_rle_edit_dist(rle_string s0, rle_string s1)
 {
   // std::vector<Point> T, T_CSWM;
-  // T.push_back(Point(1,5));
-  // T.push_back(Point(3,3));
-  // T.push_back(Point(5,5));
-  // T.push_back(Point(6,5));
-  // T_CSWM = get_cswm(T, 6);
+  // T.push_back(Point(1,7));
+  // T.push_back(Point(2,6));
+  // T.push_back(Point(3,6));
+  // T.push_back(Point(5,4));
+  // T_CSWM = get_cswm(T, 4);
   // std::cout<<traj_to_string(T_CSWM);
   // return 0;
   const int M = s0.size();
@@ -582,10 +582,11 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
         // Propagate 3
         OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);
 
-        // if(i == 5 && j == 5)
+        // if(i == 5 && j == 3)
         // {
         //   std::cout<<traj_to_string(LEFT[i][j])<<traj_to_string(TOP[i][j]);
-        //   std::cout<<"Left out and top out:\n"<<traj_to_string(LEFT_CSWM)<<traj_to_string(TOP_CSWM);
+        //   std::cout<<"Left and top cswm:\n"<<traj_to_string(LEFT_CSWM)<<traj_to_string(TOP_CSWM);
+        //   std::cout<<"Left out and top out:\n"<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
         // }
       }
       dyn[i][j] = get_val_at_coord(w, OUT[i][j]);

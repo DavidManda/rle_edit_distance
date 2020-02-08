@@ -24,7 +24,7 @@ int main()
     
     if(sol != sol_rle)
     {
-      std::cout<<"Test " << test << "/"<<T<<" failed for strings " + s0 + " and " + s1 + "\n";
+      std::cout<<"Test " << test << "/"<<T<<" failed for strings " + s0 + " and " + s1 + " with sizes of "<< M<<" and "<<N<<"\n";
       std::cout << "Edit distance is: " << sol << '\n';
       std::cout << "RLE edit distance for strings is: " << sol_rle << '\n';
       return 0;
