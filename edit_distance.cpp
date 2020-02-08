@@ -344,8 +344,41 @@ void normalise_trajectories(std::vector<Point>& A, std::vector<Point>& B)
   }
   A = A_norm;
   B = B_norm;
+  if(A.size() != B.size())
+  {
+    std::cout<<"Trajectories should have the same number or points now!\n";
+  }
 }
 
+bool intersects(Point a1, Point a2, Point b1, Point b2)
+{
+  if(a1.x != b1.x || a2.x != b2.x)
+  {
+    std::cout<<"Line segments should have the same start and end coordinates!\n";
+    return false;
+  }
+
+  return (a1.y < b1.y && a2.y > b2.y)|| (a1.y > b1.y && a2.y < b2.y);
+}
+
+Point get_intersection(Point a1, Point a2, Point b1, Point b2)
+{
+  if(a1.x != b1.x || a2.x != b2.x)
+  {
+    std::cout<<"Line segments should have the same start and end coordinates in intersection!\n";
+    return Point(0,0);
+  }
+  int s1 = (a2.y - a1.y)/(a2.x - a1.x);
+  int s2 = (b2.y - b1.y)/(b2.x - b1.x);
+  if(s1 == s2)
+  {
+    std::cout<<"Slopes should not be equal!\n";
+    return Point(0,0);
+  }
+  int x = (b1.y - a1.y)/(s1 - s2) + a1.x;
+  int y = a1.y + (x - a1.x) * s1;
+  return Point(x, y);
+}
 // Returns the lower part of two trajectories
 std::vector<Point> get_lower_part(std::vector<Point> A, std::vector<Point> B)
 {
@@ -357,9 +390,14 @@ std::vector<Point> get_lower_part(std::vector<Point> A, std::vector<Point> B)
   }
   normalise_trajectories(A, B);
   // here A and B should have the same length and have the same x-coordinates 
-  for(int i = 0; i < A.size(); i++)
+  for(int i = 0; i < A.size() - 1; i++)
   {
     add_point(sol, min(A[i], B[i]));
+    if(intersects(A[i], A[i+1], B[i], B[i+1]))
+    {
+      Point intersection = get_intersection(A[i], A[i+1], B[i], B[i+1]);
+      add_point(sol, intersection);
+    }
   }
 
   return sol;
@@ -446,13 +484,6 @@ void propagate_2(int h, int w, std::vector<Point> LEFT_CSWM, std::vector<Point> 
 
 int get_rle_edit_dist(rle_string s0, rle_string s1)
 {
-  // std::vector<Point> T_CSWM, T;
-  // T.push_back(Point(1, 1));
-  // T.push_back(Point(2, 1));
-  // T.push_back(Point(3, 2));
-  // T_CSWM = get_cswm(T, 2);
-  // return 0;
-
   const int M = s0.size();
   const int N = s1.size();
   std::vector< std::vector< int > > dyn(M, std::vector<int>(N));
@@ -493,6 +524,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
         propagate_2(h, w, LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT);
         // Propagate 3
         OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);
+        // std::cout<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
       }
       dyn[i][j] = get_val_at_coord(w, OUT[i][j]);
       // std::cout<<dyn[i][j]<<'\n';
