@@ -188,37 +188,21 @@ int get_val_at_coord(int coord, std::vector<Point> points)
   
 }
 
-int get_coord_for_val(int val, std::vector<Point> points)
+int get_coord_for_val(float val, Point p1, Point p2)
 {
-  if (val < points.begin()->y || val > points.back().y)
+  if (val < p1.y || val > p2.y)
   {
-    std::cout << "Value should not be outside of the range of the points given!\n";
+    std::cout << "Value should not be outside of the range of the segment given!\n";
     return 0;
   }
 
-  int left = 0, right = points.size() - 1, middle;
-  // Leftmost binary search
-  while (left < right)
+  float s = (p2.y - p1.y)/(p2.x - p1.x);
+  if(s == 0)
   {
-    middle = (left + right) / 2;
-    if (points[middle].y < val)
-      left = middle + 1;
-    else
-      right = middle;
-  }
-
-  Point p = points[left];
-  if (p.y == val)
-  {
-    return p.x;
-  }
-  int x1 = points[left].x, y1 = points[left].y, x2 = points[left + 1].x, y2 = points[left + 1].y;
-  if (y2 == y1)
-  {
-    std::cout << "Slope should not be zero!\n";
+    std::cout<<"Slope should not be 0 in get_coord_for_val!\n";
     return 0;
   }
-  return x1 + ((val - y1) / (y2 - y1)) * (x2 - x1);
+  return (val - p1.y)/s + p1.x;
 }
 
 std::vector<Point> get_cswm(std::vector<Point> S, int h)
@@ -239,6 +223,7 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
 
     bool intersection_found = false;
     bool next_point_encountered = false;
+    // std::cout<<traj_to_string(L)<<traj_to_string(S_CSWM)<<'\n';
     for(int k = 0; k < L.size(); k++)
     {
       Point p = L[k];
@@ -274,24 +259,45 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
       }
       else
       {
-        // TODO fix this
-        int x = get_coord_for_val(next.y, L);
-        while (!L.empty() && L.back().x >= x)
+        // std::cout<<"Here\n"<<traj_to_string(L)<<next.to_string()<<'\n';
+        Point last_deleted = Point(0,0);
+        while (!L.empty() && L.back().y > next.y)
         {
+          last_deleted = L.back();
           L.pop_back();
         }
-        add_point(L, Point(x, next.y));
+        // std::cout<<"After while:\n"<<traj_to_string(L);
+        // In this case we need to insert a point where the value intersects with the trajectory
+        if(!L.empty() && L.back().y < next.y)
+        {
+          int x = get_coord_for_val(next.y, L.back(), last_deleted);
+          add_point(L, Point(x, next.y));
+        }
+        // std::cout<<"After if:\n"<<traj_to_string(L);
         add_point(L, next);
+        // std::cout<<"After:\n"<<traj_to_string(L)<<"\n\n";
       }
       // Remove elements with x coord smaller than next.x - (h - 1)
-      Point last_point = Point(0,0);
-      while(!L.empty() && L[0].x <= next.x - (h - 1))
+      // std::cout<<"Before remove begin:\n"<<traj_to_string(L);
+      if(L[0].x < next.x - h + 1)
       {
-        last_point = L[0];
-        L.erase(L.begin());
+        Point last_point = Point(0,0);
+        while(!L.empty() && L[0].x <= next.x - (h - 1))
+        {
+          last_point = L[0];
+          L.erase(L.begin());
+        }
+        float val = get_val_at_coord_(next.x - h + 1, last_point, L[0]);
+        L.insert(L.begin(), Point(next.x - (h - 1), val));
       }
-      int val = last_point.y + (L[0].y - last_point.y)/(L[0].x - last_point.x) * (next.x - (h - 1) - last_point.x);
-      L.insert(L.begin(), Point(next.x - (h - 1), val));
+      else
+      {
+        L.insert(L.begin(), Point(next.x - h + 1, next.y));
+      }
+      
+      // std::cout<<"After while:\n"<<traj_to_string(L);
+      
+      // std::cout<<"After:\n"<<traj_to_string(L)<<'\n';
     }
   }
 
@@ -526,9 +532,13 @@ void propagate_2(int h, int w, std::vector<Point> LEFT_CSWM, std::vector<Point> 
 
 int get_rle_edit_dist(rle_string s0, rle_string s1)
 {
-  // Point a1 = Point(2, 11), a2 = Point(7,6), b1 = Point(2, 2), b2 = Point(7, 7);
-  // Point p = get_intersection(a1, a2, b1, b2);
-  // std::cout<<p.to_string()<<'\n';
+  // std::vector<Point> T, T_CSWM;
+  // T.push_back(Point(1,5));
+  // T.push_back(Point(3,3));
+  // T.push_back(Point(5,5));
+  // T.push_back(Point(6,5));
+  // T_CSWM = get_cswm(T, 6);
+  // std::cout<<traj_to_string(T_CSWM);
   // return 0;
   const int M = s0.size();
   const int N = s1.size();
@@ -572,10 +582,10 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
         // Propagate 3
         OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);
 
-        // if(i == 2 && j == 2)
+        // if(i == 5 && j == 5)
         // {
-        //   std::cout<<traj_to_string(LEFT[i][j])<<traj_to_string(TOP[i][j])<<traj_to_string(OUT[i][j]);
-        //   std::cout<<"Left out and top out:\n"<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
+        //   std::cout<<traj_to_string(LEFT[i][j])<<traj_to_string(TOP[i][j]);
+        //   std::cout<<"Left out and top out:\n"<<traj_to_string(LEFT_CSWM)<<traj_to_string(TOP_CSWM);
         // }
       }
       dyn[i][j] = get_val_at_coord(w, OUT[i][j]);
