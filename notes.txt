@@ -1,1 +1,2 @@
 - intersection of trajectories can happen at non-integer places
+- comparison at the end needs >= not >

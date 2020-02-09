@@ -205,6 +205,27 @@ int get_coord_for_val(float val, Point p1, Point p2)
   return (val - p1.y)/s + p1.x;
 }
 
+
+Point get_intersection(Point a1, Point a2, Point b1, Point b2)
+{
+  // if(a1.x != b1.x || a2.x != b2.x)
+  // {
+  //   std::cout<<"Line segments should have the same start and end coordinates in intersection!\n";
+  //   return Point(0,0);
+  // }
+  float s1 = (a2.y - a1.y)/(a2.x - a1.x);
+  float s2 = (b2.y - b1.y)/(b2.x - b1.x);
+  if(s1 == s2)
+  {
+    std::cout<<"Slopes should not be equal!\n";
+    return Point(0,0);
+  }
+  // Taking ceiling because we only want values at integer locations
+  float x = ((b1.y - a1.y)/(s1 - s2) + a1.x);
+  float y = a1.y + (x - a1.x) * s1;
+  return Point(x, y);
+}
+
 std::vector<Point> get_cswm(std::vector<Point> S, int h)
 {
   if (!(h > 0))
@@ -220,7 +241,10 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
   {
     Point current = S[i], next = S[i + 1];
     int slope = (next.y - current.y)/(next.x - current.x);
-
+    // if(i == 2)
+    // {
+    //   std::cout<<traj_to_string(L)<<traj_to_string(S_CSWM)<<'\n';
+    // }
     bool intersection_found = false;
     bool next_point_encountered = false;
     // std::cout<<traj_to_string(L)<<traj_to_string(S_CSWM)<<'\n';
@@ -231,13 +255,26 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
       if(p.x + (h-1) > next.x)
         break;
       int s_val_at_curr_point = current.y + slope * (p.x + (h-1) - current.x);
+      // if(i==2)
+      // {
+      //   std::cout<<p.to_string()<<' '<<s_val_at_curr_point<<'\n';
+      // }
       if(p.y <= s_val_at_curr_point)
       {
         add_point(S_CSWM, Point(p.x + (h-1), p.y));
+        // if(i == 2)
+        // {
+        //   std::cout<<traj_to_string(S_CSWM);
+        // }
       }
       else
       {
-        add_point(S_CSWM, Point(p.x + (h-1), s_val_at_curr_point));
+        Point intersection = get_intersection(Point(L[k-1].x + h - 1, L[k-1].y), Point(L[k].x + h - 1, L[k].y), current, next);
+        // if(i == 2)
+        // {
+        //   std::cout<<"Intersection is "<<intersection.to_string()<<'\n';
+        // }
+        add_point(S_CSWM, intersection);
         intersection_found = true;
         break;
       }
@@ -297,7 +334,7 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
       
       // std::cout<<"After while:\n"<<traj_to_string(L);
       
-      // std::cout<<"After:\n"<<traj_to_string(L)<<'\n';
+      // std::cout<<"After:\n"<<traj_to_string(L)<<traj_to_string(S_CSWM)<<'\n';
     }
   }
   // std::cout<<traj_to_string(L)<<traj_to_string(S_CSWM);
@@ -369,25 +406,6 @@ bool intersects(Point a1, Point a2, Point b1, Point b2)
   return (a1.y < b1.y && a2.y > b2.y)|| (a1.y > b1.y && a2.y < b2.y);
 }
 
-Point get_intersection(Point a1, Point a2, Point b1, Point b2)
-{
-  if(a1.x != b1.x || a2.x != b2.x)
-  {
-    std::cout<<"Line segments should have the same start and end coordinates in intersection!\n";
-    return Point(0,0);
-  }
-  float s1 = (a2.y - a1.y)/(a2.x - a1.x);
-  float s2 = (b2.y - b1.y)/(b2.x - b1.x);
-  if(s1 == s2)
-  {
-    std::cout<<"Slopes should not be equal!\n";
-    return Point(0,0);
-  }
-  // Taking ceiling because we only want values at integer locations
-  float x = ((b1.y - a1.y)/(s1 - s2) + a1.x);
-  float y = a1.y + (x - a1.x) * s1;
-  return Point(x, y);
-}
 
 Point get_floor_point(Point p, Point a1, Point a2, Point b1, Point b2)
 {
@@ -533,12 +551,12 @@ void propagate_2(int h, int w, std::vector<Point> LEFT_CSWM, std::vector<Point> 
 int get_rle_edit_dist(rle_string s0, rle_string s1)
 {
   // std::vector<Point> T, T_CSWM;
-  // T.push_back(Point(1,7));
-  // T.push_back(Point(2,6));
+  // T.push_back(Point(1,6));
+  // T.push_back(Point(2,5));
   // T.push_back(Point(3,6));
   // T.push_back(Point(5,4));
   // T_CSWM = get_cswm(T, 4);
-  // std::cout<<traj_to_string(T_CSWM);
+  // // std::cout<<traj_to_string(T_CSWM);
   // return 0;
   const int M = s0.size();
   const int N = s1.size();
@@ -581,13 +599,14 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
         propagate_2(h, w, LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT);
         // Propagate 3
         OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);
-
-        // if(i == 5 && j == 3)
+        // if(i == 4 && j == 2)
         // {
         //   std::cout<<traj_to_string(LEFT[i][j])<<traj_to_string(TOP[i][j]);
         //   std::cout<<"Left and top cswm:\n"<<traj_to_string(LEFT_CSWM)<<traj_to_string(TOP_CSWM);
         //   std::cout<<"Left out and top out:\n"<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
+        //   std::cout<<"Out:\n"<<traj_to_string(OUT[i][j]);
         // }
+
       }
       dyn[i][j] = get_val_at_coord(w, OUT[i][j]);
       // std::cout<<dyn[i][j]<<'\n';

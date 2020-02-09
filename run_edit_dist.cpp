@@ -29,6 +29,10 @@ int main()
       std::cout << "RLE edit distance for strings is: " << sol_rle << '\n';
       return 0;
     }
+    // else
+    // {
+    //   std::cout<<sol<<'\n';
+    // }
   }
   std::cout<<"All "<<T<<" tests passed!\n";
   return 0;
