@@ -215,8 +215,8 @@ Point get_intersection(Point a1, Point a2, Point b1, Point b2)
     std::cout<<"Slopes should not be equal!\n";
     return Point(0,0);
   }
-  // Taking ceiling because we only want values at integer locations
-  float x = ((b1.y - a1.y)/(s1 - s2) + a1.x);
+
+  float x = (b1.y - a1.y + s1*a1.x - s2*b1.x)/(s1-s2);
   float y = a1.y + (x - a1.x) * s1;
   return Point(x, y);
 }
