@@ -208,11 +208,6 @@ int get_coord_for_val(float val, Point p1, Point p2)
 
 Point get_intersection(Point a1, Point a2, Point b1, Point b2)
 {
-  // if(a1.x != b1.x || a2.x != b2.x)
-  // {
-  //   std::cout<<"Line segments should have the same start and end coordinates in intersection!\n";
-  //   return Point(0,0);
-  // }
   float s1 = (a2.y - a1.y)/(a2.x - a1.x);
   float s2 = (b2.y - b1.y)/(b2.x - b1.x);
   if(s1 == s2)
@@ -298,13 +293,8 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
   {
     Point current = S[i], next = S[i + 1];
     int slope = (next.y - current.y)/(next.x - current.x);
-    // if(i == 2)
-    // {
-    //   std::cout<<traj_to_string(L)<<traj_to_string(S_CSWM)<<'\n';
-    // }
     bool intersection_found = false;
     bool next_point_encountered = false;
-    // std::cout<<traj_to_string(L)<<traj_to_string(S_CSWM)<<'\n';
     for(int k = 0; k < L.size(); k++)
     {
       Point p = L[k];
@@ -312,24 +302,12 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
       if(p.x + (h-1) > next.x)
         break;
       int s_val_at_curr_point = current.y + slope * (p.x + (h-1) - current.x);
-      // if(i==2)
-      // {
-      //   std::cout<<p.to_string()<<' '<<s_val_at_curr_point<<'\n';
-      // }
       if(p.y <= s_val_at_curr_point)
       {
         add_point(S_CSWM, Point(p.x + (h-1), p.y));
-        // if(i == 2)
-        // {
-        //   std::cout<<traj_to_string(S_CSWM);
-        // }
       }
       else
       {
-        // if(i == 2)
-        // {
-        //   std::cout<<"Intersection is "<<intersection.to_string()<<'\n';
-        // }
         add_intersection(S_CSWM, current, next, Point(L[k-1].x + h - 1, L[k-1].y), Point(L[k].x + h - 1, L[k].y));
         intersection_found = true;
         break;
@@ -352,26 +330,21 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
       }
       else
       {
-        // std::cout<<"Here\n"<<traj_to_string(L)<<next.to_string()<<'\n';
         Point last_deleted = Point(0,0);
         while (!L.empty() && L.back().y > next.y)
         {
           last_deleted = L.back();
           L.pop_back();
         }
-        // std::cout<<"After while:\n"<<traj_to_string(L);
         // In this case we need to insert a point where the value intersects with the trajectory
         if(!L.empty() && L.back().y < next.y)
         {
           int x = get_coord_for_val(next.y, L.back(), last_deleted);
           add_point(L, Point(x, next.y));
         }
-        // std::cout<<"After if:\n"<<traj_to_string(L);
         add_point(L, next);
-        // std::cout<<"After:\n"<<traj_to_string(L)<<"\n\n";
       }
       // Remove elements with x coord smaller than next.x - (h - 1)
-      // std::cout<<"Before remove begin:\n"<<traj_to_string(L);
       if(L[0].x < next.x - h + 1)
       {
         Point last_point = Point(0,0);
@@ -387,13 +360,8 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
       {
         L.insert(L.begin(), Point(next.x - h + 1, next.y));
       }
-      
-      // std::cout<<"After while:\n"<<traj_to_string(L);
-      
-      // std::cout<<"After:\n"<<traj_to_string(L)<<traj_to_string(S_CSWM)<<'\n';
     }
   }
-  // std::cout<<traj_to_string(L)<<traj_to_string(S_CSWM);
   for(int i = 0; i < L.size(); i++)
   {
     if(L[i].x + h - 1 >= S.back().x && L[i].x + h - 1 <= S.back().x + h - 1)
@@ -556,14 +524,6 @@ void propagate_2(int h, int w, std::vector<Point> LEFT_CSWM, std::vector<Point> 
 
 int get_rle_edit_dist(rle_string s0, rle_string s1)
 {
-  // std::vector<Point> T, T_CSWM;
-  // T.push_back(Point(1,6));
-  // T.push_back(Point(2,5));
-  // T.push_back(Point(3,6));
-  // T.push_back(Point(5,4));
-  // T_CSWM = get_cswm(T, 4);
-  // // std::cout<<traj_to_string(T_CSWM);
-  // return 0;
   const int M = s0.size();
   const int N = s1.size();
   std::vector< std::vector< int > > dyn(M, std::vector<int>(N));
@@ -583,7 +543,6 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
       int w = s1[j].len + 1;
       // Retrieve input border for current block
       get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1);
-      // std::cout<<traj_to_string(LEFT[i][j])<<traj_to_string(TOP[i][j]);
       if(s0[i].ch == s1[j].ch)
       {
         for(int k = 0; k < LEFT[i][j].size(); k++)
@@ -604,19 +563,9 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
         // Propagate 2
         propagate_2(h, w, LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT);
         // Propagate 3
-        OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);
-        // if(i == 4 && j == 2)
-        // {
-        //   std::cout<<traj_to_string(LEFT[i][j])<<traj_to_string(TOP[i][j]);
-        //   std::cout<<"Left and top cswm:\n"<<traj_to_string(LEFT_CSWM)<<traj_to_string(TOP_CSWM);
-        //   std::cout<<"Left out and top out:\n"<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
-        //   std::cout<<"Out:\n"<<traj_to_string(OUT[i][j]);
-        // }
-        
+        OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);        
       }
       dyn[i][j] = get_val_at_coord(w, OUT[i][j]);
-      // std::cout<<dyn[i][j]<<'\n';
-      // std::cout<<traj_to_string(OUT[i][j]);
     }
   }
 
