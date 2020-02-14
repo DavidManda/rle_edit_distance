@@ -114,15 +114,10 @@ void init_input_border(border_type &LEFT, border_type &TOP, int M, int N, rle_st
 
 void get_input_border(border_type &LEFT, border_type &TOP, border_type OUT, int i, int j, std::vector<std::vector<int > > dyn, rle_string s0, rle_string s1)
 {
+  // LEFT[i][j] might have been initialised (if j == 1) so we don't have to do anything in that case
   if (LEFT[i][j].empty())
   {
     // This is the first point
-    if (j <= 1)
-    {
-      std::cout << "Column should be greater than 1!\n";
-      return;
-    }
-
     add_point(LEFT[i][j], Point(1, dyn[i][j - 1]));
     // width and height of block to the left
     int w = s1[j - 1].len + 1;
@@ -131,7 +126,7 @@ void get_input_border(border_type &LEFT, border_type &TOP, border_type OUT, int 
     {
       Point p = OUT[i][j - 1][k];
       // These points are part of the left input border
-      // The very last point should also be carried over here, TODO: check
+      // The very last point should also be carried over here
       if (p.x > w)
       {
         int index = p.x - w + 1;
@@ -143,15 +138,10 @@ void get_input_border(border_type &LEFT, border_type &TOP, border_type OUT, int 
 
   if (TOP[i][j].empty())
   {
-    if (i <= 1)
-    {
-      std::cout << "Row index should be greater than 1!\n";
-      return;
-    }
     // Width and height of block above
     int w = s1[j].len + 1;
     int h = s0[i - 1].len + 1;
-    // The first point should be added here automatically, TODO: check
+    // The first point should be added here automatically
     for (int k = 0; k < OUT[i-1][j].size(); k++)
     {
       Point p = OUT[i-1][j][k];
@@ -163,7 +153,6 @@ void get_input_border(border_type &LEFT, border_type &TOP, border_type OUT, int 
       {
         break;
       }
-      
     }
     // Adding the very last point
     add_point(TOP[i][j], Point(w, dyn[i - 1][j]));
@@ -183,7 +172,12 @@ int get_val_at_coord(int coord, std::vector<Point> points)
   }
   else
   {
-    return get_val_at_coord_(coord, points[i-1], points[i]);
+    if(points[i].x >= coord && points[i-1].x <= coord)
+    {
+      return get_val_at_coord_(coord, points[i-1], points[i]);
+    }
+    std::cout<<"gotcha\n";
+    return 0;    
   }
   
 }
@@ -208,6 +202,7 @@ int get_coord_for_val(float val, Point p1, Point p2)
 
 Point get_intersection(Point a1, Point a2, Point b1, Point b2)
 {
+  // TODO make this proper
   float s1 = (a2.y - a1.y)/(a2.x - a1.x);
   float s2 = (b2.y - b1.y)/(b2.x - b1.x);
   if(s1 == s2)
@@ -223,6 +218,7 @@ Point get_intersection(Point a1, Point a2, Point b1, Point b2)
 
 bool intersects(Point a1, Point a2, Point b1, Point b2)
 {
+  // TODO and this
   if(a1.x != b1.x || a2.x != b2.x)
   {
     std::cout<<"Line segments should have the same start and end coordinates!\n";
@@ -242,6 +238,10 @@ Point get_floor_point(Point p, Point a1, Point a2, Point b1, Point b2)
   }
   else
   {
+    if(x < b1.x)
+    {
+      std::cout<<p.to_string()<<a1.to_string()<<a2.to_string()<<b1.to_string()<<b2.to_string()<<'\n';
+    }
     y = get_val_at_coord_(x, b1, b2);
   }
   return Point(x, y);
@@ -336,6 +336,7 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
           last_deleted = L.back();
           L.pop_back();
         }
+        // TODO implement L as a deque
         // In this case we need to insert a point where the value intersects with the trajectory
         if(!L.empty() && L.back().y < next.y)
         {
