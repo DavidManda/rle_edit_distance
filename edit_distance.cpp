@@ -226,6 +226,63 @@ Point get_intersection(Point a1, Point a2, Point b1, Point b2)
   return Point(x, y);
 }
 
+bool intersects(Point a1, Point a2, Point b1, Point b2)
+{
+  if(a1.x != b1.x || a2.x != b2.x)
+  {
+    std::cout<<"Line segments should have the same start and end coordinates!\n";
+    return false;
+  }
+
+  return (a1.y < b1.y && a2.y > b2.y)|| (a1.y > b1.y && a2.y < b2.y);
+}
+
+
+Point get_floor_point(Point p, Point a1, Point a2, Point b1, Point b2)
+{
+  int x = floor(p.x), y;
+  if(a1.y < b1.y)
+  {
+    y = get_val_at_coord_(x, a1, a2);
+  }
+  else
+  {
+    y = get_val_at_coord_(x, b1, b2);
+  }
+  return Point(x, y);
+}
+
+Point get_ceil_point(Point p, Point a1, Point a2, Point b1, Point b2)
+{
+  int x = ceil(p.x), y;
+  if(a2.y < b2.y)
+  {
+    y = get_val_at_coord_(x, a1, a2);
+  }
+  else
+  {
+    y = get_val_at_coord_(x, b1, b2);
+  }
+  return Point(x, y);
+}
+
+void add_intersection(std::vector<Point>& sol, Point a1, Point a2, Point b1, Point b2)
+{
+  Point intersection = get_intersection(a1, a2, b1, b2);
+  Point floor_p = get_floor_point(intersection, a1, a2, b1, b2);
+  Point ceil_p = get_ceil_point(intersection, a1, a2, b1, b2);
+  // It can be the case that the intersection happens at the end of the segment because 
+  // we take the ceiling of the coordinate. In that case we shoul not add it
+  if(floor_p.x > a1.x)
+  {
+    add_point(sol, floor_p);
+  }
+  if(ceil_p.x < a2.x)
+  {
+    add_point(sol, ceil_p);
+  }
+}
+
 std::vector<Point> get_cswm(std::vector<Point> S, int h)
 {
   if (!(h > 0))
@@ -269,12 +326,11 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
       }
       else
       {
-        Point intersection = get_intersection(Point(L[k-1].x + h - 1, L[k-1].y), Point(L[k].x + h - 1, L[k].y), current, next);
         // if(i == 2)
         // {
         //   std::cout<<"Intersection is "<<intersection.to_string()<<'\n';
         // }
-        add_point(S_CSWM, intersection);
+        add_intersection(S_CSWM, current, next, Point(L[k-1].x + h - 1, L[k-1].y), Point(L[k].x + h - 1, L[k].y));
         intersection_found = true;
         break;
       }
@@ -395,45 +451,7 @@ void normalise_trajectories(std::vector<Point>& A, std::vector<Point>& B)
   }
 }
 
-bool intersects(Point a1, Point a2, Point b1, Point b2)
-{
-  if(a1.x != b1.x || a2.x != b2.x)
-  {
-    std::cout<<"Line segments should have the same start and end coordinates!\n";
-    return false;
-  }
 
-  return (a1.y < b1.y && a2.y > b2.y)|| (a1.y > b1.y && a2.y < b2.y);
-}
-
-
-Point get_floor_point(Point p, Point a1, Point a2, Point b1, Point b2)
-{
-  int x = floor(p.x), y;
-  if(a1.y < b1.y)
-  {
-    y = get_val_at_coord_(x, a1, a2);
-  }
-  else
-  {
-    y = get_val_at_coord_(x, b1, b2);
-  }
-  return Point(x, y);
-}
-
-Point get_ceil_point(Point p, Point a1, Point a2, Point b1, Point b2)
-{
-  int x = ceil(p.x), y;
-  if(a2.y < b2.y)
-  {
-    y = get_val_at_coord_(x, a1, a2);
-  }
-  else
-  {
-    y = get_val_at_coord_(x, b1, b2);
-  }
-  return Point(x, y);
-}
 // Returns the lower part of two trajectories
 std::vector<Point> get_lower_part(std::vector<Point> A, std::vector<Point> B)
 {
@@ -450,19 +468,7 @@ std::vector<Point> get_lower_part(std::vector<Point> A, std::vector<Point> B)
     add_point(sol, min(A[i], B[i]));
     if(intersects(A[i], A[i+1], B[i], B[i+1]))
     {
-      Point intersection = get_intersection(A[i], A[i+1], B[i], B[i+1]);
-      Point floor_p = get_floor_point(intersection, A[i], A[i+1], B[i], B[i+1]);
-      Point ceil_p = get_ceil_point(intersection, A[i], A[i+1], B[i], B[i+1]);
-      // It can be the case that the intersection happens at the end of the segment because 
-      // we take the ceiling of the coordinate. In that case we shoul not add it
-      if(floor_p.x > A[i].x)
-      {
-        add_point(sol, floor_p);
-      }
-      if(ceil_p.x < A[i+1].x)
-      {
-        add_point(sol, ceil_p);
-      }
+      add_intersection(sol, A[i], A[i+1], B[i], B[i+1]);
     }
   }
   add_point(sol, min(A.back(), B.back()));  
@@ -606,7 +612,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
         //   std::cout<<"Left out and top out:\n"<<traj_to_string(LEFT_OUT)<<traj_to_string(TOP_OUT);
         //   std::cout<<"Out:\n"<<traj_to_string(OUT[i][j]);
         // }
-
+        
       }
       dyn[i][j] = get_val_at_coord(w, OUT[i][j]);
       // std::cout<<dyn[i][j]<<'\n';
