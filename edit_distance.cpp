@@ -2,6 +2,7 @@
 #include <cmath> 
 #include <math.h>
 #include "edit_distance.hpp"
+#include <deque>
 
 typedef std::vector<std::vector<std::vector<Point> > > border_type;
 typedef std::vector<rle::RLE_run> rle_string;
@@ -70,6 +71,30 @@ int get_edit_dist(const int M, const int N, const std::string &s0, const std::st
 }
 
 void add_point(std::vector<Point>& points, Point p)
+{ 
+  if(points.empty())
+  {
+    points.push_back(p);
+    return;
+  }
+  if(points.back().x == p.x && points.back().y == p.y)
+  {
+    return;
+  }
+  if(points.size() < 2)
+  {
+    points.push_back(p);
+    return;
+  }
+  int l = points.size() - 1;
+  if(std::abs((points[l].y - points[l-1].y)*(p.x - points[l-1].x) - (p.y - points[l-1].y) * (points[l].x - points[l-1].x)) < 0.0001)
+  {
+    points.pop_back();
+  }
+  points.push_back(p);
+}
+
+void add_point(std::deque<Point>& points, Point p)
 { 
   if(points.empty())
   {
@@ -285,12 +310,14 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
     std::cout << "Window size must me greater than 0!\n";
     return std::vector<Point>();
   }
-  std::vector<Point> S_CSWM, L;
+  std::vector<Point> S_CSWM;
+  std::deque<Point> L;
   add_point(S_CSWM, S[0]);
   add_point(L, Point(S[0].x - h + 1, S[0].y));
   add_point(L, S[0]);
   for (int i = 0; i < S.size() - 1; i++)
   {
+    // on each iteration we compute the lower part of L and the segment defined by [S[i], S[i+1]]
     Point current = S[i], next = S[i + 1];
     int slope = (next.y - current.y)/(next.x - current.x);
     bool intersection_found = false;
@@ -316,7 +343,7 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
     if(intersection_found)
     {
       add_point(S_CSWM, next);
-      std::vector<Point> new_L;
+      std::deque<Point> new_L;
       add_point(new_L, Point(next.x - (h - 1), next.y));
       add_point(new_L, next);
       L = new_L;
@@ -336,7 +363,6 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
           last_deleted = L.back();
           L.pop_back();
         }
-        // TODO implement L as a deque
         // In this case we need to insert a point where the value intersects with the trajectory
         if(!L.empty() && L.back().y < next.y)
         {
@@ -346,20 +372,21 @@ std::vector<Point> get_cswm(std::vector<Point> S, int h)
         add_point(L, next);
       }
       // Remove elements with x coord smaller than next.x - (h - 1)
-      if(L[0].x < next.x - h + 1)
+      if(L.front().x < next.x - h + 1)
       {
         Point last_point = Point(0,0);
-        while(!L.empty() && L[0].x <= next.x - (h - 1))
+        while(!L.empty() && L.front().x <= next.x - (h - 1))
         {
-          last_point = L[0];
-          L.erase(L.begin());
+          last_point = L.front();
+          L.pop_front();
         }
         float val = get_val_at_coord_(next.x - h + 1, last_point, L[0]);
-        L.insert(L.begin(), Point(next.x - (h - 1), val));
+        // TODO add afunction similar to add_point but for the beggining
+        L.push_front(Point(next.x - (h - 1), val));
       }
       else
       {
-        L.insert(L.begin(), Point(next.x - h + 1, next.y));
+        L.push_front(Point(next.x - h + 1, next.y));
       }
     }
   }
