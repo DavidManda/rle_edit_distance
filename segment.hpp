@@ -9,6 +9,10 @@ public:
   Point left, right;
   Segment(Point _left, Point _right);
   Segment();
+  bool operator <(const Segment& s);
+  bool operator >(const Segment& s);
+  bool operator ==(const Segment& s);
+  std::string to_string();
 };
 
 #endif

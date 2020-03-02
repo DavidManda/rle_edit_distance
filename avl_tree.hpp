@@ -1,22 +1,24 @@
 #pragma once
 #include <string>
-
+#include "segment.hpp"
 class TreeNode
 {
 public:
-  int key;
-  int val;
+  Segment segm;
   int height;
-  int x, y;
   TreeNode *left;
   TreeNode *right;
 
-  TreeNode(int _key, int _val, int _x, int _y);
+  TreeNode(Segment segm);
   void operator=(const TreeNode &node);
-  void insert(int _key, int _val, int _x, int _y);
-  void update_value(int _val, int _x, int _y);
+  static TreeNode* insert(TreeNode* root, Segment segm);
+  void update_value(Segment segm);
+  void recompute_height();
+  int get_balance();
+  static TreeNode* rotate_right(TreeNode* root);
+  static TreeNode* rotate_left(TreeNode* root);
   std::string to_string();
-  TreeNode *find(int _key);
+  TreeNode *find(Segment segm);
 };
 
 class BST
@@ -25,12 +27,12 @@ public:
   TreeNode *root;
 
   BST();
-  void insert(int _key, int _val, int _x, int _y);
+  void insert(Segment segm);
   std::string to_string();
-  TreeNode *find(int key);
-  TreeNode *find_predec(int key);
-  TreeNode *find_succ(int key);
-  void delete_node(int key);
+  TreeNode *find(Segment segm);
+  TreeNode *find_predec(Segment segm);
+  TreeNode *find_succ(Segment segm);
+  void delete_node(Segment segm);
 };
 
 void print_2D(TreeNode *root);
