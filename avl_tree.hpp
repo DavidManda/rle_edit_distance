@@ -10,6 +10,8 @@ public:
   TreeNode *right;
 
   TreeNode(Segment segm);
+  TreeNode();
+  TreeNode(Segment segm, TreeNode* left, TreeNode* right);
   void operator=(const TreeNode &node);
   static TreeNode* insert(TreeNode* root, Segment segm);
   void update_value(Segment segm);
@@ -32,6 +34,9 @@ public:
   TreeNode *find(Segment segm);
   TreeNode *find_predec(Segment segm);
   TreeNode *find_succ(Segment segm);
+  static TreeNode *min(TreeNode *node);
+  static TreeNode *max(TreeNode *node);
+  static BST* join(BST *t_l, BST *t_r, Segment segm);
   void delete_node(Segment segm);
 };
 

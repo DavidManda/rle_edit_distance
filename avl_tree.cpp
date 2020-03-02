@@ -12,6 +12,15 @@ TreeNode::TreeNode(Segment segm)
   right = NULL;
 }
 
+TreeNode::TreeNode(){}
+
+TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right){
+  this->segm = segm;
+  this->left = left;
+  this->right = right;
+  this->recompute_height();
+}
+
 void TreeNode::operator=(const TreeNode &node)
 {
   this->segm = node.segm;
@@ -185,7 +194,7 @@ void BST::insert(Segment segm)
     this->root = new TreeNode(segm);
     return;
   }
-  // these dots are weird here
+  // these dots are weird here but seems like I need them
   this->root = ::insert(this->root, segm);
 }
 
@@ -220,7 +229,7 @@ TreeNode *BST::find_succ(Segment segm)
 // Given a non-empty binary search tree, return the node with minimum
 // key value found in that tree. Note that the entire tree does not
 // need to be searched.
-TreeNode *min_value_node(TreeNode *node)
+TreeNode* BST::min(TreeNode *node)
 {
   TreeNode *current = node;
 
@@ -228,6 +237,15 @@ TreeNode *min_value_node(TreeNode *node)
   while (current && current->left != NULL)
     current = current->left;
 
+  return current;
+}
+
+TreeNode* BST::max(TreeNode *node){
+  TreeNode *current = node;
+
+  while(current && current->right != NULL)
+    current = current->right;
+  
   return current;
 }
 
@@ -270,7 +288,7 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
 
     // node with two children: Get the inorder successor (smallest
     // in the right subtree)
-    TreeNode *temp = min_value_node(root->right);
+    TreeNode *temp = BST::min(root->right);
 
     // Copy the inorder successor's content to this node
     *root = *temp;
@@ -315,6 +333,76 @@ void BST::delete_node(Segment segm)
   }
   this->root = _delete_node(this->root, segm);
 }
+
+TreeNode *join_right(TreeNode *t_l, TreeNode *t_r, Segment segm){
+  TreeNode *left_left = t_l->left;
+  int left_left_height = (left_left != NULL) ? left_left->height : 0;
+  TreeNode *left_right = t_l->right;
+  Segment left_segm = t_l->segm;
+  std::cout<<(left_right->height < t_r->height + 1)<<'\n';
+  if(left_right->height < t_r->height + 1){
+    TreeNode *aux = new TreeNode(segm, left_right, t_r);
+    if(aux->height <= left_left_height + 1){
+      return new TreeNode(left_segm, left_left, aux);
+    }
+    else{
+      return rotate_left(new TreeNode(left_segm, left_left, rotate_right(aux)));
+    }
+  }
+  else{
+    TreeNode *aux = join_right(left_right, t_r, segm);
+    TreeNode *join_sol = new TreeNode(left_segm, left_left, aux);
+    if(left_left_height < aux->height + 1)
+      return rotate_left(join_sol);
+    else
+      return join_sol;
+  }
+}
+
+TreeNode *join_left(TreeNode *t_l, TreeNode *t_r, Segment segm){
+  TreeNode *right_right = t_r->right;
+  int right_right_height = (right_right != NULL) ? right_right->height : 0;
+  TreeNode *right_left = t_r->left;
+  Segment right_segm = t_r->segm;
+
+  if(right_left->height < t_l->height + 1){
+    TreeNode *aux = new TreeNode(segm, t_l, right_left);
+    if(aux->height <= right_right_height + 1){
+      return new TreeNode(right_segm, aux, right_right);
+    }
+    else{
+      return rotate_right(new TreeNode(right_segm, rotate_left(aux), right_right));
+    }
+  }
+  else{
+    TreeNode* aux = join_left(t_l, right_left, segm);
+    TreeNode* join_sol = new TreeNode(right_segm, aux, right_right);
+    if(aux->height + 1 > right_right->height + 1)
+      return rotate_right(join_sol);
+    else
+      return join_sol;
+  }
+}
+
+static BST* join(BST *t_l, BST *t_r, Segment segm){
+  BST *joined_tree = new BST();
+  TreeNode *root;
+
+  if(t_l->root->height > t_r->root->height + 1){
+    std::cout<<t_l->root->to_string()<<' '<<t_r->root->to_string()<<'\n';
+    root = join_right(t_l->root, t_r->root, segm);
+  }
+  else if(t_r->root->height > t_l->root->height + 1){
+    root = join_left(t_l->root, t_r->root, segm);
+  }
+  else
+  {
+    root = new TreeNode(segm, t_l->root, t_r->root);
+    std::cout<<t_l->root->to_string()<<' '<<t_r->root->to_string()<<'\n';
+  }
+  joined_tree->root = root;
+  return joined_tree;
+}
 // Function to print binary tree in 2D
 // It does reverse inorder traversal
 void print_2D_util(TreeNode *root, int space)
@@ -345,20 +433,24 @@ void print_2D(TreeNode *root)
   print_2D_util(root, 0);
 }
 
-// int main(){
-//     BST my_bst;
-//     my_bst.insert(Segment(Point(0,0),Point(1,0)));
-//     my_bst.insert(Segment(Point(1,0),Point(2,0)));
-//     my_bst.insert(Segment(Point(2,0),Point(3,0)));
-//     my_bst.insert(Segment(Point(3,0),Point(4,0)));
-//     my_bst.insert(Segment(Point(4,0),Point(5,0)));
-//     my_bst.insert(Segment(Point(5,0),Point(6,0)));
-//     print_2D(my_bst.root);
-//     my_bst.delete_node(3);
-//     my_bst.delete_node(5);
-//     my_bst.insert(6,6,6,6);
-//     my_bst.insert(7,7,7,7);
-//     print_2D(my_bst.root);
+int main(){
+    BST bst1, bst2, *joined;
+    bst1.insert(Segment(Point(0,0),Point(1,0)));
+    // print_2D(bst1.root);
+    bst1.insert(Segment(Point(1,0),Point(2,0)));
+    bst1.insert(Segment(Point(2,0),Point(3,0)));
+    // bst2.insert(Segment(Point(3,0),Point(4,0)));
+    bst2.insert(Segment(Point(4,0),Point(5,0)));
+    bst2.insert(Segment(Point(5,0),Point(6,0)));
+    bst2.insert(Segment(Point(6,0),Point(7,0)));
+    bst2.insert(Segment(Point(7,0),Point(8,0)));
+    bst2.insert(Segment(Point(8,0),Point(9,0)));
+    bst2.insert(Segment(Point(9,0),Point(10,0)));
+    bst2.insert(Segment(Point(10,0),Point(11,0)));
+    bst2.insert(Segment(Point(11,0),Point(12,0)));
+    // print_2D(bst2.root);
+    joined = join(&bst1, &bst2, Segment(Point(3,0), Point(4,0)));
+    print_2D(joined->root);
     
-//     return 0;
-// }
+    return 0;
+}

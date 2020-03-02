@@ -1,36 +1,13 @@
-#include <boost/intrusive/rbtree.hpp>
-
-using namespace boost::intrusive;
-
-class Node : public set_base_hook<>{
-
-public:
-  int s;
-  Node *left;
-  Node *right;
-
-  Node(int _s){
-    s = _s;
-  }
-
-  friend bool operator< (const Node &a, const Node &b)
-    {  return a.s < b.s;  }
-  friend bool operator> (const Node &a, const Node &b)
-    {  return a.s > b.s;  }
-  friend bool operator== (const Node &a, const Node &b)
-    {  return a.s == b.s;  }
-
-  // bool is_linked()  {  return set_base_hook<> ::is_linked();  }
-};
-
-typedef rbtree<Node> FooRbtree;
+#include "avl_tree.hpp"
+#include "segment.hpp"
+#include <iostream>
 
 int main(){
-  Node foo_object(1);
-  FooRbtree rbtree;
+  TreeNode node1 = TreeNode(Segment(Point(0,0),Point(1,1)));
+  TreeNode node2 = node1;
+  std::cout << node1.to_string() << node2.to_string() << '\n';
+  node1.height = 100;
+  node1.segm.left.x = 100;
 
-  rbtree.insert_unique(foo_object);
-
-  // assert(&list.front() == &foo_object);
-  return 0;
+  std::cout << node1.to_string() << node2.to_string() << '\n';
 }

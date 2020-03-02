@@ -22,6 +22,7 @@ bool Segment::operator ==(const Segment& s){
 }
 std::string Segment::to_string(){
   std::stringstream ss;
-  ss << '[' << this->left.to_string()<<'-'<<this->right.to_string()<<']';
+  // ss << '[' << this->left.to_string()<<'-'<<this->right.to_string()<<']';
+  ss<<this->left.x;
   return ss.str();
 }
