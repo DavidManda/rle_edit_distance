@@ -9,6 +9,10 @@ Segment::Segment(Point _left, Point _right)
 
 Segment::Segment(){}
 
+bool Segment::contains(int x){
+  return left.x <= x && right.x >= x;
+}
+
 bool Segment::operator <(const Segment& s){
   return left.x < s.left.x && right.x <= s.left.x;
 }
@@ -20,6 +24,7 @@ bool Segment::operator >(const Segment& s){
 bool Segment::operator ==(const Segment& s){
   return left.x == s.left.x && right.x == s.right.x;
 }
+
 std::string Segment::to_string(){
   std::stringstream ss;
   ss << '[' << this->left.to_string()<<'-'<<this->right.to_string()<<']';

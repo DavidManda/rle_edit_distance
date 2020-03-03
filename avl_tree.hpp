@@ -29,6 +29,7 @@ public:
   TreeNode *root;
 
   BST();
+  BST(TreeNode* root);
   void insert(Segment segm);
   std::string to_string();
   TreeNode *find(Segment segm);
@@ -36,7 +37,8 @@ public:
   TreeNode *find_succ(Segment segm);
   static TreeNode *min(TreeNode *node);
   static TreeNode *max(TreeNode *node);
-  static BST *join(BST *t_l, BST *t_r, Segment segm);
+  static BST *join(TreeNode *t_l, TreeNode *t_r, Segment segm);
+  static std::pair<BST*, BST*> split(TreeNode* root, Segment segm);
   void delete_node(Segment segm);
 };
 

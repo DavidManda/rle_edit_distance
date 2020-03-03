@@ -187,6 +187,10 @@ BST::BST()
   this->root = NULL;
 }
 
+BST::BST(TreeNode* root){
+  this->root = root;
+}
+
 void BST::insert(Segment segm)
 {
   if (this->root == NULL)
@@ -384,24 +388,57 @@ TreeNode *join_left(TreeNode *t_l, TreeNode *t_r, Segment segm){
   }
 }
 
-BST* BST::join(BST *t_l, BST *t_r, Segment segm){
+BST* BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
   BST *joined_tree = new BST();
   TreeNode *root;
 
-  if(t_l->root->height > t_r->root->height + 1){
-    std::cout<<t_l->root->to_string()<<' '<<t_r->root->to_string()<<'\n';
-    root = join_right(t_l->root, t_r->root, segm);
+  if(t_l == NULL && t_r == NULL){
+    joined_tree->insert(segm);
+    return NULL;
   }
-  else if(t_r->root->height > t_l->root->height + 1){
-    root = join_left(t_l->root, t_r->root, segm);
+  if(t_l == NULL){
+    joined_tree->root = t_r;
+    joined_tree->insert(segm);
+    return joined_tree;
+  }
+  if(t_r == NULL){
+    joined_tree->root = t_l;
+    joined_tree->insert(segm);
+    return joined_tree;
+  }
+
+  if(t_l->height > t_r->height + 1){
+    root = join_right(t_l, t_r, segm);
+  }
+  else if(t_r->height > t_l->height + 1){
+    root = join_left(t_l, t_r, segm);
   }
   else
   {
-    root = new TreeNode(segm, t_l->root, t_r->root);
-    std::cout<<t_l->root->to_string()<<' '<<t_r->root->to_string()<<'\n';
+    root = new TreeNode(segm, t_l, t_r);
   }
   joined_tree->root = root;
   return joined_tree;
+}
+
+// splits the tree, keeping the segment in the right partition of the tree
+std::pair<BST*, BST*> BST::split(TreeNode* root, Segment segm){
+  if(root == NULL){
+    return std::pair<BST*, BST*>(NULL, NULL);
+  }
+  if(segm == root->segm){
+    BST* left = (root->left != NULL) ? new BST(root->left) : new BST();
+    BST* right = (root->right != NULL) ? new BST(root->right) : new BST();
+    right->insert(segm);
+    return std::pair<BST*, BST*>(left, right);
+  }
+  if(segm < root->segm){
+    std::pair<BST*, BST*> aux = BST::split(root->left, segm);
+    return std::pair<BST*, BST*>(aux.first, BST::join(aux.second->root, root->right, root->segm));
+  }
+  std::pair<BST*, BST*> aux = BST::split(root->right, segm);
+  return std::pair<BST*, BST*>(BST::join(root->left, aux.first->root, root->segm), new BST(root->right)); 
+  
 }
 // Function to print binary tree in 2D
 // It does reverse inorder traversal
