@@ -36,7 +36,7 @@ public:
   TreeNode *find_succ(Segment segm);
   static TreeNode *min(TreeNode *node);
   static TreeNode *max(TreeNode *node);
-  static BST* join(BST *t_l, BST *t_r, Segment segm);
+  static BST *join(BST *t_l, BST *t_r, Segment segm);
   void delete_node(Segment segm);
 };
 

@@ -384,7 +384,7 @@ TreeNode *join_left(TreeNode *t_l, TreeNode *t_r, Segment segm){
   }
 }
 
-static BST* join(BST *t_l, BST *t_r, Segment segm){
+BST* BST::join(BST *t_l, BST *t_r, Segment segm){
   BST *joined_tree = new BST();
   TreeNode *root;
 
