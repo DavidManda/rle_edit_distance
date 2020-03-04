@@ -469,25 +469,3 @@ void print_2D(TreeNode *root)
 {
   print_2D_util(root, 0);
 }
-
-// int main(){
-//     BST bst1, bst2, *joined;
-//     bst1.insert(Segment(Point(0,0),Point(1,0)));
-//     // print_2D(bst1.root);
-//     bst1.insert(Segment(Point(1,0),Point(2,0)));
-//     bst1.insert(Segment(Point(2,0),Point(3,0)));
-//     // bst2.insert(Segment(Point(3,0),Point(4,0)));
-//     bst2.insert(Segment(Point(4,0),Point(5,0)));
-//     bst2.insert(Segment(Point(5,0),Point(6,0)));
-//     bst2.insert(Segment(Point(6,0),Point(7,0)));
-//     bst2.insert(Segment(Point(7,0),Point(8,0)));
-//     bst2.insert(Segment(Point(8,0),Point(9,0)));
-//     bst2.insert(Segment(Point(9,0),Point(10,0)));
-//     bst2.insert(Segment(Point(10,0),Point(11,0)));
-//     bst2.insert(Segment(Point(11,0),Point(12,0)));
-//     // print_2D(bst2.root);
-//     joined = join(&bst1, &bst2, Segment(Point(3,0), Point(4,0)));
-//     print_2D(joined->root);
-    
-//     return 0;
-// }
