@@ -440,6 +440,21 @@ std::pair<BST*, BST*> BST::split(TreeNode* root, Segment segm){
   return std::pair<BST*, BST*>(BST::join(root->left, aux.first->root, root->segm), new BST(root->right)); 
   
 }
+
+void TreeNode::free(TreeNode *node){
+  if(node == NULL){
+    return;
+  }
+  TreeNode::free(node->left);
+  TreeNode::free(node->right);
+  std::free(node);
+}
+
+void BST::free(BST *t){
+  TreeNode::free(t->root);
+  std::free(t);
+}
+
 // Function to print binary tree in 2D
 // It does reverse inorder traversal
 void print_2D_util(TreeNode *root, int space)

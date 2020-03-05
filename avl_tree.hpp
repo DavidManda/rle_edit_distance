@@ -21,6 +21,7 @@ public:
   static TreeNode* rotate_left(TreeNode* root);
   std::string to_string();
   TreeNode *find(Segment segm);
+  static void free(TreeNode *node);
 };
 
 class BST
@@ -40,6 +41,7 @@ public:
   static BST *join(TreeNode *t_l, TreeNode *t_r, Segment segm);
   static std::pair<BST*, BST*> split(TreeNode* root, Segment segm);
   void delete_node(Segment segm);
+  static void free(BST *tree);
 };
 
 void print_2D(TreeNode *root);
