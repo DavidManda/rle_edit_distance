@@ -1,2 +1,0 @@
-find smallest wrong example
-check values in each cell, noyt only the end result

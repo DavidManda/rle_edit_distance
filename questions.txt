@@ -1,0 +1,1 @@
+Combine: why do we do inorder traversal as opposed to search for the segment?
