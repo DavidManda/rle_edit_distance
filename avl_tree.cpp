@@ -394,7 +394,7 @@ BST* BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
 
   if(t_l == NULL && t_r == NULL){
     joined_tree->insert(segm);
-    return NULL;
+    return joined_tree;
   }
   if(t_l == NULL){
     joined_tree->root = t_r;
