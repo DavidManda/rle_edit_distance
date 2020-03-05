@@ -15,6 +15,13 @@ float get_val_at_coord(float coord, Point p1, Point p2)
 // this function expects two trees that describe intervals [X_l, X_m] and [X_m, X_r]
 // it will return a new balanced tree that is the joining of the two trees
 BST* join(BST *t1, BST *t2){
+  if(t1->root == NULL){
+    return new BST(t2->root);
+  }
+  if(t2->root == NULL){
+    return new BST(t1->root);
+  }
+  
   TreeNode *largest_t1 = BST::max(t1->root);
   TreeNode *smallest_t2 = BST::min(t2->root);
   if(largest_t1->segm.right.x != smallest_t2->segm.left.x){
@@ -38,7 +45,7 @@ BST* join(BST *t1, BST *t2){
     aux = smallest_t2->segm;
     t2->delete_node(smallest_t2->segm);
   }
-  // return new BST();
+
   return BST::join(t1->root,t2->root,aux);
 }
 
@@ -50,10 +57,16 @@ TreeNode* find_segm_containing(TreeNode* root, float x){
   if(x < root->segm.left.x){
     return find_segm_containing(root->left, x);
   }
-
-  return find_segm_containing(root->right, x);
+  if(x > root->segm.right.x){
+    return find_segm_containing(root->right, x);
+  }
+  else{
+    std::cout<<"Element " << x <<" is not contained by the interval described by the tree!\n";
+    throw;
+  }
 }
 
+// split a tree describing interval [x_l, x_r] into two trees describing [x_l, x_m],[x_m, x_r]
 std::pair<BST*, BST*> split(BST *T, float x_m){
   std::pair<BST*, BST*> sol;
   TreeNode* node = find_segm_containing(T->root, x_m);
@@ -84,27 +97,27 @@ std::pair<BST*, BST*> split(BST *T, float x_m){
   }
   return sol;
 }
-int main(){
-  BST bst1, bst2, *joined;
-  bst1.insert(Segment(Point(0,0),Point(1,0)));
-  bst1.insert(Segment(Point(1,0),Point(2,0)));
-  bst1.insert(Segment(Point(2,0),Point(3,0)));
+// int main(){
+//   BST bst1, bst2, *joined;
+//   bst1.insert(Segment(Point(0,0),Point(1,0)));
+//   bst1.insert(Segment(Point(1,0),Point(2,0)));
+//   bst1.insert(Segment(Point(2,0),Point(3,0)));
 
-  bst2.insert(Segment(Point(3,0),Point(4,0)));
-  bst2.insert(Segment(Point(4,0),Point(5,0)));
-  bst2.insert(Segment(Point(5,0),Point(6,0)));
-  bst2.insert(Segment(Point(6,0),Point(7,0)));
-  bst2.insert(Segment(Point(7,0),Point(8,0)));
-  bst2.insert(Segment(Point(8,0),Point(9,0)));
-  bst2.insert(Segment(Point(9,0),Point(10,0)));
-  bst2.insert(Segment(Point(10,0),Point(11,0)));
-  bst2.insert(Segment(Point(11,0),Point(12,0)));
-  // print_2D(bst2.root);
-  joined = join(&bst1, &bst2);
-  // print_2D(joined->root);
-  std::pair<BST*, BST*> p = split(joined, 3);
-  print_2D(p.first->root);
-  print_2D(p.second->root);
-  return 0;
-}
+//   bst2.insert(Segment(Point(3,0),Point(4,0)));
+//   bst2.insert(Segment(Point(4,0),Point(5,0)));
+//   bst2.insert(Segment(Point(5,0),Point(6,0)));
+//   bst2.insert(Segment(Point(6,0),Point(7,0)));
+//   bst2.insert(Segment(Point(7,0),Point(8,0)));
+//   bst2.insert(Segment(Point(8,0),Point(9,0)));
+//   bst2.insert(Segment(Point(9,0),Point(10,0)));
+//   bst2.insert(Segment(Point(10,0),Point(11,0)));
+//   bst2.insert(Segment(Point(11,0),Point(12,0)));
+//   // print_2D(bst2.root);
+//   joined = join(&bst1, &bst2);
+//   // print_2D(joined->root);
+//   std::pair<BST*, BST*> p = split(joined, 5);
+//   print_2D(p.first->root);
+//   print_2D(p.second->root);
+//   return 0;
+// }
 
