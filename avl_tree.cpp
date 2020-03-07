@@ -214,6 +214,16 @@ bool BST::is_balanced(){
   return is_balanced_(root);
 }
 
+void TreeNode::set_right(TreeNode* node){
+  this->right = node;
+  this->recompute_height();
+}
+
+void TreeNode::set_left(TreeNode* node){
+  this->left = node;
+  this->recompute_height();
+}
+
 void BST::insert(Segment segm)
 {
   if (this->root == NULL)
@@ -368,19 +378,24 @@ TreeNode *join_right(TreeNode *t_l, TreeNode *t_r, Segment segm){
   if(height(left_right) < height(t_r) + 1){
     TreeNode *aux = new TreeNode(segm, left_right, t_r);
     if(height(aux) <= height(left_left) + 1){
-      return new TreeNode(left_segm, left_left, aux);
+      t_l->set_right(aux);
+      return t_l;
+      // return new TreeNode(left_segm, left_left, aux);
     }
     else{
-      return rotate_left(new TreeNode(left_segm, left_left, rotate_right(aux)));
+      t_l->set_right(rotate_right(aux));
+      return rotate_left(t_l);
+      // return rotate_left(new TreeNode(left_segm, left_left, rotate_right(aux)));
     }
   }
   else{
     TreeNode *aux = join_right(left_right, t_r, segm);
-    TreeNode *join_sol = new TreeNode(left_segm, left_left, aux);
-    if(height(join_sol->right) > height(join_sol->left) + 1)
-      return rotate_left(join_sol);
+    t_l->set_right(aux);
+    // TreeNode *join_sol = new TreeNode(left_segm, left_left, aux);
+    if(height(t_l->right) > height(t_l->left) + 1)
+      return rotate_left(t_l);
     else
-      return join_sol;
+      return t_l;
   }
 }
 
@@ -392,19 +407,24 @@ TreeNode *join_left(TreeNode *t_l, TreeNode *t_r, Segment segm){
   if(height(right_left) < height(t_l) + 1){
     TreeNode *aux = new TreeNode(segm, t_l, right_left);
     if(height(aux) <= height(right_right) + 1){
-      return new TreeNode(right_segm, aux, right_right);
+      t_r->set_left(aux);
+      return t_r;
+      // return new TreeNode(right_segm, aux, right_right);
     }
     else{
-      return rotate_right(new TreeNode(right_segm, rotate_left(aux), right_right));
+      t_r->set_left(rotate_left(aux));
+      return rotate_right(t_r);
+      // return rotate_right(new TreeNode(right_segm, rotate_left(aux), right_right));
     }
   }
   else{
     TreeNode* aux = join_left(t_l, right_left, segm);
-    TreeNode* join_sol = new TreeNode(right_segm, aux, right_right);
-    if(height(join_sol->left) > height(join_sol->right) + 1)
-      return rotate_right(join_sol);
+    t_r->set_left(aux);
+    // TreeNode* join_sol = new TreeNode(right_segm, aux, right_right);
+    if(height(t_r->left) > height(t_r->right) + 1)
+      return rotate_right(t_r);
     else
-      return join_sol;
+      return t_r;
   }
 }
 
