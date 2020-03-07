@@ -38,10 +38,13 @@ public:
   TreeNode *find_succ(Segment segm);
   static TreeNode *min(TreeNode *node);
   static TreeNode *max(TreeNode *node);
-  static BST *join(TreeNode *t_l, TreeNode *t_r, Segment segm);
-  static std::pair<BST*, BST*> split(TreeNode* root, Segment segm);
+  bool is_balanced();
+  static BST join(TreeNode *t_l, TreeNode *t_r, Segment segm);
+  static BST join(TreeNode *t_l, TreeNode *t_r);
+  // splits the tree, keeping the segment in the right partition of the tree
+  // This function has side effect for the subtree rooted at root, which is compromised
+  static std::pair<BST, BST> split(TreeNode* root, Segment segm);
   void delete_node(Segment segm);
-  static void free(BST *tree);
 };
 
 void print_2D(TreeNode *root);

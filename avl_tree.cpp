@@ -32,6 +32,12 @@ void TreeNode::update_value(Segment segm)
   this->segm = segm;
 }
 
+int height(TreeNode* node){
+  if(node == NULL)
+    return 0;
+  return node->height;
+}
+
 static TreeNode* rotate_right(TreeNode* root){
   TreeNode *left = root->left;
   TreeNode *left_right = left->right;
@@ -191,6 +197,23 @@ BST::BST(TreeNode* root){
   this->root = root;
 }
 
+bool is_balanced_(TreeNode* root){
+  if(root == NULL)
+    return true;
+  int h = root->height;
+  root->recompute_height();
+  if(h != root->height){
+    std::cout<<"Heights should already be the correct and updated value, caught in is_balanced\n";
+    throw;
+  }
+  int balance = root->get_balance();
+  return balance >= -1 && balance <= 1 && is_balanced_(root->left) && is_balanced_(root->right);
+}
+
+bool BST::is_balanced(){
+  return is_balanced_(root);
+}
+
 void BST::insert(Segment segm)
 {
   if (this->root == NULL)
@@ -340,13 +363,11 @@ void BST::delete_node(Segment segm)
 
 TreeNode *join_right(TreeNode *t_l, TreeNode *t_r, Segment segm){
   TreeNode *left_left = t_l->left;
-  int left_left_height = (left_left != NULL) ? left_left->height : 0;
   TreeNode *left_right = t_l->right;
   Segment left_segm = t_l->segm;
-  std::cout<<(left_right->height < t_r->height + 1)<<'\n';
-  if(left_right->height < t_r->height + 1){
+  if(height(left_right) < height(t_r) + 1){
     TreeNode *aux = new TreeNode(segm, left_right, t_r);
-    if(aux->height <= left_left_height + 1){
+    if(height(aux) <= height(left_left) + 1){
       return new TreeNode(left_segm, left_left, aux);
     }
     else{
@@ -356,7 +377,7 @@ TreeNode *join_right(TreeNode *t_l, TreeNode *t_r, Segment segm){
   else{
     TreeNode *aux = join_right(left_right, t_r, segm);
     TreeNode *join_sol = new TreeNode(left_segm, left_left, aux);
-    if(left_left_height < aux->height + 1)
+    if(height(join_sol->right) > height(join_sol->left) + 1)
       return rotate_left(join_sol);
     else
       return join_sol;
@@ -365,13 +386,12 @@ TreeNode *join_right(TreeNode *t_l, TreeNode *t_r, Segment segm){
 
 TreeNode *join_left(TreeNode *t_l, TreeNode *t_r, Segment segm){
   TreeNode *right_right = t_r->right;
-  int right_right_height = (right_right != NULL) ? right_right->height : 0;
   TreeNode *right_left = t_r->left;
   Segment right_segm = t_r->segm;
 
-  if(right_left->height < t_l->height + 1){
+  if(height(right_left) < height(t_l) + 1){
     TreeNode *aux = new TreeNode(segm, t_l, right_left);
-    if(aux->height <= right_right_height + 1){
+    if(height(aux) <= height(right_right) + 1){
       return new TreeNode(right_segm, aux, right_right);
     }
     else{
@@ -381,29 +401,30 @@ TreeNode *join_left(TreeNode *t_l, TreeNode *t_r, Segment segm){
   else{
     TreeNode* aux = join_left(t_l, right_left, segm);
     TreeNode* join_sol = new TreeNode(right_segm, aux, right_right);
-    if(aux->height + 1 > right_right->height + 1)
+    if(height(join_sol->left) > height(join_sol->right) + 1)
       return rotate_right(join_sol);
     else
       return join_sol;
   }
 }
 
-BST* BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
-  BST *joined_tree = new BST();
+// joins the two trees and inserts a node with segm in it
+BST BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
+  BST joined_tree = BST();
   TreeNode *root;
 
   if(t_l == NULL && t_r == NULL){
-    joined_tree->insert(segm);
+    joined_tree.insert(segm);
     return joined_tree;
   }
   if(t_l == NULL){
-    joined_tree->root = t_r;
-    joined_tree->insert(segm);
+    joined_tree.root = t_r;
+    joined_tree.insert(segm);
     return joined_tree;
   }
   if(t_r == NULL){
-    joined_tree->root = t_l;
-    joined_tree->insert(segm);
+    joined_tree.root = t_l;
+    joined_tree.insert(segm);
     return joined_tree;
   }
 
@@ -417,28 +438,64 @@ BST* BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
   {
     root = new TreeNode(segm, t_l, t_r);
   }
-  joined_tree->root = root;
+  joined_tree.root = root;
   return joined_tree;
 }
 
+BST BST::join(TreeNode *t_l, TreeNode *t_r){
+  BST joined_tree;
+  if(t_l == NULL && t_r == NULL){
+    return joined_tree;
+  }
+  if(t_l == NULL){
+    joined_tree.root = t_r;
+    return joined_tree;
+  }
+  if(t_r == NULL){
+    joined_tree.root = t_l;
+    return joined_tree;
+  }
+  Segment min_right = min(t_r)->segm;
+  t_r = _delete_node(t_r, min_right);
+  return BST::join(t_l, t_r, min_right);
+}
+
 // splits the tree, keeping the segment in the right partition of the tree
-std::pair<BST*, BST*> BST::split(TreeNode* root, Segment segm){
+// This function has side effect for the subtree rooted at root, which is compromised
+std::pair<BST, BST> BST::split(TreeNode* root, Segment segm){
+  std::pair<BST, BST> pair;
   if(root == NULL){
-    return std::pair<BST*, BST*>(NULL, NULL);
+    return pair;
   }
   if(segm == root->segm){
-    BST* left = (root->left != NULL) ? new BST(root->left) : new BST();
-    BST* right = (root->right != NULL) ? new BST(root->right) : new BST();
-    right->insert(segm);
-    return std::pair<BST*, BST*>(left, right);
+    BST left = (root->left != NULL) ? BST(root->left) : BST();
+    BST right = (root->right != NULL) ? BST(root->right) : BST();
+    right.insert(segm);
+    return std::pair<BST, BST>(left, right);
   }
   if(segm < root->segm){
-    std::pair<BST*, BST*> aux = BST::split(root->left, segm);
-    return std::pair<BST*, BST*>(aux.first, BST::join(aux.second->root, root->right, root->segm));
+    std::pair<BST, BST> aux = BST::split(root->left, segm);
+    if(!aux.first.is_balanced()){
+      print_2D(aux.first.root);
+      throw;
+    }
+    if(!aux.second.is_balanced()){
+      print_2D(aux.second.root);
+      throw;
+    }
+    BST right = BST::join(aux.second.root, root->right, root->segm);
+    return std::pair<BST, BST>(aux.first, right);
   }
-  std::pair<BST*, BST*> aux = BST::split(root->right, segm);
-  return std::pair<BST*, BST*>(BST::join(root->left, aux.first->root, root->segm), new BST(root->right)); 
-  
+  std::pair<BST, BST> aux = BST::split(root->right, segm);
+  if(!aux.first.is_balanced()){
+    print_2D(aux.first.root);
+    throw;
+  }
+  if(!aux.second.is_balanced()){
+    print_2D(aux.second.root);
+    throw;
+  }
+  return std::pair<BST, BST>(BST::join(root->left, aux.first.root, root->segm), aux.second); 
 }
 
 void TreeNode::free(TreeNode *node){
@@ -448,11 +505,6 @@ void TreeNode::free(TreeNode *node){
   TreeNode::free(node->left);
   TreeNode::free(node->right);
   std::free(node);
-}
-
-void BST::free(BST *t){
-  TreeNode::free(t->root);
-  std::free(t);
 }
 
 // Function to print binary tree in 2D

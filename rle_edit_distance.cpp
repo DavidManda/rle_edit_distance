@@ -14,16 +14,16 @@ float get_val_at_coord(float coord, Point p1, Point p2)
 
 // this function expects two trees that describe intervals [X_l, X_m] and [X_m, X_r]
 // it will return a new balanced tree that is the joining of the two trees
-BST* join(BST *t1, BST *t2){
-  if(t1->root == NULL){
-    return new BST(t2->root);
+BST join(BST t1, BST t2){
+  if(t1.root == NULL){
+    return BST(t2.root);
   }
-  if(t2->root == NULL){
-    return new BST(t1->root);
+  if(t2.root == NULL){
+    return BST(t1.root);
   }
   
-  TreeNode *largest_t1 = BST::max(t1->root);
-  TreeNode *smallest_t2 = BST::min(t2->root);
+  TreeNode *largest_t1 = BST::max(t1.root);
+  TreeNode *smallest_t2 = BST::min(t2.root);
   if(largest_t1->segm.right.x != smallest_t2->segm.left.x){
     std::cout<<"Rightmost point of tree 1 should be equal to leftmost point of tree 2\n";
     throw;
@@ -38,15 +38,15 @@ BST* join(BST *t1, BST *t2){
   if(slope1 == slope2){
     aux.left = largest_t1->segm.left;
     aux.right = smallest_t2->segm.right;
-    t1->delete_node(largest_t1->segm);
-    t2->delete_node(smallest_t2->segm);
+    t1.delete_node(largest_t1->segm);
+    t2.delete_node(smallest_t2->segm);
   }
   else{
     aux = smallest_t2->segm;
-    t2->delete_node(smallest_t2->segm);
+    t2.delete_node(smallest_t2->segm);
   }
 
-  return BST::join(t1->root,t2->root,aux);
+  return BST::join(t1.root,t2.root,aux);
 }
 
 TreeNode* find_segm_containing(TreeNode* root, float x){
@@ -67,12 +67,12 @@ TreeNode* find_segm_containing(TreeNode* root, float x){
 }
 
 // split a tree describing interval [x_l, x_r] into two trees describing [x_l, x_m],[x_m, x_r]
-std::pair<BST*, BST*> split(BST *T, float x_m){
-  std::pair<BST*, BST*> sol;
-  TreeNode* node = find_segm_containing(T->root, x_m);
+std::pair<BST, BST> split(BST T, float x_m){
+  std::pair<BST, BST> sol;
+  TreeNode* node = find_segm_containing(T.root, x_m);
   Segment segm = node->segm;
 
-  T->delete_node(segm);
+  T.delete_node(segm);
 
   if(x_m > segm.left.x && x_m < segm.right.x){
     // If x_m is strictly within the segment, we split it and then split the tree on the 
@@ -80,20 +80,20 @@ std::pair<BST*, BST*> split(BST *T, float x_m){
     float val = get_val_at_coord(x_m, segm.left, segm.right);
     Segment s1 = Segment(segm.left, Point(x_m, val));
     Segment s2 = Segment(Point(x_m, val), segm.right);
-    T->insert(s1);
-    T->insert(s2);
-    sol = BST::split(T->root, s2);
+    T.insert(s1);
+    T.insert(s2);
+    sol = BST::split(T.root, s2);
   }
   else if(x_m == segm.left.x){
     // we keep the segment in the right part of the tree by using it for splitting
-    T->insert(segm);
-    sol = BST::split(T->root,segm);
+    T.insert(segm);
+    sol = BST::split(T.root,segm);
   }
   else{
     // we keep the segment in the left part of the tree by using its successor to split the tree
-    T->insert(segm);
-    TreeNode* succ = T->find_succ(segm);
-    sol = BST::split(T->root, succ->segm);
+    T.insert(segm);
+    TreeNode* succ = T.find_succ(segm);
+    sol = BST::split(T.root, succ->segm);
   }
   return sol;
 }

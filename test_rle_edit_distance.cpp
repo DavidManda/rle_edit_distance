@@ -26,7 +26,7 @@ void test_get_val_at_coord(){
   assert(val == 0);
 }
 
-void test_join(){
+// void test_join(){
   // BST t_l,t_r, t;
   // t = *join(&t_l, &t_r);
 
@@ -62,11 +62,8 @@ void test_join(){
   // t_r->insert(s_1122);
   // t = join(t_l, t_r);
   // assert(t->root->segm == Segment(Point(0,0), Point(2,2)));
-}
+// }
 
-int main(){
+void test_rle_edit_distance(){
   test_get_val_at_coord();
-  test_join();
-  std::cout<<"All tests passed!\n";
-  return 0;
 }
