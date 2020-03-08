@@ -14,6 +14,7 @@ float get_val_at_coord(float coord, Point p1, Point p2)
 
 // this function expects two trees that describe intervals [X_l, X_m] and [X_m, X_r]
 // it will return a new balanced tree that is the joining of the two trees
+// t1 and t2 will be compromised and shouldn't be used after calling this function
 BST join(BST t1, BST t2){
   if(t1.root == NULL){
     return BST(t2.root);
