@@ -35,10 +35,40 @@ int height(TreeNode* node){
   return node->height;
 }
 
+void TreeNode::shift(int dx, int dy){
+  this->active = false;
+  this->dx += dx;
+  this->dy += dy;
+}
+
+void TreeNode::lazy_update(TreeNode* node){
+  if(node == NULL || node->active){
+    return;
+  }
+  node->segm.left.x += node->dx;
+  node->segm.left.y += node->dy;
+
+  node->segm.right.x += node->dx;
+  node->segm.right.y += node->dy;
+  
+  if(node->left){
+    node->left->shift(node->dx, node->dy);
+  }
+  if(node->right){
+    node->right->shift(node->dx, node->dy);
+  }
+
+  node->active = true;
+  node->dx = 0;
+  node->dy = 0;
+}
+
 static TreeNode* rotate_right(TreeNode* root){
   TreeNode *left = root->left;
   TreeNode *left_right = left->right;
-
+  TreeNode::lazy_update(root);
+  TreeNode::lazy_update(left);
+  TreeNode::lazy_update(left_right);
   // rotation
   left->right = root;
   root->left = left_right;
@@ -52,7 +82,9 @@ static TreeNode* rotate_right(TreeNode* root){
 static TreeNode* rotate_left(TreeNode* root){
   TreeNode* right = root->right;
   TreeNode* right_left = right->left;
-
+  TreeNode::lazy_update(root);
+  TreeNode::lazy_update(right);
+  TreeNode::lazy_update(right_left);
   right->left = root;
   root->right = right_left;
 
@@ -123,6 +155,7 @@ std::string TreeNode::to_string()
 
 TreeNode *TreeNode::find(Segment segm)
 {
+  lazy_update(this);
   if (this->segm == segm)
   {
     return this;
@@ -148,7 +181,7 @@ void _find_predec_succ(TreeNode *root, Segment segm, TreeNode *&predec, TreeNode
   // Base case
   if (root == NULL)
     return;
-
+  TreeNode::lazy_update(root);
   // If key is present at root
   if (root->segm == segm)
   {
@@ -156,8 +189,11 @@ void _find_predec_succ(TreeNode *root, Segment segm, TreeNode *&predec, TreeNode
     if (root->left != NULL)
     {
       TreeNode *tmp = root->left;
-      while (tmp->right)
+      TreeNode::lazy_update(tmp);
+      while (tmp->right){
         tmp = tmp->right;
+        TreeNode::lazy_update(tmp);
+      }
       predec = tmp;
     }
 
@@ -165,8 +201,11 @@ void _find_predec_succ(TreeNode *root, Segment segm, TreeNode *&predec, TreeNode
     if (root->right != NULL)
     {
       TreeNode *tmp = root->right;
-      while (tmp->left)
+      TreeNode::lazy_update(tmp);
+      while (tmp->left){
         tmp = tmp->left;
+        TreeNode::lazy_update(tmp);
+      }
       succ = tmp;
     }
     return;
@@ -266,19 +305,23 @@ TreeNode *BST::find_succ(Segment segm)
 TreeNode* TreeNode::min(TreeNode *node)
 {
   TreeNode *current = node;
-
+  lazy_update(current);
   /* loop down to find the leftmost leaf */
-  while (current && current->left != NULL)
+  while (current && current->left != NULL){
     current = current->left;
+    lazy_update(current);
+  }
 
   return current;
 }
 
 TreeNode* TreeNode::max(TreeNode *node){
   TreeNode *current = node;
-
-  while(current && current->right != NULL)
+  lazy_update(current);
+  while(current && current->right != NULL){
     current = current->right;
+    lazy_update(current);
+  }
   
   return current;
 }
@@ -292,6 +335,7 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
   if (root == NULL)
     return root;
 
+  TreeNode::lazy_update(root);
   // If the key to be deleted is smaller than the root's key,
   // then it lies in left subtree
   if (segm < root->segm)
@@ -321,9 +365,9 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
     }
 
     // node with two children: Get the inorder successor (smallest
-    // in the right subtree)
+    // in the right subtree) - this will be a leaf
     TreeNode *temp = TreeNode::min(root->right);
-
+    TreeNode::lazy_update(temp);
     // Copy the inorder successor's content to this node
     root->update_value(temp->segm);
 
@@ -371,24 +415,25 @@ void BST::delete_node(Segment segm)
 TreeNode *join_right(TreeNode *t_l, TreeNode *t_r, Segment segm){
   TreeNode *left_left = t_l->left;
   TreeNode *left_right = t_l->right;
+  TreeNode::lazy_update(t_r);
+  TreeNode::lazy_update(t_l);
+  TreeNode::lazy_update(left_left);
+  TreeNode::lazy_update(left_right);
   Segment left_segm = t_l->segm;
   if(height(left_right) < height(t_r) + 1){
     TreeNode *aux = new TreeNode(segm, left_right, t_r);
     if(height(aux) <= height(left_left) + 1){
       t_l->set_right(aux);
       return t_l;
-      // return new TreeNode(left_segm, left_left, aux);
     }
     else{
       t_l->set_right(rotate_right(aux));
       return rotate_left(t_l);
-      // return rotate_left(new TreeNode(left_segm, left_left, rotate_right(aux)));
     }
   }
   else{
     TreeNode *aux = join_right(left_right, t_r, segm);
     t_l->set_right(aux);
-    // TreeNode *join_sol = new TreeNode(left_segm, left_left, aux);
     if(height(t_l->right) > height(t_l->left) + 1)
       return rotate_left(t_l);
     else
@@ -400,24 +445,25 @@ TreeNode *join_left(TreeNode *t_l, TreeNode *t_r, Segment segm){
   TreeNode *right_right = t_r->right;
   TreeNode *right_left = t_r->left;
   Segment right_segm = t_r->segm;
+  TreeNode::lazy_update(t_l);
+  TreeNode::lazy_update(t_l);
+  TreeNode::lazy_update(right_left);
+  TreeNode::lazy_update(right_right);
 
   if(height(right_left) < height(t_l) + 1){
     TreeNode *aux = new TreeNode(segm, t_l, right_left);
     if(height(aux) <= height(right_right) + 1){
       t_r->set_left(aux);
       return t_r;
-      // return new TreeNode(right_segm, aux, right_right);
     }
     else{
       t_r->set_left(rotate_left(aux));
       return rotate_right(t_r);
-      // return rotate_right(new TreeNode(right_segm, rotate_left(aux), right_right));
     }
   }
   else{
     TreeNode* aux = join_left(t_l, right_left, segm);
     t_r->set_left(aux);
-    // TreeNode* join_sol = new TreeNode(right_segm, aux, right_right);
     if(height(t_r->left) > height(t_r->right) + 1)
       return rotate_right(t_r);
     else
@@ -484,6 +530,7 @@ std::pair<BST, BST> BST::split(TreeNode* root, Segment segm){
   if(root == NULL){
     return pair;
   }
+  TreeNode::lazy_update(root);
   if(segm == root->segm){
     BST left = (root->left != NULL) ? BST(root->left) : BST();
     BST right = (root->right != NULL) ? BST(root->right) : BST();

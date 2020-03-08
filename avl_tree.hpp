@@ -14,6 +14,8 @@ public:
   TreeNode(Segment segm);
   TreeNode();
   TreeNode(Segment segm, TreeNode* left, TreeNode* right);
+  void shift(int dx, int dy);
+  static void lazy_update(TreeNode* node);
   void set_right(TreeNode* node);
   void set_left(TreeNode* node);
   static TreeNode* insert(TreeNode* root, Segment segm);

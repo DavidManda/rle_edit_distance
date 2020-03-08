@@ -1,1 +1,2 @@
 Combine: why do we do inorder traversal as opposed to search for the segment?
+What happens when you insert into a tree that has lazy updates propagating?
