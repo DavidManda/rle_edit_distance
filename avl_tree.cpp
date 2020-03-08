@@ -325,7 +325,7 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
     TreeNode *temp = TreeNode::min(root->right);
 
     // Copy the inorder successor's content to this node
-    *root = *temp;
+    root->update_value(temp->segm);
 
     // Delete the inorder successor
     root->right = _delete_node(root->right, temp->segm);

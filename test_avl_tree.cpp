@@ -71,6 +71,7 @@ void test_specific_join(){
   Segment s(Point(7,7), Point(8,8));
 
 }
+
 void test_join_avl(){
   for(int i = 0; i < 100; i++){
     for(int j = i+1; j < 100; j++){
@@ -79,9 +80,30 @@ void test_join_avl(){
   }
 }
 
+void test_delete(){
+  BST tree;
+  for(int i = 0; i <= 100; i++){
+    tree.insert(Segment(Point(i,i), Point(i+1, i+1)));
+  }
+  // print_2D(tree.root);
+  // std::cout<<"----------------\n";
+  // tree.delete_node(Segment(Point(7,7), Point(8, 8)));
+  // print_2D(tree.root);
+  for(int i = 20; i <= 90; i++){
+    tree.delete_node(Segment(Point(i,i), Point(i+1, i+1)));
+    bool balanced = tree.is_balanced();
+    if(!balanced){
+      std::cout<<i<<'\n';
+      print_2D(tree.root);
+    }
+    assert(tree.is_balanced());
+  }
+}
+
 void test_avl_tree(){
   test_insert();
   test_split_basics();
   test_join_avl();
   test_split();
+  test_delete();
 }
