@@ -5,6 +5,8 @@ class TreeNode
 {
 public:
   Segment segm;
+  bool active;
+  int dx, dy;
   int height;
   TreeNode *left;
   TreeNode *right;
