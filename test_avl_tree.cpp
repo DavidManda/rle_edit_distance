@@ -71,7 +71,7 @@ void test_specific_join(){
   Segment s(Point(7,7), Point(8,8));
 
 }
-void test_join(){
+void test_join_avl(){
   for(int i = 0; i < 100; i++){
     for(int j = i+1; j < 100; j++){
       test_join_(i,j);
@@ -82,6 +82,6 @@ void test_join(){
 void test_avl_tree(){
   test_insert();
   test_split_basics();
-  test_join();
+  test_join_avl();
   test_split();
 }
