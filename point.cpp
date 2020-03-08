@@ -15,3 +15,7 @@ std::string Point::to_string()
   ss << "(" << x << ", " << y << ")";
   return ss.str();
 }
+
+bool Point::operator ==(const Point& s){
+  return x == s.x && y == s.y;
+}
