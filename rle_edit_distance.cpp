@@ -1,4 +1,5 @@
 #include "avl_tree.hpp"
+#include <assert.h>
 
 float get_val_at_coord(float coord, Point p1, Point p2)
 {
@@ -99,8 +100,31 @@ std::pair<BST, BST> split(BST T, float x_m){
   return sol;
 }
 
-// BST combine(BST t1, BST t2){
+// Takes the minumum of the functions described by t1 and t2
+// The functions should be over the same interval [x_l, x_r]
+// Assumes there exists x_m in [x_l, x_r] such that:
+// F1(x) > F2(x) if x < x_m and F1(x) <= F2(x) if x >= x_m
+// where F1 and F2 are the functions described by t1 and t2
+BST combine(BST t1, BST t2){
+  Point min1 = TreeNode::min(t1.root)->segm.left;
+  Point min2 = TreeNode::min(t2.root)->segm.left;
+  Point max1 = TreeNode::max(t1.root)->segm.right;
+  Point max2 = TreeNode::max(t2.root)->segm.right;
+  assert(min1 == min2);
+  assert(max1 == max2);
 
-//   Segment min1 = BST::min(t1.root)->segm;
-// }
+  BST sol;
+  // check if x_m == x_l
+  if(min1.y <= min2.y){
+    return t1;
+  }
+  // check if x_m == x_r
+  if(max1.y > max2.y){
+    return t2;
+  }
+  
+
+
+  return sol;
+}
 
