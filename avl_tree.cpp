@@ -266,7 +266,7 @@ TreeNode *BST::find_succ(Segment segm)
 // Given a non-empty binary search tree, return the node with minimum
 // key value found in that tree. Note that the entire tree does not
 // need to be searched.
-TreeNode* BST::min(TreeNode *node)
+TreeNode* TreeNode::min(TreeNode *node)
 {
   TreeNode *current = node;
 
@@ -277,7 +277,7 @@ TreeNode* BST::min(TreeNode *node)
   return current;
 }
 
-TreeNode* BST::max(TreeNode *node){
+TreeNode* TreeNode::max(TreeNode *node){
   TreeNode *current = node;
 
   while(current && current->right != NULL)
@@ -325,7 +325,7 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
 
     // node with two children: Get the inorder successor (smallest
     // in the right subtree)
-    TreeNode *temp = BST::min(root->right);
+    TreeNode *temp = TreeNode::min(root->right);
 
     // Copy the inorder successor's content to this node
     *root = *temp;
@@ -475,7 +475,7 @@ BST BST::join(TreeNode *t_l, TreeNode *t_r){
     joined_tree.root = t_l;
     return joined_tree;
   }
-  Segment min_right = min(t_r)->segm;
+  Segment min_right = TreeNode::min(t_r)->segm;
   t_r = _delete_node(t_r, min_right);
   return BST::join(t_l, t_r, min_right);
 }

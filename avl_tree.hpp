@@ -19,6 +19,8 @@ public:
   void update_value(Segment segm);
   void recompute_height();
   int get_balance();
+  static TreeNode *min(TreeNode *node);
+  static TreeNode *max(TreeNode *node);
   static TreeNode* rotate_right(TreeNode* root);
   static TreeNode* rotate_left(TreeNode* root);
   std::string to_string();
@@ -38,8 +40,6 @@ public:
   TreeNode *find(Segment segm);
   TreeNode *find_predec(Segment segm);
   TreeNode *find_succ(Segment segm);
-  static TreeNode *min(TreeNode *node);
-  static TreeNode *max(TreeNode *node);
   bool is_balanced();
   static BST join(TreeNode *t_l, TreeNode *t_r, Segment segm);
   static BST join(TreeNode *t_l, TreeNode *t_r);

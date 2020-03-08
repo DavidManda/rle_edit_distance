@@ -23,8 +23,8 @@ BST join(BST t1, BST t2){
     return BST(t1.root);
   }
   
-  TreeNode *largest_t1 = BST::max(t1.root);
-  TreeNode *smallest_t2 = BST::min(t2.root);
+  TreeNode *largest_t1 = TreeNode::max(t1.root);
+  TreeNode *smallest_t2 = TreeNode::min(t2.root);
   if(largest_t1->segm.right.x != smallest_t2->segm.left.x){
     std::cout<<"Rightmost point of tree 1 should be equal to leftmost point of tree 2\n";
     throw;
@@ -99,5 +99,8 @@ std::pair<BST, BST> split(BST T, float x_m){
   return sol;
 }
 
+// BST combine(BST t1, BST t2){
 
+//   Segment min1 = BST::min(t1.root)->segm;
+// }
 
