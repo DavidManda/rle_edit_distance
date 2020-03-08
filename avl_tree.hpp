@@ -12,7 +12,6 @@ public:
   TreeNode(Segment segm);
   TreeNode();
   TreeNode(Segment segm, TreeNode* left, TreeNode* right);
-  void operator=(const TreeNode &node);
   void set_right(TreeNode* node);
   void set_left(TreeNode* node);
   static TreeNode* insert(TreeNode* root, Segment segm);

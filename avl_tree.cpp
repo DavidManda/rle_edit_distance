@@ -21,12 +21,6 @@ TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right){
   this->recompute_height();
 }
 
-void TreeNode::operator=(const TreeNode &node)
-{
-  this->segm = node.segm;
-  this->height = node.height;
-}
-
 void TreeNode::update_value(Segment segm)
 {
   this->segm = segm;
