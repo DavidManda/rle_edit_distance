@@ -6,7 +6,7 @@ class TreeNode
 public:
   Segment segm;
   bool active;
-  int dx, dy;
+  int dx, dy, dg;
   int height;
   TreeNode *left;
   TreeNode *right;

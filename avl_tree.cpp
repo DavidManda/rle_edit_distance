@@ -9,18 +9,28 @@ TreeNode::TreeNode(Segment segm)
   this->segm = segm;
   this->height = 1;
   this->active = false;
+  this->dx = 0;
+  this->dy = 0;
+  this->dg = 0;
   this->left = NULL;
   this->right = NULL;
 }
 
-TreeNode::TreeNode(){}
+TreeNode::TreeNode(){
+  this->active = false;
+  this->dx = 0;
+  this->dy = 0;
+  this->dg = 0;
+}
 
 TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right){
   this->segm = segm;
   this->left = left;
   this->right = right;
-  // TODO make sure this is fine
   this->active = false;
+  this->dx = 0;
+  this->dy = 0;
+  this->dg = 0;
   this->recompute_height();
 }
 
