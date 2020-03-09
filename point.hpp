@@ -5,8 +5,8 @@
 
 class Point{
 public:
-  float x, y;
-  Point(float _x, float _y);
+  double x, y;
+  Point(double _x, double _y);
   Point();
   bool operator ==(const Point& s);
   std::string to_string();
