@@ -119,7 +119,7 @@ static TreeNode* rotate_left(TreeNode* root){
 
 static TreeNode* insert(TreeNode* root, Segment segm)
 {
-  if (root == NULL)  
+  if (root == NULL)
     return(new TreeNode(segm));  
   TreeNode::lazy_update(root);
   if (segm < root->segm)  
@@ -127,8 +127,8 @@ static TreeNode* insert(TreeNode* root, Segment segm)
   else if (segm > root->segm)  
     root->right = insert(root->right, segm);  
   else{
-    root->update_value(segm);  
-    return root;
+    // node already exists
+    return NULL;
   }
 
   root->recompute_height();
