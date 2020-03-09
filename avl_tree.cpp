@@ -98,7 +98,7 @@ static TreeNode* insert(TreeNode* root, Segment segm)
 {
   if (root == NULL)  
     return(new TreeNode(segm));  
-
+  TreeNode::lazy_update(root);
   if (segm < root->segm)  
     root->left = insert(root->left, segm);  
   else if (segm > root->segm)  
@@ -413,10 +413,10 @@ void BST::delete_node(Segment segm)
 }
 
 TreeNode *join_right(TreeNode *t_l, TreeNode *t_r, Segment segm){
-  TreeNode *left_left = t_l->left;
-  TreeNode *left_right = t_l->right;
   TreeNode::lazy_update(t_r);
   TreeNode::lazy_update(t_l);
+  TreeNode *left_left = t_l->left;
+  TreeNode *left_right = t_l->right;
   TreeNode::lazy_update(left_left);
   TreeNode::lazy_update(left_right);
   Segment left_segm = t_l->segm;
@@ -442,11 +442,11 @@ TreeNode *join_right(TreeNode *t_l, TreeNode *t_r, Segment segm){
 }
 
 TreeNode *join_left(TreeNode *t_l, TreeNode *t_r, Segment segm){
+  TreeNode::lazy_update(t_r);
+  TreeNode::lazy_update(t_l);
   TreeNode *right_right = t_r->right;
   TreeNode *right_left = t_r->left;
   Segment right_segm = t_r->segm;
-  TreeNode::lazy_update(t_l);
-  TreeNode::lazy_update(t_l);
   TreeNode::lazy_update(right_left);
   TreeNode::lazy_update(right_right);
 
