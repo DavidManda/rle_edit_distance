@@ -213,6 +213,20 @@ void test_split_with_lazy_update(){
     test_split_with_lazy_update_(i);
   }
 }
+
+void test_simple_gradient_change(){
+  BST t;
+  for(int i = 0; i<3; i++){
+    t.insert(Segment(Point(i,1), Point(i+1, 1)));
+  }
+  t.root->change_grad(1);
+  t.root->shift(0,2);
+  for(int i = 0; i < 3; i++){
+    TreeNode *node = t.find(Segment(Point(i,1 + i + 2), Point(i+1, 1 + (i + 1) + 2)));
+    assert(node != NULL);
+  }
+}
+
 void test_lazy_propagation(){
   test_simple_shift();
   test_shift_propagates();
@@ -221,6 +235,7 @@ void test_lazy_propagation(){
   test_join_with_lazy_update();
   test_split_with_lazy_update_simple();
   test_split_with_lazy_update();
+  test_simple_gradient_change();
 }
 
 void test_avl_tree(){

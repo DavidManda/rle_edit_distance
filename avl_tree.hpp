@@ -15,6 +15,7 @@ public:
   TreeNode();
   TreeNode(Segment segm, TreeNode* left, TreeNode* right);
   void shift(int dx, int dy);
+  void change_grad(int dg);
   static void lazy_update(TreeNode* node);
   void set_right(TreeNode* node);
   void set_left(TreeNode* node);

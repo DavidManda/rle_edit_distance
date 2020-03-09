@@ -51,10 +51,20 @@ void TreeNode::shift(int dx, int dy){
   this->dy += dy;
 }
 
+void TreeNode::change_grad(int dg){
+  this->active = false;
+  this->dg += dg;
+}
+
 void TreeNode::lazy_update(TreeNode* node){
   if(node == NULL || node->active){
     return;
   }
+  // update gradient first, this is important
+  node->segm.left.y += node->segm.left.x * node->dg;
+  node->segm.right.y += node->segm.right.x * node->dg;
+
+  // perform shift
   node->segm.left.x += node->dx;
   node->segm.left.y += node->dy;
 
@@ -63,14 +73,17 @@ void TreeNode::lazy_update(TreeNode* node){
   
   if(node->left){
     node->left->shift(node->dx, node->dy);
+    node->left->change_grad(node->dg);
   }
   if(node->right){
     node->right->shift(node->dx, node->dy);
+    node->right->change_grad(node->dg);
   }
 
   node->active = true;
   node->dx = 0;
   node->dy = 0;
+  node->dg = 0;
 }
 
 static TreeNode* rotate_right(TreeNode* root){
