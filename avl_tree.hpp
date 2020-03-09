@@ -6,7 +6,7 @@ class TreeNode
 public:
   Segment segm;
   bool active;
-  int dx, dy, dg;
+  int dx, dy, dg, dt, min_t;
   Point_t type_l, type_r;
   int height;
   TreeNode *left;
@@ -46,6 +46,8 @@ public:
   TreeNode *find_predec(Segment segm);
   TreeNode *find_succ(Segment segm);
   bool is_balanced();
+  void shift(int dx, int dy);
+  void change_grad(int dg);
   static BST join(TreeNode *t_l, TreeNode *t_r, Segment segm);
   static BST join(TreeNode *t_l, TreeNode *t_r);
   // splits the tree, keeping the segment in the right partition of the tree

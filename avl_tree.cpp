@@ -435,6 +435,24 @@ void BST::delete_node(Segment segm)
   this->root = _delete_node(this->root, segm);
 }
 
+void BST::shift(int dx, int dy){
+  this->root->shift(dx, dy);
+
+  // This ensures the invariant that no deferred changes are stored
+  //  on the leftmost and on the rightmost path of the BST
+  TreeNode* min = TreeNode::min(this->root);
+  TreeNode* max = TreeNode::max(this->root);
+}
+
+void BST::change_grad(int dg){
+  this->root->change_grad(dg);
+
+  // This ensures the invariant that no deferred changes are stored
+  //  on the leftmost and on the rightmost path of the BST
+  TreeNode* min = TreeNode::min(this->root);
+  TreeNode* max = TreeNode::max(this->root);
+}
+
 TreeNode *join_right(TreeNode *t_l, TreeNode *t_r, Segment segm){
   TreeNode::lazy_update(t_r);
   TreeNode::lazy_update(t_l);
