@@ -8,7 +8,7 @@ TreeNode::TreeNode(Segment segm)
 {
   this->segm = segm;
   this->height = 1;
-  this->active = true;
+  this->active = false;
   this->left = NULL;
   this->right = NULL;
 }
@@ -20,7 +20,7 @@ TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right){
   this->left = left;
   this->right = right;
   // TODO make sure this is fine
-  this->active = true;
+  this->active = false;
   this->recompute_height();
 }
 
@@ -481,11 +481,13 @@ BST BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
     return joined_tree;
   }
   if(t_l == NULL){
+    TreeNode::lazy_update(t_r);
     joined_tree.root = t_r;
     joined_tree.insert(segm);
     return joined_tree;
   }
   if(t_r == NULL){
+    TreeNode::lazy_update(t_l);
     joined_tree.root = t_l;
     joined_tree.insert(segm);
     return joined_tree;
