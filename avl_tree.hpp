@@ -7,6 +7,7 @@ public:
   Segment segm;
   bool active;
   int dx, dy, dg;
+  Point_t type_l, type_r;
   int height;
   TreeNode *left;
   TreeNode *right;
