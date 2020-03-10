@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-enum Point_t { ID, IF, FD, FI, DF, _I, _F, _D, I_, F_, D_ } ;
+enum Point_t { NotInitialised, DI, ID, IF, FD, FI, DF, _I, _F, _D, I_, F_, D_ } ;
 
 class Point{
 public:

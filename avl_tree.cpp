@@ -8,7 +8,7 @@ TreeNode::TreeNode(Segment segm)
 {
   this->segm = segm;
   this->height = 1;
-  this->active = false;
+  this->active = true;
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
@@ -17,7 +17,7 @@ TreeNode::TreeNode(Segment segm)
 }
 
 TreeNode::TreeNode(){
-  this->active = false;
+  this->active = true;
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
@@ -27,7 +27,7 @@ TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right){
   this->segm = segm;
   this->left = left;
   this->right = right;
-  this->active = false;
+  this->active = true;
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
@@ -45,6 +45,87 @@ int height(TreeNode* node){
   return node->height;
 }
 
+void move_point(Point &p, Point_t type, int dt){
+  if(type == FI || type == IF || type == I_ || type == F_){
+    p.x += 1 * dt;
+  }
+  if(type == ID){
+    p.x += 0.5 * (double)dt;
+    p.y -= 0.5 * (double)dt;
+  }
+}
+
+Point_t update_point_type(Point_t type, int dg){
+  assert(type != ID && type != DI);
+  assert(!((type == _D || type == D_ || type == FD || type == DF) && dg == -1));
+  assert(!((type == _I || type == I_ || type == FI || type == IF) && dg == 1));
+
+  if(type == _I && dg == -1){
+    return _F;
+  }
+
+  if(type == I_ && dg == -1){
+    return F_;
+  }
+
+  if(type == _F && dg == -1){
+    return _D;
+  }
+
+  if(type == F_ && dg == -1){
+    return D_;
+  }
+
+  if(type == IF && dg == -1){
+    return FD;
+  }
+
+  if(type == FI && dg == -1){
+    return DF;
+  }
+  
+  if(type == _D && dg == 1){
+    return _F;
+  }
+
+  if(type == D_ && dg == 1){
+    return F_;
+  }
+
+  if(type == _F && dg == 1){
+    return _I;
+  }
+
+  if(type == F_ && dg == 1){
+    return I_;
+  }
+
+  if(type == DF && dg == 1){
+    return FI;
+  }
+
+  if(type == FD && dg == 1){
+    return IF;
+  }
+  return type;
+}
+
+void TreeNode::update_endpoints(){
+  if(this->dt == 0){
+    return;
+  }
+  move_point(this->left->segm.left, this->type_l, this->dt);
+  move_point(this->left->segm.right, this->type_l, this->dt);
+  move_point(this->right->segm.left, this->type_r, this->dt);
+  move_point(this->right->segm.right, this->type_r, this->dt);
+
+  if(this->dg == 0){
+    return;
+  }
+  this->type_l = update_point_type(this->type_l, this->dg);
+  this->type_r = update_point_type(this->type_r, this->dg);
+}
+
 void TreeNode::shift(int dx, int dy){
   this->active = false;
   this->dx += dx;
@@ -56,13 +137,28 @@ void TreeNode::change_grad(int dg){
   this->dg += dg;
 }
 
+void TreeNode::apply_swm(int dt){
+  this->active = false;
+  this->t_min -= dt;
+  if(this->dg == 0){
+    this->dt += dt;
+  }
+  else if(this->type_l == IF || this->type_l == FI){
+    this->shift(dt, 0);
+  }
+}
+
 void TreeNode::lazy_update(TreeNode* node){
   if(node == NULL || node->active){
     return;
   }
-  // update gradient first, this is important
+
+  node->update_endpoints();
+
+  // update gradient before performing shift, this is important
   node->segm.left.y += node->segm.left.x * node->dg;
   node->segm.right.y += node->segm.right.x * node->dg;
+
 
   // perform shift
   node->segm.left.x += node->dx;
@@ -72,18 +168,21 @@ void TreeNode::lazy_update(TreeNode* node){
   node->segm.right.y += node->dy;
   
   if(node->left){
-    node->left->shift(node->dx, node->dy);
+    node->left->apply_swm(node->dt);
     node->left->change_grad(node->dg);
+    node->left->shift(node->dx, node->dy);
   }
   if(node->right){
-    node->right->shift(node->dx, node->dy);
+    node->right->apply_swm(node->dt);
     node->right->change_grad(node->dg);
+    node->right->shift(node->dx, node->dy);
   }
 
   node->active = true;
   node->dx = 0;
   node->dy = 0;
   node->dg = 0;
+  node->dt = 0;
 }
 
 static TreeNode* rotate_right(TreeNode* root){
@@ -327,6 +426,10 @@ TreeNode *BST::find_succ(Segment segm)
 // need to be searched.
 TreeNode* TreeNode::min(TreeNode *node)
 {
+  if(node == NULL){
+    return NULL;
+  }
+
   TreeNode *current = node;
   lazy_update(current);
   /* loop down to find the leftmost leaf */
@@ -437,7 +540,6 @@ void BST::delete_node(Segment segm)
 
 void BST::shift(int dx, int dy){
   this->root->shift(dx, dy);
-
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
   TreeNode* min = TreeNode::min(this->root);
@@ -447,6 +549,14 @@ void BST::shift(int dx, int dy){
 void BST::change_grad(int dg){
   this->root->change_grad(dg);
 
+  // This ensures the invariant that no deferred changes are stored
+  //  on the leftmost and on the rightmost path of the BST
+  TreeNode* min = TreeNode::min(this->root);
+  TreeNode* max = TreeNode::max(this->root);
+}
+
+void BST::apply_swm(int dt){
+  this->root->apply_swm(dt);
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
   TreeNode* min = TreeNode::min(this->root);
@@ -545,6 +655,10 @@ BST BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
     root = new TreeNode(segm, t_l, t_r);
   }
   joined_tree.root = root;
+  // This ensures the invariant that no deferred changes are stored
+  //  on the leftmost and on the rightmost path of the BST
+  TreeNode* min = TreeNode::min(joined_tree.root);
+  TreeNode* max = TreeNode::max(joined_tree.root);
   return joined_tree;
 }
 
@@ -568,7 +682,7 @@ BST BST::join(TreeNode *t_l, TreeNode *t_r){
 
 // splits the tree, keeping the segment in the right partition of the tree
 // This function has side effect for the subtree rooted at root, which is compromised
-std::pair<BST, BST> BST::split(TreeNode* root, Segment segm){
+std::pair<BST, BST> split_(TreeNode* root, Segment segm){
   std::pair<BST, BST> pair;
   if(root == NULL){
     return pair;
@@ -581,7 +695,7 @@ std::pair<BST, BST> BST::split(TreeNode* root, Segment segm){
     return std::pair<BST, BST>(left, right);
   }
   if(segm < root->segm){
-    std::pair<BST, BST> aux = BST::split(root->left, segm);
+    std::pair<BST, BST> aux = split_(root->left, segm);
     if(!aux.first.is_balanced()){
       print_2D(aux.first.root);
       throw;
@@ -593,7 +707,7 @@ std::pair<BST, BST> BST::split(TreeNode* root, Segment segm){
     BST right = BST::join(aux.second.root, root->right, root->segm);
     return std::pair<BST, BST>(aux.first, right);
   }
-  std::pair<BST, BST> aux = BST::split(root->right, segm);
+  std::pair<BST, BST> aux = split_(root->right, segm);
   if(!aux.first.is_balanced()){
     print_2D(aux.first.root);
     throw;
@@ -603,6 +717,19 @@ std::pair<BST, BST> BST::split(TreeNode* root, Segment segm){
     throw;
   }
   return std::pair<BST, BST>(BST::join(root->left, aux.first.root, root->segm), aux.second); 
+}
+
+std::pair<BST, BST> BST::split(TreeNode* root, Segment segm){
+  std::pair<BST, BST> pair = split_(root, segm);
+
+  // This ensures the invariant that no deferred changes are stored
+  //  on the leftmost and on the rightmost path of the BSTs
+  TreeNode* aux;
+  aux = TreeNode::min(pair.first.root);
+  aux = TreeNode::max(pair.first.root);
+  aux = TreeNode::min(pair.second.root);
+  aux = TreeNode::max(pair.second.root);
+  return pair;
 }
 
 void TreeNode::free(TreeNode *node){

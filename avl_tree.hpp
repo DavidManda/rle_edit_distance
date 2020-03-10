@@ -6,7 +6,7 @@ class TreeNode
 public:
   Segment segm;
   bool active;
-  int dx, dy, dg, dt, min_t;
+  int dx, dy, dg, dt, t_min;
   Point_t type_l, type_r;
   int height;
   TreeNode *left;
@@ -17,6 +17,8 @@ public:
   TreeNode(Segment segm, TreeNode* left, TreeNode* right);
   void shift(int dx, int dy);
   void change_grad(int dg);
+  void apply_swm(int dt);
+  void update_endpoints();
   static void lazy_update(TreeNode* node);
   void set_right(TreeNode* node);
   void set_left(TreeNode* node);
@@ -48,6 +50,7 @@ public:
   bool is_balanced();
   void shift(int dx, int dy);
   void change_grad(int dg);
+  void apply_swm(int dt);
   static BST join(TreeNode *t_l, TreeNode *t_r, Segment segm);
   static BST join(TreeNode *t_l, TreeNode *t_r);
   // splits the tree, keeping the segment in the right partition of the tree

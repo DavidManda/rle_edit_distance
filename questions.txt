@@ -1,2 +1,10 @@
 Combine: why do we do inorder traversal as opposed to search for the segment?
-What happens when you insert into a tree that has lazy updates propagating?
+
+Propagation SWM - why are all nodes in the subtree of v of types DF and FD or of types IF and FI.
+
+The paper claims that whenever a node type changes, this change needs to be reflected at both
+incident segments as the node is stored in two places. However, since the update comes from the 
+root and will affect all children, all turning points will be correctly changed when the propagation
+reaches them. I believe updating each point individually suffices.
+
+

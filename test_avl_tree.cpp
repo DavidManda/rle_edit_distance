@@ -227,6 +227,20 @@ void test_simple_gradient_change(){
   }
 }
 
+void test_gradient_and_shift(){
+  BST tree;
+  for(int i = 0; i <= 100; i++){
+    tree.insert(Segment(Point(i,0), Point(i+1, 0)));
+  }
+  tree.root->change_grad(1);
+  tree.root->shift(5, 6);
+
+  for(int i = 0; i <= 50; i++){
+    TreeNode* node = tree.find(Segment(Point(i+5,i+6), Point(i+1+5, i+1+6)));
+    assert(node != NULL);
+  }
+}
+
 void test_lazy_propagation(){
   test_simple_shift();
   test_shift_propagates();
@@ -236,6 +250,61 @@ void test_lazy_propagation(){
   test_split_with_lazy_update_simple();
   test_split_with_lazy_update();
   test_simple_gradient_change();
+  test_gradient_and_shift();
+}
+
+bool left_right_paths_have_no_pending_updates(TreeNode *root){
+  bool sol = true;
+  TreeNode *aux = root;
+  while(aux && sol){
+    sol = sol && aux->active;
+    aux = aux->left;
+  }
+  aux = root;
+  while(aux && sol){
+    sol = sol && aux->active;
+    aux = aux->right;
+  }
+  return sol;
+}
+
+void test_invariant_lr_insert(){
+  BST tree;
+  for(int i = 0; i <= 100; i++){
+    tree.insert(Segment(Point(i,1), Point(i+1, 1)));
+  }
+  tree.apply_swm(3);
+  assert(left_right_paths_have_no_pending_updates(tree.root));
+  tree.change_grad(0);
+  assert(left_right_paths_have_no_pending_updates(tree.root));
+  tree.shift(0,2);
+  assert(left_right_paths_have_no_pending_updates(tree.root));
+}
+
+void test_invariant_lr_split_(int x){
+  int N = 10;
+  assert(x <= N);
+  BST tree;
+  for(int i = 0; i <= N; i++){
+    tree.insert(Segment(Point(i,1), Point(i+1, 1)));
+  }
+  tree.apply_swm(4);
+  tree.change_grad(-1);
+  tree.shift(3,4);
+  std::pair<BST, BST> trees = BST::split(tree.root, tree.root->left->segm);
+  assert(left_right_paths_have_no_pending_updates(trees.first.root));
+  assert(left_right_paths_have_no_pending_updates(trees.second.root));
+}
+
+void test_invariant_lr_split(){
+  for(int i = 2; i < 5; i++){
+    test_invariant_lr_split_(i);
+  }
+}
+
+void test_invariant_left_right_path(){
+  test_invariant_lr_insert();
+  test_invariant_lr_split();
 }
 
 void test_avl_tree(){
@@ -245,4 +314,5 @@ void test_avl_tree(){
   test_split();
   test_delete();
   test_lazy_propagation();
+  test_invariant_left_right_path();
 }
