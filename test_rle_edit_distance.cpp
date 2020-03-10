@@ -131,9 +131,25 @@ void test_point_types_join_diff_grad(){
   assert(tt.root->right->type_r == D_);
 }
 
+void test_join_with_DI_type(){
+  BST t1 = BST(new TreeNode(Segment(Point(0,10),Point(10,0))));
+  BST t2 = BST(new TreeNode(Segment(Point(10,0),Point(20,10))));
+  BST t = join(t1, t2);
+  TreeNode *left = t.find(Segment(Point(0,10),Point(10,0)));
+  TreeNode *right = t.find(Segment(Point(10,0),Point(20,10)));
+  TreeNode *empty_node = t.find(Segment(Point(10,10),Point(10,10)));
+  assert(left->type_l == _D);
+  assert(left->type_r == DF);
+  assert(empty_node->type_l == DF);
+  assert(empty_node->type_r == FI);
+  assert(right->type_l == FI);
+  assert(right->type_r == I_);
+}
+
 void test_point_types_join(){
   test_point_types_join_same_grad();
   test_point_types_join_diff_grad();
+  test_join_with_DI_type();
 }
 
 void test_point_types(){

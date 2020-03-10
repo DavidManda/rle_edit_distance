@@ -258,9 +258,9 @@ TreeNode* TreeNode::insert(TreeNode* root, Segment segm)
   if (root == NULL)
     return(new TreeNode(segm));  
   TreeNode::lazy_update(root);
-  if (segm < root->segm)
+  if (segm <= root->segm)
     root->left = insert(root->left, segm);
-  else if (segm > root->segm)  
+  else if (segm >= root->segm)  
     root->right = insert(root->right, segm);  
   else{
     // node already exists
@@ -578,7 +578,25 @@ void BST::delete_node(Segment segm)
   this->root = _delete_node(this->root, segm);
 }
 
-Point_t get_midpoint_type(int slope_l, int slope_r){
+Point_t get_midpoint_type(Segment s_l, Segment s_r){
+
+  if(s_l.right.x == s_l.left.x){
+    assert(s_r.right.x != s_r.left.x);
+    int slope_r = (s_r.right.y - s_r.left.y)/(s_r.right.x - s_r.left.x);
+    if(slope_r == -1)
+      return FD;
+    return FI;
+  }
+
+  if(s_r.right.x == s_r.left.x){
+    assert(s_l.right.x != s_l.left.x);
+    int slope_l = (s_l.right.y - s_l.left.y)/(s_l.right.x - s_l.left.x);
+    if(slope_l == -1)
+      return DF;
+    return IF;
+  }
+  int slope_r = (s_r.right.y - s_r.left.y)/(s_r.right.x - s_r.left.x);
+  int slope_l = (s_l.right.y - s_l.left.y)/(s_l.right.x - s_l.left.x);
   if(slope_l == -1){
     if(slope_r == 0)
       return DF;
@@ -607,24 +625,37 @@ void BST::update_point_type(Segment segm){
   TreeNode *succ = this->find_succ(segm);
   set_endpoints(node);
   Segment s = node->segm;
-  assert(s.right.x != s.left.x);
-  int slope = (s.right.y - s.left.y)/(s.right.x - s.left.x);
-  assert(slope == 1 || slope == 0 || slope == -1);
 
   if(succ != NULL){
     Segment s_r = succ->segm;
-    assert(s_r.right.x != s_r.left.x);
-    int slope_r = (s_r.right.y - s_r.left.y)/(s_r.right.x - s_r.left.x);
-    assert(slope_r == 1 || slope_r == 0 || slope_r == -1);
-    node->type_r = get_midpoint_type(slope, slope_r);
+    Point_t type = get_midpoint_type(s, s_r);
+    if(type != DI){
+      node->type_r = type;
+    }
+    else
+    {
+      Segment empty_segm = Segment(s.right, s.right);
+      this->insert(empty_segm);
+      this->update_point_type(segm);
+      this->update_point_type(empty_segm);
+      this->update_point_type(s_r);
+    }
   }
 
   if(predec != NULL){
     Segment s_l = predec->segm;
-    assert(s_l.right.x != s_l.left.x);
-    int slope_l = (s_l.right.y - s_l.left.y)/(s_l.right.x - s_l.left.x);
-    assert(slope_l == 1 || slope_l == 0 || slope_l == -1);
-    node->type_l = get_midpoint_type(slope_l, slope);
+    Point_t type = get_midpoint_type(s_l, s);
+    if(type != DI){
+      node->type_l = type;
+    }
+    else
+    {
+      Segment empty_segm = Segment(s.left, s.left);
+      this->insert(empty_segm);
+      this->update_point_type(s_l);
+      this->update_point_type(empty_segm);
+      this->update_point_type(segm);
+    }
   }
 }
 

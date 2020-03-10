@@ -12,6 +12,8 @@ public:
   bool contains(int x);
   bool operator <(const Segment& s);
   bool operator >(const Segment& s);
+  bool operator <=(const Segment& s);
+  bool operator >=(const Segment& s);
   bool operator ==(const Segment& s);
   std::string to_string();
 };

@@ -21,6 +21,14 @@ bool Segment::operator >(const Segment& s){
   return right.x > s.right.x && left.x >= s.right.x;
 }
 
+bool Segment::operator <=(const Segment& s){
+  return left.x <= s.left.x && right.x <= s.left.x;
+}
+
+bool Segment::operator >=(const Segment& s){
+  return right.x >= s.right.x && left.x >= s.right.x;
+}
+
 bool Segment::operator ==(const Segment& s){
   return left.x == s.left.x && right.x == s.right.x;
 }
