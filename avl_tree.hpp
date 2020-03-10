@@ -15,6 +15,7 @@ public:
   TreeNode(Segment segm);
   TreeNode();
   TreeNode(Segment segm, TreeNode* left, TreeNode* right);
+  int get_t_min();
   void shift(int dx, int dy);
   void change_grad(int dg);
   void apply_swm(int dt);

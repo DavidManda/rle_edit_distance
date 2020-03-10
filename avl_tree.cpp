@@ -1,14 +1,20 @@
 #include "avl_tree.hpp"
 #include <cstddef>
 #include <iostream>
+#include <cmath>
 
 #define COUNT 10
+
+int get_manhattan(Point p1, Point p2){
+  return std::abs(p1.x - p2.x) + std::abs(p1.y - p2.y);
+}
 
 TreeNode::TreeNode(Segment segm)
 {
   this->segm = segm;
   this->height = 1;
   this->active = true;
+  this->t_min = get_manhattan(segm.left, segm.right);
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
@@ -28,10 +34,15 @@ TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right){
   this->left = left;
   this->right = right;
   this->active = true;
+  this->t_min = get_manhattan(segm.left, segm.right);
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
   this->recompute_height();
+}
+
+int TreeNode::get_t_min(){
+  return std::min(this->t_min, get_manhattan(this->segm.left, this->segm.right));
 }
 
 void TreeNode::update_value(Segment segm)
