@@ -355,6 +355,14 @@ void test_endpoints(){
   assert(t.root->type_r == D_);
 }
 
+void test_find_predec(){
+  BST t;
+  Segment s(Point(0,0), Point(1,0));
+  t.insert(s);
+  TreeNode *predec = t.find_predec(s);
+  assert(predec == NULL);
+}
+
 void test_avl_tree(){
   test_insert();
   test_split_basics();
@@ -365,4 +373,5 @@ void test_avl_tree(){
   test_invariant_left_right_path();
   test_t_min();
   test_endpoints();
+  test_find_predec();
 }

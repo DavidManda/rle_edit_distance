@@ -53,6 +53,7 @@ public:
   void shift(int dx, int dy);
   void change_grad(int dg);
   void apply_swm(int dt);
+  void update_point_type(Segment segm);
   static BST join(TreeNode *t_l, TreeNode *t_r, Segment segm);
   static BST join(TreeNode *t_l, TreeNode *t_r);
   // splits the tree, keeping the segment in the right partition of the tree

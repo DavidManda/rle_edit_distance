@@ -24,31 +24,38 @@ BST join(BST t1, BST t2){
     return BST(t1.root);
   }
   
-  TreeNode *largest_t1 = TreeNode::max(t1.root);
-  TreeNode *smallest_t2 = TreeNode::min(t2.root);
-  if(largest_t1->segm.right.x != smallest_t2->segm.left.x){
+  Segment largest_t1 = TreeNode::max(t1.root)->segm;
+  Segment smallest_t2 = TreeNode::min(t2.root)->segm;
+  if(largest_t1.right.x != smallest_t2.left.x){
     std::cout<<"Rightmost point of tree 1 should be equal to leftmost point of tree 2\n";
     throw;
   }
 
-  int slope1 = (largest_t1->segm.right.y - largest_t1->segm.left.y) / 
-              (largest_t1->segm.right.x - largest_t1->segm.left.x);
-  int slope2 = (smallest_t2->segm.right.y - smallest_t2->segm.left.y) / 
-              (smallest_t2->segm.right.x - smallest_t2->segm.left.x);
+  int slope1 = (largest_t1.right.y - largest_t1.left.y) / 
+              (largest_t1.right.x - largest_t1.left.x);
+  int slope2 = (smallest_t2.right.y - smallest_t2.left.y) / 
+              (smallest_t2.right.x - smallest_t2.left.x);
   Segment aux;
+  BST t_join;
   // combine segments if they have the same gradient
   if(slope1 == slope2){
-    aux.left = largest_t1->segm.left;
-    aux.right = smallest_t2->segm.right;
-    t1.delete_node(largest_t1->segm);
-    t2.delete_node(smallest_t2->segm);
+    aux.left = largest_t1.left;
+    aux.right = smallest_t2.right;
+    t1.delete_node(largest_t1);
+    t2.delete_node(smallest_t2);
+    t_join = BST::join(t1.root,t2.root,aux);
+    t_join.update_point_type(aux);
   }
   else{
-    aux = smallest_t2->segm;
-    t2.delete_node(smallest_t2->segm);
+    aux = smallest_t2;
+    t2.delete_node(smallest_t2);
+    t_join = BST::join(t1.root,t2.root,aux);
+    t_join.update_point_type(largest_t1);
+    TreeNode *n = t_join.find(largest_t1);
+    t_join.update_point_type(smallest_t2);
   }
 
-  return BST::join(t1.root,t2.root,aux);
+  return t_join;
 }
 
 TreeNode* find_segm_containing(TreeNode* root, float x){
@@ -85,6 +92,8 @@ std::pair<BST, BST> split(BST T, float x_m){
     T.insert(s1);
     T.insert(s2);
     sol = BST::split(T.root, s2);
+    sol.first.update_point_type(s1);
+    sol.second.update_point_type(s2);
   }
   else if(x_m == segm.left.x){
     // we keep the segment in the right part of the tree by using it for splitting

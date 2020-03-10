@@ -578,6 +578,56 @@ void BST::delete_node(Segment segm)
   this->root = _delete_node(this->root, segm);
 }
 
+Point_t get_midpoint_type(int slope_l, int slope_r){
+  if(slope_l == -1){
+    if(slope_r == 0)
+      return DF;
+    if(slope_r == 1)
+      return DI;
+  }
+  if(slope_l == 0){
+    if(slope_r == -1)
+      return FD;
+    if(slope_l == 1)
+      return FI;
+  }
+  if(slope_l == 1){
+    if(slope_r == -1)
+      return ID;
+    if(slope_r == 0)
+      return IF;
+  }
+  return NotInitialised;
+}
+
+void BST::update_point_type(Segment segm){
+  TreeNode *node = this->find(segm);
+  assert(node != NULL);
+  TreeNode *predec = this->find_predec(segm);
+  TreeNode *succ = this->find_succ(segm);
+  set_endpoints(node);
+  Segment s = node->segm;
+  assert(s.right.x != s.left.x);
+  int slope = (s.right.y - s.left.y)/(s.right.x - s.left.x);
+  assert(slope == 1 || slope == 0 || slope == -1);
+
+  if(succ != NULL){
+    Segment s_r = succ->segm;
+    assert(s_r.right.x != s_r.left.x);
+    int slope_r = (s_r.right.y - s_r.left.y)/(s_r.right.x - s_r.left.x);
+    assert(slope_r == 1 || slope_r == 0 || slope_r == -1);
+    node->type_r = get_midpoint_type(slope, slope_r);
+  }
+
+  if(predec != NULL){
+    Segment s_l = predec->segm;
+    assert(s_l.right.x != s_l.left.x);
+    int slope_l = (s_l.right.y - s_l.left.y)/(s_l.right.x - s_l.left.x);
+    assert(slope_l == 1 || slope_l == 0 || slope_l == -1);
+    node->type_l = get_midpoint_type(slope_l, slope);
+  }
+}
+
 void BST::shift(int dx, int dy){
   this->root->shift(dx, dy);
   // This ensures the invariant that no deferred changes are stored
