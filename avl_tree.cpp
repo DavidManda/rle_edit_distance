@@ -139,6 +139,7 @@ void TreeNode::change_grad(int dg){
 
 void TreeNode::apply_swm(int dt){
   this->active = false;
+  // TODO make sure you should update this here or just recompute the value. maybe do both.
   this->t_min -= dt;
   if(this->dg == 0){
     this->dt += dt;

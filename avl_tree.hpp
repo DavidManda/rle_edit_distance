@@ -6,7 +6,7 @@ class TreeNode
 public:
   Segment segm;
   bool active;
-  int dx, dy, dg, dt, t_min;
+  int dx, dy, dg, dt;
   Point_t type_l, type_r;
   int height;
   TreeNode *left;
@@ -33,6 +33,9 @@ public:
   std::string to_string();
   TreeNode *find(Segment segm);
   static void free(TreeNode *node);
+
+private:
+  int t_min;
 };
 
 class BST

@@ -7,4 +7,4 @@ incident segments as the node is stored in two places. However, since the update
 root and will affect all children, all turning points will be correctly changed when the propagation
 reaches them. I believe updating each point individually suffices.
 
-
+Why is tmin access only when the node is inactive? shouldn't it be the other way around?
