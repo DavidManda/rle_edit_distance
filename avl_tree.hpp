@@ -26,6 +26,7 @@ public:
   static TreeNode* insert(TreeNode* root, Segment segm);
   void update_value(Segment segm);
   void recompute_height();
+  void recompute_tmin();
   int get_balance();
   static TreeNode *min(TreeNode *node);
   static TreeNode *max(TreeNode *node);

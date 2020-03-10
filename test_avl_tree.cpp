@@ -282,13 +282,12 @@ void test_invariant_lr_insert(){
 }
 
 void test_invariant_lr_split_(int x){
-  int N = 10;
+  int N = 100;
   assert(x <= N);
   BST tree;
   for(int i = 0; i <= N; i++){
     tree.insert(Segment(Point(i,1), Point(i+1, 1)));
   }
-  tree.apply_swm(4);
   tree.change_grad(-1);
   tree.shift(3,4);
   std::pair<BST, BST> trees = BST::split(tree.root, tree.root->left->segm);
@@ -297,7 +296,7 @@ void test_invariant_lr_split_(int x){
 }
 
 void test_invariant_lr_split(){
-  for(int i = 2; i < 5; i++){
+  for(int i = 2; i < 50; i++){
     test_invariant_lr_split_(i);
   }
 }
@@ -305,6 +304,55 @@ void test_invariant_lr_split(){
 void test_invariant_left_right_path(){
   test_invariant_lr_insert();
   test_invariant_lr_split();
+}
+
+void test_tmin_simple(){
+  BST tree;
+  Point p11(1,1), p22(2,2);
+
+  tree.insert(Segment(p11,p22));
+  assert(tree.root->t_min == Point::get_manhattan(p11, p22));
+  tree.insert(Segment(Point(0,0), Point(1,0)));
+  assert(tree.root->t_min == 1);
+  tree.insert(Segment(Point(-10,0), Point(-10,0)));
+  assert(tree.root->t_min == 0);
+}
+
+void test_tmin_complex(){
+  BST tree;
+  Point p1(-1,1), p2(0,0);
+  for(int i=0; i<10;i++){
+    tree.insert(Segment(Point(i*10, 0), Point((i+1)*10, 0)));
+  }
+  assert(tree.root->t_min == 10);
+
+  tree.insert(Segment(p1,p2));
+  assert(tree.root->t_min == 2);
+  tree.delete_node(Segment(p1,p2));
+  assert(tree.root->t_min == 10);
+}
+
+void test_t_min(){
+  test_tmin_simple();
+  test_tmin_complex();
+}
+
+void test_endpoints(){
+  BST t;
+  Segment s(Point(0,0), Point(1,0));
+  return;
+  t = BST(new TreeNode(s));
+  assert(t.root->type_l == _F);
+  assert(t.root->type_r == F_);
+  s = Segment(Point(0,0), Point(1,1));
+  t = BST(new TreeNode(s));
+  assert(t.root->type_l == _I);
+  assert(t.root->type_r == I_);
+
+  s = Segment(Point(2,2), Point(1,1));
+  t = BST(new TreeNode(s));
+  assert(t.root->type_l == _D);
+  assert(t.root->type_r == D_);
 }
 
 void test_avl_tree(){
@@ -315,4 +363,6 @@ void test_avl_tree(){
   test_delete();
   test_lazy_propagation();
   test_invariant_left_right_path();
+  test_t_min();
+  test_endpoints();
 }

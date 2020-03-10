@@ -1,20 +1,15 @@
 #include "avl_tree.hpp"
 #include <cstddef>
 #include <iostream>
-#include <cmath>
 
 #define COUNT 10
-
-int get_manhattan(Point p1, Point p2){
-  return std::abs(p1.x - p2.x) + std::abs(p1.y - p2.y);
-}
 
 TreeNode::TreeNode(Segment segm)
 {
   this->segm = segm;
   this->height = 1;
   this->active = true;
-  this->t_min = get_manhattan(segm.left, segm.right);
+  this->t_min = Point::get_manhattan(segm.left, segm.right);
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
@@ -34,15 +29,20 @@ TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right){
   this->left = left;
   this->right = right;
   this->active = true;
-  this->t_min = get_manhattan(segm.left, segm.right);
+  this->t_min = Point::get_manhattan(segm.left, segm.right);
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
   this->recompute_height();
+  this->recompute_tmin();
 }
 
-int TreeNode::get_t_min(){
-  return std::min(this->t_min, get_manhattan(this->segm.left, this->segm.right));
+void TreeNode::recompute_tmin(){
+  int t_left = (this->left != NULL) ? this->left->t_min : INT_MAX;
+  int t_right = (this->right != NULL) ? this->right->t_min : INT_MAX;
+  int this_tmin = Point::get_manhattan(this->segm.left, this->segm.right);
+
+  this->t_min = std::min(this_tmin, std::min(t_left, t_right));
 }
 
 void TreeNode::update_value(Segment segm)
@@ -54,6 +54,27 @@ int height(TreeNode* node){
   if(node == NULL)
     return 0;
   return node->height;
+}
+
+void set_endpoints(TreeNode* node){
+  if(node == NULL || node->segm.left.x == node->segm.right.x)
+    return;
+  Segment s = node->segm;
+  int slope = (s.right.y - s.left.y)/(s.right.x - s.left.x);
+  assert(slope == 1 || slope == 0 || slope == -1);
+
+  if(slope == 1){
+    node->type_l = _I;
+    node->type_r = I_;
+  }
+  if(slope == -1){
+    node->type_l = _D;
+    node->type_r = D_;
+  }
+  if(slope == 0){
+    node->type_l = _F;
+    node->type_r = F_;
+  }
 }
 
 void move_point(Point &p, Point_t type, int dt){
@@ -197,7 +218,7 @@ void TreeNode::lazy_update(TreeNode* node){
   node->dt = 0;
 }
 
-static TreeNode* rotate_right(TreeNode* root){
+TreeNode* TreeNode::rotate_right(TreeNode* root){
   TreeNode *left = root->left;
   TreeNode *left_right = left->right;
   TreeNode::lazy_update(root);
@@ -207,13 +228,15 @@ static TreeNode* rotate_right(TreeNode* root){
   left->right = root;
   root->left = left_right;
 
+  root->recompute_tmin();
   root->recompute_height();
+  left->recompute_tmin();
   left->recompute_height();
 
   return left;
 }
 
-static TreeNode* rotate_left(TreeNode* root){
+TreeNode* TreeNode::rotate_left(TreeNode* root){
   TreeNode* right = root->right;
   TreeNode* right_left = right->left;
   TreeNode::lazy_update(root);
@@ -222,47 +245,49 @@ static TreeNode* rotate_left(TreeNode* root){
   right->left = root;
   root->right = right_left;
 
+  root->recompute_tmin();
   root->recompute_height();
+  right->recompute_tmin();
   right->recompute_height();
 
   return right;
 }
 
-static TreeNode* insert(TreeNode* root, Segment segm)
+TreeNode* TreeNode::insert(TreeNode* root, Segment segm)
 {
   if (root == NULL)
     return(new TreeNode(segm));  
   TreeNode::lazy_update(root);
-  if (segm < root->segm)  
-    root->left = insert(root->left, segm);  
+  if (segm < root->segm)
+    root->left = insert(root->left, segm);
   else if (segm > root->segm)  
     root->right = insert(root->right, segm);  
   else{
     // node already exists
     return NULL;
   }
-
+  root->recompute_tmin();
   root->recompute_height();
 
   int balance = root->get_balance();
 
   // left left
   if(balance > 1 && (segm < root->left->segm)){
-    return rotate_right(root);
+    return TreeNode::rotate_right(root);
   }
   // right right
   if(balance < -1 && segm > root->right->segm){
-    return rotate_left(root);
+    return TreeNode::rotate_left(root);
   }
   // left right
   if(balance > 1 && segm > root->left->segm){
-    root->left = rotate_left(root->left);
-    return rotate_right(root);
+    root->left = TreeNode::rotate_left(root->left);
+    return TreeNode::rotate_right(root);
   }
   // right left
   if(balance < -1 && segm < root->right->segm){
-    root->right = rotate_right(root->right);
-    return rotate_left(root);
+    root->right = TreeNode::rotate_right(root->right);
+    return TreeNode::rotate_left(root);
   }
 
   // if here no rotation happened
@@ -365,6 +390,7 @@ BST::BST()
 
 BST::BST(TreeNode* root){
   this->root = root;
+  set_endpoints(this->root);
 }
 
 bool is_balanced_(TreeNode* root){
@@ -387,11 +413,13 @@ bool BST::is_balanced(){
 void TreeNode::set_right(TreeNode* node){
   this->right = node;
   this->recompute_height();
+  this->recompute_tmin();
 }
 
 void TreeNode::set_left(TreeNode* node){
   this->left = node;
   this->recompute_height();
+  this->recompute_tmin();
 }
 
 void BST::insert(Segment segm)
@@ -401,8 +429,8 @@ void BST::insert(Segment segm)
     this->root = new TreeNode(segm);
     return;
   }
-  // these dots are weird here but seems like I need them
-  this->root = ::insert(this->root, segm);
+
+  this->root = TreeNode::insert(this->root, segm);
 }
 
 TreeNode *BST::find(Segment segm)
@@ -515,27 +543,27 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
   // If the tree had only one node
   if(root == NULL)
     return root;
-  
+  root->recompute_tmin();
   root->recompute_height();
 
   int balance = root->get_balance();
   // left left
   if(balance > 1 && root->left->get_balance() >= 0){
-    return rotate_right(root);
+    return TreeNode::rotate_right(root);
   }
   // left right
   if(balance > 1  && root->left->get_balance() < 0){
-    root->left = rotate_left(root->left);
-    return rotate_right(root);
+    root->left = TreeNode::rotate_left(root->left);
+    return TreeNode::rotate_right(root);
   }
   // right right
   if(balance < -1 && root->right->get_balance() <= 0){
-    return rotate_left(root);
+    return TreeNode::rotate_left(root);
   }
   // right left
   if(balance < -1 && root->right->get_balance() > 0){
-    root->right = rotate_left(root->right);
-    return rotate_left(root);
+    root->right = TreeNode::rotate_left(root->right);
+    return TreeNode::rotate_left(root);
   }
 
   return root;
@@ -590,15 +618,15 @@ TreeNode *join_right(TreeNode *t_l, TreeNode *t_r, Segment segm){
       return t_l;
     }
     else{
-      t_l->set_right(rotate_right(aux));
-      return rotate_left(t_l);
+      t_l->set_right(TreeNode::rotate_right(aux));
+      return TreeNode::rotate_left(t_l);
     }
   }
   else{
     TreeNode *aux = join_right(left_right, t_r, segm);
     t_l->set_right(aux);
     if(height(t_l->right) > height(t_l->left) + 1)
-      return rotate_left(t_l);
+      return TreeNode::rotate_left(t_l);
     else
       return t_l;
   }
@@ -620,15 +648,15 @@ TreeNode *join_left(TreeNode *t_l, TreeNode *t_r, Segment segm){
       return t_r;
     }
     else{
-      t_r->set_left(rotate_left(aux));
-      return rotate_right(t_r);
+      t_r->set_left(TreeNode::rotate_left(aux));
+      return TreeNode::rotate_right(t_r);
     }
   }
   else{
     TreeNode* aux = join_left(t_l, right_left, segm);
     t_r->set_left(aux);
     if(height(t_r->left) > height(t_r->right) + 1)
-      return rotate_right(t_r);
+      return TreeNode::rotate_right(t_r);
     else
       return t_r;
   }
