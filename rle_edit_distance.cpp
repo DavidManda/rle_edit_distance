@@ -158,11 +158,7 @@ void find_and_remove_collapsed_segm(TreeNode *root){
   BST t = BST(root);
   // if node is collapsed
   if(root->get_t_min() == 0){
-    TreeNode *pred = t.find_predec(root->segm);
-    TreeNode *succ = t.find_succ(root->segm);
     t.delete_node(root->segm);
-    t.update_point_type(pred->segm);
-    t.update_point_type(succ->segm);
   }
 }
 

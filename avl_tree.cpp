@@ -610,7 +610,14 @@ void BST::delete_node(Segment segm)
   {
     return;
   }
+  TreeNode *pred = this->find_predec(segm);
+  TreeNode *succ = this->find_succ(segm);
   this->root = _delete_node(this->root, segm);
+
+  if(pred != NULL)
+    this->update_point_type(pred->segm);
+  if(succ != NULL)
+    this->update_point_type(succ->segm);
 }
 
 Point_t get_midpoint_type(Segment s_l, Segment s_r){
