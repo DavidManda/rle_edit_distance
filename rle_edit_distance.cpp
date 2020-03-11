@@ -44,15 +44,12 @@ BST join(BST t1, BST t2){
     t1.delete_node(largest_t1);
     t2.delete_node(smallest_t2);
     t_join = BST::join(t1.root,t2.root,aux);
-    t_join.update_point_type(aux);
   }
   else{
     aux = smallest_t2;
     t2.delete_node(smallest_t2);
+    // point type of the incident segments will be updated in here when aux is inserted
     t_join = BST::join(t1.root,t2.root,aux);
-    t_join.update_point_type(largest_t1);
-    TreeNode *n = t_join.find(largest_t1);
-    t_join.update_point_type(smallest_t2);
   }
 
   return t_join;
@@ -105,6 +102,7 @@ std::pair<BST, BST> split(BST T, float x_m){
     sol = BST::split(T.root, succ->segm);
   }
   // update type of points of the new boundry elements
+  // TODO!! this is not OK because it has complexity O(log(n))^2. Fix this
   TreeNode* aux = sol.first.root;
   while(aux){
     sol.first.update_point_type(aux->segm);
@@ -175,14 +173,10 @@ BST SWM(BST tree, int h){
   if(left_most->type_l == _I){
     Segment empty_segm = Segment(left_most->segm.left, left_most->segm.left);
     tree.insert(empty_segm);
-    tree.update_point_type(empty_segm);
-    tree.update_point_type(left_most->segm);
   }
   if(right_most->type_r == D_){
     Segment empty_segm = Segment(right_most->segm.right, right_most->segm.right);
     tree.insert(empty_segm);
-    tree.update_point_type(empty_segm);
-    tree.update_point_type(right_most->segm);
   }
   while(h > 0){
     int t_min = tree.root->t_min;

@@ -672,9 +672,6 @@ void BST::update_point_type(Segment segm){
     {
       Segment empty_segm = Segment(s.right, s.right);
       this->insert(empty_segm);
-      this->update_point_type(segm);
-      this->update_point_type(empty_segm);
-      this->update_point_type(s_r);
     }
   }
 
@@ -688,9 +685,6 @@ void BST::update_point_type(Segment segm){
     {
       Segment empty_segm = Segment(s.left, s.left);
       this->insert(empty_segm);
-      this->update_point_type(s_l);
-      this->update_point_type(empty_segm);
-      this->update_point_type(segm);
     }
   }
   this->update_tmin_on_path_to(node->segm);
