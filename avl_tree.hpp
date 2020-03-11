@@ -28,6 +28,7 @@ public:
   void recompute_height();
   void recompute_tmin();
   int get_balance();
+  static TreeNode* delete_node(TreeNode *root, Segment segm);
   static TreeNode *min(TreeNode *node);
   static TreeNode *max(TreeNode *node);
   static TreeNode* rotate_right(TreeNode* root);
@@ -54,6 +55,7 @@ public:
   void change_grad(int dg);
   void apply_swm(int dt);
   void update_point_type(Segment segm);
+  void update_tmin_on_path_to(Segment segm);
   static BST join(TreeNode *t_l, TreeNode *t_r, Segment segm);
   static BST join(TreeNode *t_l, TreeNode *t_r);
   // splits the tree, keeping the segment in the right partition of the tree

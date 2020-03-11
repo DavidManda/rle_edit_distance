@@ -15,3 +15,5 @@ TreeNode* find_segm_containing(TreeNode* root, float x);
 
 // split a tree describing interval [x_l, x_r] into two trees describing [x_l, x_m],[x_m, x_r]
 std::pair<BST, BST> split(BST T, float x_m);
+
+BST SWM(BST tree, int h);

@@ -47,7 +47,7 @@ int TreeNode::get_t_min(){
   if(has_collapse_time(this)){
     return Point::get_manhattan(this->segm.left, this->segm.right);
   }
-  return 0;
+  return INT_MAX;
 }
 
 void TreeNode::recompute_tmin(){
@@ -70,8 +70,15 @@ int height(TreeNode* node){
 }
 
 void set_endpoints(TreeNode* node){
-  if(node == NULL || node->segm.left.x == node->segm.right.x)
+  if(node == NULL)
     return;
+
+  if(node->segm.left.x == node->segm.right.x){
+    node->type_l = _F;
+    node->type_r = F_;
+    return;
+  }
+
   Segment s = node->segm;
   int slope = (s.right.y - s.left.y)/(s.right.x - s.left.x);
   assert(slope == 1 || slope == 0 || slope == -1);
@@ -159,10 +166,8 @@ void TreeNode::update_endpoints(){
   if(this->dt == 0){
     return;
   }
-  move_point(this->left->segm.left, this->type_l, this->dt);
-  move_point(this->left->segm.right, this->type_l, this->dt);
-  move_point(this->right->segm.left, this->type_r, this->dt);
-  move_point(this->right->segm.right, this->type_r, this->dt);
+  move_point(this->segm.left, this->type_l, this->dt);
+  move_point(this->segm.right, this->type_r, this->dt);
 
   if(this->dg == 0){
     return;
@@ -198,7 +203,6 @@ void TreeNode::lazy_update(TreeNode* node){
   if(node == NULL || node->active){
     return;
   }
-
   node->update_endpoints();
 
   // update gradient before performing shift, this is important
@@ -435,15 +439,25 @@ void TreeNode::set_left(TreeNode* node){
   this->recompute_tmin();
 }
 
+// inserts node into tree, sets point type and updates t_min
 void BST::insert(Segment segm)
 {
   if (this->root == NULL)
   {
     this->root = new TreeNode(segm);
+    set_endpoints(this->root);
     return;
   }
 
   this->root = TreeNode::insert(this->root, segm);
+  // update point types
+  TreeNode *pred = BST::find_predec(segm);
+  TreeNode *succ = BST::find_succ(segm);
+  this->update_point_type(segm);
+  if(pred != NULL)
+    this->update_point_type(pred->segm);
+  if(succ != NULL)
+    this->update_point_type(succ->segm);
 }
 
 TreeNode *BST::find(Segment segm)
@@ -582,6 +596,14 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
   return root;
 }
 
+TreeNode* TreeNode::delete_node(TreeNode* root, Segment segm){
+  if(root == NULL)
+    return NULL;
+
+  return _delete_node(root, segm);
+
+}
+
 void BST::delete_node(Segment segm)
 {
   if (this->root == NULL)
@@ -631,6 +653,7 @@ Point_t get_midpoint_type(Segment s_l, Segment s_r){
   return NotInitialised;
 }
 
+// O(log(n))
 void BST::update_point_type(Segment segm){
   TreeNode *node = this->find(segm);
   assert(node != NULL);
@@ -670,6 +693,26 @@ void BST::update_point_type(Segment segm){
       this->update_point_type(segm);
     }
   }
+  this->update_tmin_on_path_to(node->segm);
+}
+
+void update_tmin_on_path_to_(TreeNode* root, Segment segm){
+  assert(root != NULL);
+  if(root->segm == segm){
+    root->recompute_tmin();
+  }
+  else if(root->segm >= segm){
+    update_tmin_on_path_to_(root->left, segm);
+  }
+  else
+  {
+    update_tmin_on_path_to_(root->right, segm);
+  }
+  root->recompute_tmin();
+}
+
+void BST::update_tmin_on_path_to(Segment segm){
+  update_tmin_on_path_to_(this->root, segm);
 }
 
 void BST::shift(int dx, int dy){
@@ -691,6 +734,7 @@ void BST::change_grad(int dg){
 
 void BST::apply_swm(int dt){
   this->root->apply_swm(dt);
+
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
   TreeNode* min = TreeNode::min(this->root);

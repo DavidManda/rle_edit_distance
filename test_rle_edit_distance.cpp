@@ -157,8 +157,74 @@ void test_point_types(){
   test_point_types_join();
 }
 
+void test_swm_one_segm(){
+  Segment flat(Point(0,1), Point(10,1));
+  int h = 3;
+  BST t = BST(new TreeNode(flat));
+  t = SWM(t, 3);
+
+  assert(t.root->segm == Segment(Point(0,1), Point(13, 1)));
+  assert(t.root->type_l == _F);
+  assert(t.root->type_r == F_);
+
+  Segment incr(Point(0,0), Point(10,10));
+  t = BST(new TreeNode(incr));
+  t = SWM(t, 3);
+  TreeNode* min = TreeNode::min(t.root);
+  TreeNode* max = TreeNode::max(t.root);
+  assert(min->segm == Segment(Point(0,0), Point(3,0)));
+  assert(max->segm == Segment(Point(3,0), Point(13, 10)));
+  assert(min->type_l == _F);
+  assert(min->type_r == FI);
+  assert(max->type_l == FI);
+  assert(max->type_r == I_);
+
+  Segment decr(Point(0,0), Point(10,-10));
+  t = BST(new TreeNode(decr));
+  t = SWM(t, 3);
+  min = TreeNode::min(t.root);
+  max = TreeNode::max(t.root);
+  assert(min->segm == Segment(Point(0,0), Point(10,-10)));
+  assert(max->segm == Segment(Point(10,-10), Point(13, -10)));
+  assert(min->type_l == _D);
+  assert(min->type_r == DF);
+  assert(max->type_l == DF);
+  assert(max->type_r == F_);
+}
+
+void test_swm_collapsing_segm(){
+  Segment incr(Point(0,0), Point(10,10));
+  Segment decr(Point(10,10), Point(15, 5));
+  Segment flat(Point(15,5), Point(20,5));
+
+  BST t1 = BST(new TreeNode(incr));
+  BST t2 = BST(new TreeNode(decr));
+  BST t3 = BST(new TreeNode(flat));
+
+  BST t = join(join(t1, t2), t3);
+  TreeNode *mid = t.root;
+  TreeNode *left = t.root->left;
+  TreeNode *right = t.root->right;
+
+  assert(left->type_l == _I);
+  assert(left->type_r == ID);
+  assert(mid->type_l == ID);
+  assert(mid->type_r == DF);
+  assert(right->type_l == DF);
+  assert(right->type_r == F_);
+  std::cout<<t.root->t_min<<'\n';
+  assert(t.root->t_min == 10);
+
+}
+
+void test_swm(){
+  test_swm_one_segm();
+  test_swm_collapsing_segm();
+}
+
 void test_rle_edit_distance(){
   test_get_val_at_coord();
   test_join();
   test_point_types();
+  test_swm();
 }
