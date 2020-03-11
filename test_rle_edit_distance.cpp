@@ -200,7 +200,6 @@ void test_swm_collapsing_segm(){
   BST t1 = BST(new TreeNode(incr));
   BST t2 = BST(new TreeNode(decr));
   BST t3 = BST(new TreeNode(flat));
-
   BST t = join(join(t1, t2), t3);
   TreeNode *mid = t.root;
   TreeNode *left = t.root->left;
@@ -212,19 +211,44 @@ void test_swm_collapsing_segm(){
   assert(mid->type_r == DF);
   assert(right->type_l == DF);
   assert(right->type_r == F_);
-  std::cout<<t.root->t_min<<'\n';
   assert(t.root->t_min == 10);
 
+  t = SWM(t, 5);
+  mid = t.root;
+  left = t.root->left;
+  right = t.root->right;
+  TreeNode *left_left = left->left;
+
+  assert(left_left->type_l == _F);
+  assert(left_left->type_r == FI);
+  assert(left->type_l == FI);
+  assert(left->type_r == ID);
+  assert(mid->type_l == ID);
+  assert(mid->type_r == DF);
+  assert(right->type_l == DF);
+  assert(right->type_r == F_);
+  assert(t.root->t_min == 5);
+
+  t = SWM(t, 6);
+  mid = t.root;
+  left = t.root->left;
+  right = t.root->right;
+  assert(left->type_l == _F);
+  assert(left->type_r == FI);
+  assert(mid->type_l == FI);
+  assert(mid->type_r == IF);
+  assert(right->type_l == IF);
+  assert(right->type_r == F_);
 }
 
 void test_swm(){
-  test_swm_one_segm();
+  // test_swm_one_segm();
   test_swm_collapsing_segm();
 }
 
 void test_rle_edit_distance(){
-  test_get_val_at_coord();
-  test_join();
-  test_point_types();
+  // test_get_val_at_coord();
+  // test_join();
+  // test_point_types();
   test_swm();
 }

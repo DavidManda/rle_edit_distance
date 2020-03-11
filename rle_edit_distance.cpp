@@ -143,23 +143,24 @@ BST combine(BST t1, BST t2){
   return sol;
 }
 
-void find_and_remove_collapsed_segm(TreeNode *root){
-  if(root == NULL || root->t_min == 0)
-    return;
+TreeNode* find_and_remove_collapsed_segm(TreeNode *root){
+  assert(root != NULL);
 
   if(root->left && root->left->t_min == 0){
-    find_and_remove_collapsed_segm(root->left);
+    root->left =  find_and_remove_collapsed_segm(root->left);
   }
 
   if(root->right && root->right->t_min == 0){
-    find_and_remove_collapsed_segm(root->right);
+    root->right = find_and_remove_collapsed_segm(root->right);
   }
-  // wrap node in a BST in order to use the BST API which is simpler
-  BST t = BST(root);
   // if node is collapsed
   if(root->get_t_min() == 0){
+    // wrap node in a BST in order to use the BST API which is updates point types
+    BST t = BST(root);
     t.delete_node(root->segm);
+    root = t.root;
   }
+  return root;
 }
 
 BST SWM(BST tree, int h){
@@ -174,13 +175,14 @@ BST SWM(BST tree, int h){
     Segment empty_segm = Segment(right_most->segm.right, right_most->segm.right);
     tree.insert(empty_segm);
   }
+
   while(h > 0){
     int t_min = tree.root->t_min;
     if(h >= t_min){
       tree.apply_swm(t_min);
       h -= t_min;
       while(tree.root->t_min == 0){
-        find_and_remove_collapsed_segm(tree.root);
+        tree.root = find_and_remove_collapsed_segm(tree.root);
       }
     }
     else

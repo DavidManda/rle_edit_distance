@@ -648,7 +648,7 @@ Point_t get_midpoint_type(Segment s_l, Segment s_r){
   if(slope_l == 0){
     if(slope_r == -1)
       return FD;
-    if(slope_l == 1)
+    if(slope_r == 1)
       return FI;
   }
   if(slope_l == 1){
