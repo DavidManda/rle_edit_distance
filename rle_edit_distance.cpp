@@ -92,8 +92,6 @@ std::pair<BST, BST> split(BST T, float x_m){
     T.insert(s1);
     T.insert(s2);
     sol = BST::split(T.root, s2);
-    sol.first.update_point_type(s1);
-    sol.second.update_point_type(s2);
   }
   else if(x_m == segm.left.x){
     // we keep the segment in the right part of the tree by using it for splitting
@@ -105,6 +103,17 @@ std::pair<BST, BST> split(BST T, float x_m){
     T.insert(segm);
     TreeNode* succ = T.find_succ(segm);
     sol = BST::split(T.root, succ->segm);
+  }
+  // update type of points of the new boundry elements
+  TreeNode* aux = sol.first.root;
+  while(aux){
+    sol.first.update_point_type(aux->segm);
+    aux = aux->right;
+  }
+  aux = sol.second.root;
+  while(aux){
+    sol.second.update_point_type(aux->segm);
+    aux = aux->left;
   }
   return sol;
 }

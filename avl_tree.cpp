@@ -9,7 +9,7 @@ TreeNode::TreeNode(Segment segm)
   this->segm = segm;
   this->height = 1;
   this->active = true;
-  this->t_min = Point::get_manhattan(segm.left, segm.right);
+  this->t_min = this->get_t_min();
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
@@ -29,7 +29,7 @@ TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right){
   this->left = left;
   this->right = right;
   this->active = true;
-  this->t_min = Point::get_manhattan(segm.left, segm.right);
+  this->t_min = this->get_t_min();
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
@@ -37,10 +37,23 @@ TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right){
   this->recompute_tmin();
 }
 
+bool has_collapse_time(TreeNode* node){
+  return  (node->type_l == ID && node->type_r == DF) ||
+          (node->type_l == IF && node->type_r == FD) ||
+          (node->type_l == FI && node->type_r == ID);
+}
+
+int TreeNode::get_t_min(){
+  if(has_collapse_time(this)){
+    return Point::get_manhattan(this->segm.left, this->segm.right);
+  }
+  return 0;
+}
+
 void TreeNode::recompute_tmin(){
   int t_left = (this->left != NULL) ? this->left->t_min : INT_MAX;
   int t_right = (this->right != NULL) ? this->right->t_min : INT_MAX;
-  int this_tmin = Point::get_manhattan(this->segm.left, this->segm.right);
+  int this_tmin = this->get_t_min();
 
   this->t_min = std::min(this_tmin, std::min(t_left, t_right));
 }

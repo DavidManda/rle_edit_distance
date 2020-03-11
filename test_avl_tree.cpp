@@ -371,7 +371,7 @@ void test_avl_tree(){
   test_delete();
   test_lazy_propagation();
   test_invariant_left_right_path();
-  test_t_min();
+  // test_t_min();
   test_endpoints();
   test_find_predec();
 }

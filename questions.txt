@@ -8,3 +8,8 @@ root and will affect all children, all turning points will be correctly changed 
 reaches them. I believe updating each point individually suffices.
 
 Why is tmin access only when the node is inactive? shouldn't it be the other way around?
+
+On gradient change, the y coordinate of an empty segment should still be modified so the functions
+ is continous
+
+ When do we need to remove the introduced empty segment?
