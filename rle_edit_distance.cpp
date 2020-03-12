@@ -1,6 +1,8 @@
 #include "avl_tree.hpp"
+#include "rle.hpp"
 #include <assert.h>
 
+typedef std::vector<rle::RLE_run> rle_string;
 // this function expects two trees that describe intervals [X_l, X_m] and [X_m, X_r]
 // it will return a new balanced tree that is the joining of the two trees
 // t1 and t2 will be compromised and shouldn't be used after calling this function
@@ -87,24 +89,43 @@ std::pair<BST, BST> split(BST T, float x_m){
   return sol;
 }
 
-void find_leftmost_smaller(TreeNode *node, BST T, Segment &s){
-  if(node == NULL)
-    return;
-  find_leftmost_smaller(node->left, T, s);
+void find_leftmost_smaller(TreeNode *node, BST T, Segment &s, bool &found_segm){
 
+  if(node == NULL || found_segm)
+    return;
+  find_leftmost_smaller(node->left, T, s, found_segm);
+
+  float val = T.get_value_at_coord(node->segm.right.x);
+  if(node->segm.right.y <= val && found_segm == false){
+    s = node->segm;
+    found_segm = true;
+    return;
+  }
+
+  find_leftmost_smaller(node->right, T, s, found_segm);
 }
-// Takes the minumum of the functions described by t1 and t2
-// The functions should be over the same interval [x_l, x_r]
-// Assumes there exists x_m in [x_l, x_r] such that:
-// F1(x) > F2(x) if x < x_m and F1(x) <= F2(x) if x >= x_m
-// where F1 and F2 are the functions described by t1 and t2
+
+void find_rightmost_larger(TreeNode *node, BST T, Segment &s, bool &found_segm){
+  if(node == NULL || found_segm)
+    return;
+  find_rightmost_larger(node->right, T, s, found_segm);
+  float val = T.get_value_at_coord(node->segm.left.x);
+  if(val > node->segm.left.y && found_segm == false){
+    s = node->segm;
+    found_segm = true;
+    return;
+  }
+
+  find_rightmost_larger(node->left, T, s, found_segm);
+}
+
 BST combine(BST t1, BST t2){
   Point min1 = TreeNode::min(t1.root)->segm.left;
   Point min2 = TreeNode::min(t2.root)->segm.left;
   Point max1 = TreeNode::max(t1.root)->segm.right;
   Point max2 = TreeNode::max(t2.root)->segm.right;
-  assert(min1 == min2);
-  assert(max1 == max2);
+  assert(min1.x == min2.x);
+  assert(max1.x == max2.x);
 
   BST sol;
   // check if x_m == x_l
@@ -116,10 +137,17 @@ BST combine(BST t1, BST t2){
     return t2;
   }
 
-  Segment S1;
-  find_leftmost_smaller(t1.root, t2.root, S1);
+  Segment S1, S2;
+  bool found_segm = false;
+  find_leftmost_smaller(t1.root, t2, S1, found_segm);
+  found_segm = false;
+  find_rightmost_larger(t2.root, t1, S2, found_segm);
 
-  return sol;
+  float x_m  = Segment::get_intersection(S1, S2).x;
+  std::pair<BST, BST> pair_1 = split(t1, x_m);
+  std::pair<BST, BST> pair_2 = split(t2, x_m);
+
+  return join(pair_2.first, pair_1.second);
 }
 
 TreeNode* find_and_remove_collapsed_segm(TreeNode *root){
@@ -241,3 +269,5 @@ BST get_OUT_TOP(BST TOP, int h, int w){
     return join(join(S1,S2),S3);
   }
 }
+
+

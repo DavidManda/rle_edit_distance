@@ -221,8 +221,25 @@ void test_swm(){
   test_swm_collapsing_segm();
 }
 
+void test_combine(){
+  BST T1 = BST(new TreeNode(Segment(Point(0,4), Point(10,4))));
+  T1.insert(Segment(Point(10,4), Point(15,4)));
+
+  BST T2 = join(BST(new TreeNode(Segment(Point(0,0), Point(4,4)))), BST(new TreeNode(Segment(Point(4,4), Point(15,4)))));
+
+  BST T_comb = combine(T1, T2);
+  TreeNode *mid = T_comb.root;
+  TreeNode *left = mid->left;
+  TreeNode *right = mid->right;
+
+  assert(left->segm == Segment(Point(0,0), Point(4,4)));
+  assert(mid->segm == Segment(Point(4,4), Point(10,4)));
+  assert(right->segm == Segment(Point(10,4), Point(15,4)));
+}
+
 void test_rle_edit_distance(){
   test_join();
   test_point_types();
   test_swm();
+  test_combine();
 }
