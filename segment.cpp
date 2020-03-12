@@ -27,6 +27,17 @@ float Segment::get_val_at_coord(float x){
   return p1.y + slope * (x - p1.x);
 }
 
+Point Segment::get_intersection(Segment s1, Segment s2){
+  Point a1 = s1.left, a2 = s1.right, b1 = s2.left, b2 = s2.right;
+  float slope_1 = (a2.y - a1.y)/(a2.x - a1.x);
+  float slope_2 = (b2.y - b1.y)/(b2.x - b1.x);
+  assert(slope_1 != slope_2);
+
+  float x = (b1.y - a1.y + slope_1*a1.x - slope_2*b1.x)/(slope_1-slope_2);
+  float y = a1.y + (x - a1.x) * slope_1;
+  return Point(x, y);
+}
+
 bool Segment::operator <(const Segment& s){
   return left.x < s.left.x && right.x <= s.left.x;
 }
