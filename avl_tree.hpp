@@ -28,6 +28,7 @@ public:
   void recompute_height();
   void recompute_tmin();
   int get_balance();
+  TreeNode* find_node_containing(float x);
   static TreeNode* delete_node(TreeNode *root, Segment segm);
   static TreeNode *min(TreeNode *node);
   static TreeNode *max(TreeNode *node);

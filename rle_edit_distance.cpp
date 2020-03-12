@@ -55,27 +55,10 @@ BST join(BST t1, BST t2){
   return t_join;
 }
 
-TreeNode* find_segm_containing(TreeNode* root, float x){
-  if(root == NULL || root->segm.contains(x)){
-    return root;
-  }
-
-  if(x < root->segm.left.x){
-    return find_segm_containing(root->left, x);
-  }
-  if(x > root->segm.right.x){
-    return find_segm_containing(root->right, x);
-  }
-  else{
-    std::cout<<"Element " << x <<" is not contained by the interval described by the tree!\n";
-    throw;
-  }
-}
-
 // split a tree describing interval [x_l, x_r] into two trees describing [x_l, x_m],[x_m, x_r]
 std::pair<BST, BST> split(BST T, float x_m){
   std::pair<BST, BST> sol;
-  TreeNode* node = find_segm_containing(T.root, x_m);
+  TreeNode* node = T.root->find_node_containing(x_m);
   Segment segm = node->segm;
 
   T.delete_node(segm);
@@ -116,6 +99,12 @@ std::pair<BST, BST> split(BST T, float x_m){
   return sol;
 }
 
+void find_leftmost_smaller(TreeNode *node1, TreeNode* node2, Segment &s){
+  if(node1 == NULL)
+    return;
+  find_leftmost_smaller(node1->left, node2, s);
+
+}
 // Takes the minumum of the functions described by t1 and t2
 // The functions should be over the same interval [x_l, x_r]
 // Assumes there exists x_m in [x_l, x_r] such that:
@@ -138,7 +127,9 @@ BST combine(BST t1, BST t2){
   if(max1.y > max2.y){
     return t2;
   }
-  
+
+  Segment S1;
+  find_leftmost_smaller(t1.root, t2.root, S1);
 
   return sol;
 }
@@ -194,4 +185,73 @@ BST SWM(BST tree, int h){
   return tree;
 }
 
+BST initialise(int n){
+  return BST(new TreeNode(Segment(Point(1,0), Point(n,0))));
+}
 
+BST get_OUT_LEFT(BST LEFT, int h, int w){
+  if(h <= w){
+    BST S = SWM(LEFT, h);
+    std::pair<BST, BST> p = split(S,h);
+    BST S_l = p.first;
+    BST S_r = p.second;
+
+    S_l.change_grad(1);
+    S_l.shift(0,-1);
+    BST S1 = S_l;
+    
+    Segment segm = S.root->find_node_containing(h)->segm;
+    float s_h = get_val_at_coord(h, segm.left, segm.right);
+    BST S2 = initialise(w-h); S2.change_grad(1); S2.shift(0,s_h + h - 1);
+    S_r.shift(0,w-1);
+    BST S3 = S_r;
+    return join(join(S1,S2),S3);
+  }
+  else{
+    BST S = SWM(LEFT, w);
+    std::pair<BST, BST> p = split(S,w);
+    BST S_l = p.first;
+    BST S_r = p.second;
+
+    S_l.change_grad(1);
+    S_l.shift(0,-1);
+    BST S1 = S_l;
+
+    S_r.shift(0,w-1);
+    BST S2 = S_r;
+    return join(S1,S2);
+  }
+}
+
+BST get_OUT_TOP(BST TOP, int h, int w){
+  if(h <= w){
+    BST S = SWM(TOP,h);
+    std::pair<BST, BST> p = split(S,h);
+    BST S_l = p.first;
+    BST S_r = p.second;
+
+    S_l.shift(0,h-1);
+    BST S1 = S_l;
+
+    S_r.change_grad(-1); S_r.shift(0,w+h-1);
+    BST S2 = S_r;
+    return join(S1,S2);
+  }
+  else{
+    BST S = SWM(TOP,w);
+    std::pair<BST, BST> p = split(S,h);
+    BST S_l = p.first;
+    BST S_r = p.second;
+
+    S_l.shift(0,h-1);
+    BST S1 = S_l;
+
+    Segment segm = S.root->find_node_containing(w)->segm;
+    float s_w = get_val_at_coord(w, segm.left, segm.right);
+    BST S2 = initialise(h-w); S2.change_grad(-1); S2.shift(w,s_w + h - 1);
+
+    S_r.change_grad(-1); S_r.shift(h-w,w+h-1);
+    BST S3 = S_r;
+    return join(join(S1,S2),S3);
+  }
+}

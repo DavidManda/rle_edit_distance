@@ -352,6 +352,24 @@ TreeNode *TreeNode::find(Segment segm)
   return next_node->find(segm);
 }
 
+
+TreeNode* TreeNode::find_node_containing(float x){
+  if(this->segm.contains(x)){
+    return this;
+  }
+
+  if(x < this->segm.left.x && this->left != NULL){
+    return this->left->find_node_containing(x);
+  }
+  if(x > this->segm.right.x && this->right != NULL){
+    return this->right->find_node_containing(x);
+  }
+  else{
+    std::cout<<"Element " << x <<" is not contained by the interval described by the tree!\n";
+    throw;
+  }
+}
+
 void _find_predec_succ(TreeNode *root, Segment segm, TreeNode *&predec, TreeNode *&succ)
 {
   // Base case
