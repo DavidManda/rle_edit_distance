@@ -487,6 +487,11 @@ TreeNode *BST::find(Segment segm)
   return this->root->find(segm);
 }
 
+float BST::get_value_at_coord(float x){
+  Segment s = this->root->find_node_containing(x)->segm;
+  return s.get_val_at_coord(x);
+}
+
 // This returns the node with the biggest key that is smaller than _key
 TreeNode *BST::find_predec(Segment segm)
 {

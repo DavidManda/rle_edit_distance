@@ -1,31 +1,6 @@
 #include "rle_edit_distance.hpp"
 #include <assert.h>
 
-void test_get_val_at_coord(){
-  Point p1(0,0), p2(10,0);
-  float coord = 5;
-  float val = get_val_at_coord(coord, p1, p2);
-  assert(val == 0);
-  
-  p1 = Point(0,0);
-  p2 = Point(10,10);
-  coord = 5;
-  val = get_val_at_coord(coord, p1, p2);
-  assert(val == 5);
-
-  p1 = Point(0,0);
-  p2 = Point(10,10);
-  coord = 5.5;
-  val = get_val_at_coord(coord, p1, p2);
-  assert(val == 5.5);
-
-  p1 = Point(0,0);
-  p2 = Point(1,0);
-  coord = 0;
-  val = get_val_at_coord(coord, p1, p2);
-  assert(val == 0);
-}
-
 void test_join_empty_trees(){
   BST t_l,t_r, t;
   t = join(t_l, t_r);
@@ -242,13 +217,12 @@ void test_swm_collapsing_segm(){
 }
 
 void test_swm(){
-  // test_swm_one_segm();
+  test_swm_one_segm();
   test_swm_collapsing_segm();
 }
 
 void test_rle_edit_distance(){
-  // test_get_val_at_coord();
-  // test_join();
-  // test_point_types();
+  test_join();
+  test_point_types();
   test_swm();
 }

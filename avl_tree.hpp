@@ -57,6 +57,7 @@ public:
   void apply_swm(int dt);
   void update_point_type(Segment segm);
   void update_tmin_on_path_to(Segment segm);
+  float get_value_at_coord(float x);
   static BST join(TreeNode *t_l, TreeNode *t_r, Segment segm);
   static BST join(TreeNode *t_l, TreeNode *t_r);
   // splits the tree, keeping the segment in the right partition of the tree

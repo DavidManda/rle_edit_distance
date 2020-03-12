@@ -1,18 +1,6 @@
 #include "avl_tree.hpp"
 #include <assert.h>
 
-float get_val_at_coord(float coord, Point p1, Point p2)
-{
-  if(coord < p1.x || coord > p2.x)
-  {
-    std::cout<<"Coord should be between the two given points!\n";
-    return 0;
-  }
-  float slope = (p2.y - p1.y)/(p2.x - p1.x);
-  
-  return p1.y + slope * (coord - p1.x);
-}
-
 // this function expects two trees that describe intervals [X_l, X_m] and [X_m, X_r]
 // it will return a new balanced tree that is the joining of the two trees
 // t1 and t2 will be compromised and shouldn't be used after calling this function
@@ -66,7 +54,7 @@ std::pair<BST, BST> split(BST T, float x_m){
   if(x_m > segm.left.x && x_m < segm.right.x){
     // If x_m is strictly within the segment, we split it and then split the tree on the 
     // right part of the segment
-    float val = get_val_at_coord(x_m, segm.left, segm.right);
+    float val = segm.get_val_at_coord(x_m);
     Segment s1 = Segment(segm.left, Point(x_m, val));
     Segment s2 = Segment(Point(x_m, val), segm.right);
     T.insert(s1);
@@ -99,10 +87,10 @@ std::pair<BST, BST> split(BST T, float x_m){
   return sol;
 }
 
-void find_leftmost_smaller(TreeNode *node1, TreeNode* node2, Segment &s){
-  if(node1 == NULL)
+void find_leftmost_smaller(TreeNode *node, BST T, Segment &s){
+  if(node == NULL)
     return;
-  find_leftmost_smaller(node1->left, node2, s);
+  find_leftmost_smaller(node->left, T, s);
 
 }
 // Takes the minumum of the functions described by t1 and t2
@@ -200,8 +188,7 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
     S_l.shift(0,-1);
     BST S1 = S_l;
     
-    Segment segm = S.root->find_node_containing(h)->segm;
-    float s_h = get_val_at_coord(h, segm.left, segm.right);
+    float s_h = S.get_value_at_coord(h);
     BST S2 = initialise(w-h); S2.change_grad(1); S2.shift(0,s_h + h - 1);
     S_r.shift(0,w-1);
     BST S3 = S_r;
@@ -246,8 +233,7 @@ BST get_OUT_TOP(BST TOP, int h, int w){
     S_l.shift(0,h-1);
     BST S1 = S_l;
 
-    Segment segm = S.root->find_node_containing(w)->segm;
-    float s_w = get_val_at_coord(w, segm.left, segm.right);
+    float s_w = S.get_value_at_coord(w);
     BST S2 = initialise(h-w); S2.change_grad(-1); S2.shift(w,s_w + h - 1);
 
     S_r.change_grad(-1); S_r.shift(h-w,w+h-1);
