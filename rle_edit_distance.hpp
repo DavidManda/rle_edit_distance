@@ -1,7 +1,11 @@
-#pragma once
+#ifndef rle_ED
+#define rle_ED
 
 #include "point.hpp"
+#include "rle.hpp"
 #include "avl_tree.hpp"
+
+typedef std::vector<rle::RLE_run> rle_string;
 
 float get_val_at_coord(float coord, Point p1, Point p2);
 
@@ -31,3 +35,8 @@ std::pair<BST, BST> split(BST T, float x_m);
 BST combine(BST t1, BST t2);
 
 BST SWM(BST tree, int h);
+
+int get_rle_edit_dist(rle_string s0, rle_string s1);
+
+int get_naive_edit_dist(const int M, const int N, const std::string &s0, const std::string &s1);
+#endif

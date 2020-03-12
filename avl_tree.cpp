@@ -740,6 +740,8 @@ void BST::update_tmin_on_path_to(Segment segm){
 }
 
 void BST::shift(int dx, int dy){
+  if(this->root == NULL)
+    return;
   this->root->shift(dx, dy);
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
@@ -748,6 +750,8 @@ void BST::shift(int dx, int dy){
 }
 
 void BST::change_grad(int dg){
+  if(this->root == NULL)
+    return;
   this->root->change_grad(dg);
 
   // This ensures the invariant that no deferred changes are stored

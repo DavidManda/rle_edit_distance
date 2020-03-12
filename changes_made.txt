@@ -1,1 +1,3 @@
-This is the list of changes I made to the algorithm:
+This is the list of changes and additions I made to the algorithm:
+
+- propagating over match block (addition)
