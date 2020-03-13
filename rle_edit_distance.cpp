@@ -205,25 +205,26 @@ BST SWM(BST tree, int h){
 BST initialise(int n){
   if(n == 0)
     return BST();
-  return BST(new TreeNode(Segment(Point(1,0), Point(n+2,0))));
+  return BST(new TreeNode(Segment(Point(1,0), Point(1+n,0))));
 }
 
 BST get_OUT_LEFT(BST LEFT, int h, int w){
   if(h <= w){
-    print_2D(LEFT.root);
     BST S = SWM(LEFT, h);
     std::pair<BST, BST> p = split(S,h);
     BST S_l = p.first;
     BST S_r = p.second;
+
     S_l.change_grad(1);
     S_l.shift(0,-1);
     BST S1 = S_l;
     
     float s_h = S.get_value_at_coord(h);
-    BST S2 = initialise(w-h);
-    S2.change_grad(1); S2.shift(0,s_h + h - 1);
-    S_r.shift(0,w-1);
+    BST S2 = initialise(w-h); S2.change_grad(1); S2.shift(h,s_h + h - 1);
+
+    S_r.shift(w-h,w-1);
     BST S3 = S_r;
+
     return join(join(S1,S2),S3);
   }
   else{
@@ -244,9 +245,7 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
 
 BST get_OUT_TOP(BST TOP, int h, int w){
   if(h <= w){
-    std::cout<<TOP.root->to_string()<<'\n';
     BST S = SWM(TOP,h);
-    print_2D(S.root);
     std::pair<BST, BST> p = split(S,h);
     BST S_l = p.first;
     BST S_r = p.second;
@@ -269,7 +268,7 @@ BST get_OUT_TOP(BST TOP, int h, int w){
     float s_w = S.get_value_at_coord(w);
     BST S2 = initialise(h-w); S2.change_grad(-1); S2.shift(w,s_w + h - 1);
 
-    S_r.change_grad(-1); S_r.shift(h-w,w+h-1);
+    S_r.change_grad(-1); S_r.shift(w - h,2*w-1);
     BST S3 = S_r;
     return join(join(S1,S2),S3);
   }
@@ -348,7 +347,6 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       else
       {
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
-        std::cout<<"here\n";
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
         OUT[i][j] = combine(OUT_LEFT, OUT_TOP);      
       }
