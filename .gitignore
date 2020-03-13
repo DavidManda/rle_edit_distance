@@ -3,3 +3,4 @@
 *.out
 *.o
 boost_1_72_0
+valgrind_log.txt

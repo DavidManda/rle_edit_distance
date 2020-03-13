@@ -10,42 +10,22 @@
 TreeNode::TreeNode(Segment segm)
 {
   this->segm = segm;
-  this->height = 1;
   this->active = true;
-  this->type_l = NotInitialised;
-  this->type_r = NotInitialised;
-  this->t_min = this->get_t_min();
-  this->dt = 0;
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
+  this->dt = 0;
+  this->type_l = NotInitialised;
+  this->type_r = NotInitialised;
+  this->height = 1;
+  this->t_min = this->get_t_min();
   this->left = NULL;
   this->right = NULL;
 }
 
-TreeNode::TreeNode(){
-  this->active = true;
-  this->type_l = NotInitialised;
-  this->type_r = NotInitialised;
-  this->t_min = INT_MAX;
-  this->dx = 0;
-  this->dy = 0;
-  this->dg = 0;
-  this->dt = 0;
-}
-
-TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right){
-  this->segm = segm;
+TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right) : TreeNode(segm){
   this->left = left;
   this->right = right;
-  this->active = true;
-  this->type_l = NotInitialised;
-  this->type_r = NotInitialised;
-  this->t_min = this->get_t_min();
-  this->dx = 0;
-  this->dy = 0;
-  this->dg = 0;
-  this->dt = 0;
   this->recompute_height();
   this->recompute_tmin();
 }
