@@ -1,6 +1,9 @@
 #include "avl_tree.hpp"
 #include <cstddef>
 #include <iostream>
+#include <assert.h>
+#include <limits.h>
+#include <cstdlib>
 
 #define COUNT 10
 
@@ -9,7 +12,10 @@ TreeNode::TreeNode(Segment segm)
   this->segm = segm;
   this->height = 1;
   this->active = true;
+  this->type_l = NotInitialised;
+  this->type_r = NotInitialised;
   this->t_min = this->get_t_min();
+  this->dt = 0;
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
@@ -19,9 +25,13 @@ TreeNode::TreeNode(Segment segm)
 
 TreeNode::TreeNode(){
   this->active = true;
+  this->type_l = NotInitialised;
+  this->type_r = NotInitialised;
+  this->t_min = INT_MAX;
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
+  this->dt = 0;
 }
 
 TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right){
@@ -29,15 +39,20 @@ TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right){
   this->left = left;
   this->right = right;
   this->active = true;
+  this->type_l = NotInitialised;
+  this->type_r = NotInitialised;
   this->t_min = this->get_t_min();
   this->dx = 0;
   this->dy = 0;
   this->dg = 0;
+  this->dt = 0;
   this->recompute_height();
   this->recompute_tmin();
 }
 
 bool has_collapse_time(TreeNode* node){
+  if(node == NULL)
+    return false;
   return  (node->type_l == ID && node->type_r == DF) ||
           (node->type_l == IF && node->type_r == FD) ||
           (node->type_l == FI && node->type_r == ID);
@@ -168,7 +183,6 @@ void TreeNode::update_endpoints(){
   }
   move_point(this->segm.left, this->type_l, this->dt);
   move_point(this->segm.right, this->type_r, this->dt);
-
   if(this->dg == 0){
     return;
   }
@@ -546,7 +560,6 @@ TreeNode* TreeNode::max(TreeNode *node){
 // and returns the new root
 TreeNode *_delete_node(TreeNode *root, Segment segm)
 {
-
   // base case
   if (root == NULL)
     return root;
@@ -570,13 +583,11 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
     if (root->left == NULL)
     {
       TreeNode *temp = root->right;
-      free(root);
       return temp;
     }
     else if (root->right == NULL)
     {
       TreeNode *temp = root->left;
-      free(root);
       return temp;
     }
 
@@ -945,6 +956,7 @@ void TreeNode::free(TreeNode *node){
   TreeNode::free(node->left);
   TreeNode::free(node->right);
   std::free(node);
+  node = NULL;
 }
 
 // Function to print binary tree in 2D
@@ -972,7 +984,8 @@ void print_2D_util(TreeNode *root, int space)
   print_2D_util(root->left, space);
 }
 
-void print_2D(TreeNode *root)
+void print_2D(BST t)
 {
-  print_2D_util(root, 0);
+  print_2D_util(t.root, 0);
+  std::cout<<"----------------------------\n";
 }

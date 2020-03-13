@@ -24,6 +24,7 @@ void find_leftmost_smaller(TreeNode *node, BST T, Segment &s, bool &found_segm);
 // preforms reverse inorder traversal of tree with root node and finds the rightmost segment s in the
 // tree such that s.left.y > T(s.left.x), where T(x) is the value at coordinate x in tree T
 void find_rightmost_larger(TreeNode *node, BST T, Segment &s, bool &found_segm);
+
 // split a tree describing interval [x_l, x_r] into two trees describing [x_l, x_m],[x_m, x_r]
 std::pair<BST, BST> split(BST T, float x_m);
 

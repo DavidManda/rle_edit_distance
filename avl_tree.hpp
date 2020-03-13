@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <stdlib.h>
 #include "segment.hpp"
 class TreeNode
 {
@@ -66,4 +67,4 @@ public:
   void delete_node(Segment segm);
 };
 
-void print_2D(TreeNode *root);
+void print_2D(BST T);

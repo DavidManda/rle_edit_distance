@@ -60,7 +60,6 @@ void test_join_(int n, int m){
   }
   t = BST::join(t1.root, t2.root);
   assert(t.is_balanced());
-  TreeNode::free(t.root);
 }
 
 void test_specific_join(){

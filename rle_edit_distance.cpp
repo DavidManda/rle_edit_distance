@@ -1,6 +1,7 @@
 #include "rle_edit_distance.hpp"
 #include "avl_tree.hpp"
 #include <assert.h>
+#include <cstdlib>
 
 typedef std::vector<std::vector<BST> > border_t;
 typedef std::vector<rle::RLE_run> rle_string;
@@ -17,10 +18,7 @@ BST join(BST t1, BST t2){
   
   Segment largest_t1 = TreeNode::max(t1.root)->segm;
   Segment smallest_t2 = TreeNode::min(t2.root)->segm;
-  if(largest_t1.right.x != smallest_t2.left.x){
-    std::cout<<"Rightmost point of tree 1 should be equal to leftmost point of tree 2\n";
-    throw;
-  }
+  assert(largest_t1.right.x == smallest_t2.left.x);
 
   int slope1 = (largest_t1.right.y - largest_t1.left.y) / 
               (largest_t1.right.x - largest_t1.left.x);
@@ -210,7 +208,7 @@ BST initialise(int n){
 
 BST get_OUT_LEFT(BST LEFT, int h, int w){
   if(h <= w){
-    BST S = SWM(LEFT, h);
+    BST S = SWM(LEFT, h-1);
     std::pair<BST, BST> p = split(S,h);
     BST S_l = p.first;
     BST S_r = p.second;
@@ -228,7 +226,10 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
     return join(join(S1,S2),S3);
   }
   else{
-    BST S = SWM(LEFT, w);
+    // std::cout<<"askhgdkjhasg\n";
+    // print_2D(LEFT);
+    BST S = SWM(LEFT, w-1);
+    // print_2D(S);
     std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
@@ -245,7 +246,7 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
 
 BST get_OUT_TOP(BST TOP, int h, int w){
   if(h <= w){
-    BST S = SWM(TOP,h);
+    BST S = SWM(TOP,h-1);
     std::pair<BST, BST> p = split(S,h);
     BST S_l = p.first;
     BST S_r = p.second;
@@ -257,8 +258,10 @@ BST get_OUT_TOP(BST TOP, int h, int w){
     return join(S1,S2);
   }
   else{
-    BST S = SWM(TOP,w);
-    std::pair<BST, BST> p = split(S,h);
+    BST S = SWM(TOP,w-1);
+    // std::cout<<"kajgsdkas\n";
+    // print_2D(S);
+    std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
 
@@ -266,10 +269,13 @@ BST get_OUT_TOP(BST TOP, int h, int w){
     BST S1 = S_l;
 
     float s_w = S.get_value_at_coord(w);
-    BST S2 = initialise(h-w); S2.change_grad(-1); S2.shift(w,s_w + h - 1);
+    BST S2 = initialise(h-w); S2.change_grad(-1); S2.shift(w-1,s_w + h - 1);
 
-    S_r.change_grad(-1); S_r.shift(w - h,2*w-1);
+    S_r.change_grad(-1); S_r.shift(h - w,2*w-1);
     BST S3 = S_r;
+    // print_2D(S1);
+    // print_2D(S2);
+    // print_2D(S3);
     return join(join(S1,S2),S3);
   }
 }
@@ -306,6 +312,8 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j,
     int h = s0[i].len + 1;
     // TODO make sure we are splitting at the correct point
     LEFT[i][j] = split(OUT[i][j-1], w).second;
+    // correct the index
+    LEFT[i][j].shift(-w + 1,0);
   }
 
   if (TOP[i][j].root == NULL)
@@ -332,6 +340,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
   {
     for (int j = 1; j < N; j++)
     {
+      std::cout<<i<<' '<<j<<'\n';
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       // Retrieve input border for current block
@@ -341,18 +350,29 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
         BST L = LEFT[i][j];
         BST T = TOP[i][j];
         // shift top to the right h positions so we can join with left and get OUT
-        T.shift(h,0);
+        T.shift(h - 1,0);
         OUT[i][j] = join(L,T);
       }
       else
       {
+        // print_2D(LEFT[i][j].root);
+        // print_2D(TOP[i][j].root);
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
-        OUT[i][j] = combine(OUT_LEFT, OUT_TOP);      
+        OUT[i][j] = combine(OUT_LEFT, OUT_TOP);
       }
       dyn[i][j] = OUT[i][j].get_value_at_coord(w);
     }
   }
+  // for (int i = 1; i < M; i++)
+  // {
+  //   for (int j = 1; j < N; j++)
+  //   {
+  //     TreeNode::free(LEFT[i][j].root);
+  //     TreeNode::free(TOP[i][j].root);
+  //     TreeNode::free(OUT[i][j].root);
+  //   }
+  // }
   return dyn[M-1][N-1];
 }
 

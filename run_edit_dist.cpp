@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 #include "rle_edit_distance.hpp"
 #include "helper.hpp"
 
@@ -21,7 +22,7 @@ int main()
     std::vector<RLE_run> rle_s1 = rle_helper.get_rle_string(s1);
     int sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1);
     int sol = rle_ED::get_naive_edit_dist(M, N, s0, s1);
-    
+
     if(sol != sol_rle)
     {
       std::cout<<"Test " << test << "/"<<T<<" failed for strings " + s0 + " and " + s1 + " with sizes of "<< M<<" and "<<N<<"\n";
