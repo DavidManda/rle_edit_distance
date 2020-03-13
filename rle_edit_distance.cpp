@@ -218,11 +218,13 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
     BST S1 = S_l;
     
     float s_h = S.get_value_at_coord(h);
-    BST S2 = initialise(w-h); S2.change_grad(1); S2.shift(h,s_h + h - 1);
+    BST S2 = initialise(w-h); S2.change_grad(1); S2.shift(h-1,s_h + h - 1);
 
     S_r.shift(w-h,w-1);
     BST S3 = S_r;
-
+    // print_2D(S1);
+    // print_2D(S2);
+    // print_2D(S3);
     return join(join(S1,S2),S3);
   }
   else{
@@ -334,7 +336,8 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
   border_t LEFT(M, std::vector<BST>(N));
   border_t TOP(M, std::vector<BST>(N));
   border_t OUT(M, std::vector<BST>(N));
-
+  // RLE_string_helper rle_helper;
+  // std::cout<<rle_helper.to_string(s0)<<'\n'<<rle_helper.to_string(s1)<<'\n';
   init_input_border(LEFT, TOP, M, N, s0, s1);
   for (int i = 1; i < M; i++)
   {
@@ -355,9 +358,10 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       }
       else
       {
-        // print_2D(LEFT[i][j].root);
-        // print_2D(TOP[i][j].root);
+        print_2D(LEFT[i][j].root);
+        print_2D(TOP[i][j].root);
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
+        std::cout<<"here\n";
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
         OUT[i][j] = combine(OUT_LEFT, OUT_TOP);
       }
