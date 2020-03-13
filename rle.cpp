@@ -6,7 +6,7 @@ RLE_run::RLE_run(char _ch, int _len)
   len = _len;
 }
 
-std::string RLE_run::print()
+std::string RLE_run::to_string()
 {
   std::stringstream ss;
   ss << "(" << ch << ", " << len << ")";
@@ -40,12 +40,12 @@ std::vector<RLE_run> RLE_string_helper::get_rle_string(std::string str)
   return rle_str;
 }
 
-std::string RLE_string_helper::print(std::vector<RLE_run> rle_str)
+std::string RLE_string_helper::to_string(std::vector<RLE_run> rle_str)
 {
   std::string str;
   for (std::vector<RLE_run>::iterator it = rle_str.begin(); it != rle_str.end(); ++it)
   {
-    str += it->print();
+    str += it->to_string();
   }
   return str;
 }

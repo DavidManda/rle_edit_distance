@@ -11,7 +11,7 @@ public:
   char ch;
   int len;
   RLE_run(char _ch, int _len);
-  std::string print();
+  std::string to_string();
 };
 
 class RLE_string_helper
@@ -19,6 +19,6 @@ class RLE_string_helper
 public:
   std::vector<RLE_run> get_rle_string(std::string str);
 
-  std::string print(std::vector<RLE_run> rle_string);
+  std::string to_string(std::vector<RLE_run> rle_string);
 };
 #endif
