@@ -545,16 +545,15 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
   // base case
   if (root == NULL)
     return root;
-
   TreeNode::lazy_update(root);
   // If the key to be deleted is smaller than the root's key,
   // then it lies in left subtree
-  if (segm < root->segm)
+  if (segm <= root->segm)
     root->left = _delete_node(root->left, segm);
 
   // If the key to be deleted is greater than the root's key,
   // then it lies in right subtree
-  else if (segm > root->segm)
+  else if (segm >= root->segm)
     root->right = _delete_node(root->right, segm);
 
   // if key is same as root's key, then This is the node
@@ -588,7 +587,7 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
     return root;
   root->recompute_tmin();
   root->recompute_height();
-
+  // print_2D(root);
   int balance = root->get_balance();
   // left left
   if(balance > 1 && root->left->get_balance() >= 0){
@@ -684,7 +683,6 @@ void BST::update_point_type(Segment segm){
   TreeNode *succ = this->find_succ(segm);
   set_endpoints(node);
   Segment s = node->segm;
-
   if(succ != NULL){
     Segment s_r = succ->segm;
     Point_t type = get_midpoint_type(s, s_r);
