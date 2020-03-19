@@ -329,8 +329,9 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j,
     // width and height of block to the left
     int w = s1[j - 1].len + 1;
     int h = s0[i].len + 1;
+    BST aux = BST::get_new_copy(OUT[i][j-1]);
     // TODO make sure we are splitting at the correct point
-    LEFT[i][j] = split(OUT[i][j-1], w).second;
+    LEFT[i][j] = split(aux, w).second;
     // correct the index
     LEFT[i][j].shift(-w + 1,0);
     // print_2D(LEFT[i][j]);
@@ -344,7 +345,8 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j,
     int h = s0[i - 1].len + 1;
     // TODO make sure we are splitting at the correct point
     // print_2D(OUT[i-1][j]);
-    TOP[i][j] = split(OUT[i-1][j], w).first;
+    BST aux = BST::get_new_copy(OUT[i-1][j]);
+    TOP[i][j] = split(aux, w).first;
     // print_2D(TOP[i][j]);
   }
 }
@@ -366,17 +368,17 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       // Retrieve input border for current block
-      std::cout<<i<<' '<<j<<'\n';
+      // std::cout<<i<<' '<<j<<'\n';
       get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1);
       // std::cout<<"here\n";
       if(s0[i].ch == s1[j].ch)
       {
         BST L = LEFT[i][j];
         BST T = TOP[i][j];
-        if(i == 2 && j == 3){
-          print_2D(L);
-          print_2D(T);
-        }
+        // if(i == 2 && j == 3){
+        //   print_2D(L);
+        //   print_2D(T);
+        // }
         // shift top to the right h positions so we can join with left and get OUT
         T.shift(h - 1,0);
         OUT[i][j] = join(L,T);

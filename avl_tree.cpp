@@ -7,9 +7,7 @@
 
 #define COUNT 10
 
-TreeNode::TreeNode(Segment segm)
-{
-  this->segm = segm;
+TreeNode::TreeNode(){
   this->active = true;
   this->dx = 0;
   this->dy = 0;
@@ -21,6 +19,10 @@ TreeNode::TreeNode(Segment segm)
   this->t_min = this->get_t_min();
   this->left = NULL;
   this->right = NULL;
+}
+
+TreeNode::TreeNode(Segment segm) : TreeNode(){
+  this->segm = segm;
 }
 
 TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right) : TreeNode(segm){
@@ -937,6 +939,27 @@ void TreeNode::free(TreeNode *node){
   TreeNode::free(node->right);
   std::free(node);
   node = NULL;
+}
+
+TreeNode* get_new_copy_(TreeNode* root){
+  if(root == NULL)
+    return NULL;
+  TreeNode* sol = new TreeNode();
+  *sol = *root;
+  sol->left = get_new_copy_(root->left);
+  sol->right = get_new_copy_(root->right);
+  return sol;
+}
+
+BST BST::get_new_copy(BST t){
+  BST sol;
+  if(t.root == NULL)
+    return sol;
+  sol.root = new TreeNode();
+  *sol.root = *t.root;
+  sol.root->left = get_new_copy_(t.root->left);
+  sol.root->right = get_new_copy_(t.root->right);
+  return sol;
 }
 
 // Function to print binary tree in 2D

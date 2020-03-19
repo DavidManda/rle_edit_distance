@@ -362,6 +362,21 @@ void test_find_predec(){
   assert(predec == NULL);
 }
 
+void test_get_new_copy(){
+  BST t = BST();
+  TreeNode *node = new TreeNode(Segment(Point(0,0), Point(2,2)));
+  node->active = false;
+  node->dg = 5;
+  node->dx = -3;
+  t.root = node;
+
+  BST new_t = BST::get_new_copy(t);
+  assert(new_t.root != t.root);
+  assert(new_t.root->active == t.root->active);
+  assert(new_t.root->dg == t.root->dg);
+  assert(new_t.root->dx == t.root->dx);
+}
+
 void test_avl_tree(){
   test_insert();
   test_split_basics();
@@ -373,4 +388,5 @@ void test_avl_tree(){
   // test_t_min();
   test_endpoints();
   test_find_predec();
+  test_get_new_copy();
 }

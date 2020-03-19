@@ -35,6 +35,7 @@ public:
   static TreeNode *max(TreeNode *node);
   static TreeNode* rotate_right(TreeNode* root);
   static TreeNode* rotate_left(TreeNode* root);
+  static TreeNode* get_new_copy(TreeNode* root);
   std::string to_string();
   TreeNode *find(Segment segm);
   static void free(TreeNode *node);
@@ -61,6 +62,7 @@ public:
   float get_value_at_coord(float x);
   static BST join(TreeNode *t_l, TreeNode *t_r, Segment segm);
   static BST join(TreeNode *t_l, TreeNode *t_r);
+  static BST get_new_copy(BST t);
   // splits the tree, keeping the segment in the right partition of the tree
   // This function has side effect for the subtree rooted at root, which is compromised
   static std::pair<BST, BST> split(TreeNode* root, Segment segm);

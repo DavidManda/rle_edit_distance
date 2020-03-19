@@ -5,4 +5,4 @@ example:
 tree:
 	g++ avl_tree.cpp segment.cpp point.cpp -o avl_tree.o
 test:
-	g++ -g -O0 test.cpp test_rle_edit_distance.cpp test_avl_tree.cpp rle_edit_distance.cpp segment.cpp point.cpp avl_tree.cpp -o test.o 
+	g++ -std=c++11 -g -O0 test.cpp test_rle_edit_distance.cpp test_avl_tree.cpp rle_edit_distance.cpp segment.cpp point.cpp avl_tree.cpp -o test.o 
