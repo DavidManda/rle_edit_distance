@@ -271,7 +271,7 @@ BST get_OUT_TOP(BST TOP, int h, int w){
     BST S1 = S_l;
 
     float s_w = S.get_value_at_coord(w);
-    BST S2 = initialise(h-w); S2.change_grad(-1); S2.shift(w-1,s_w + h - 1);
+    BST S2 = initialise(h-w); S2.change_grad(-1); S2.shift(w-1,s_w + h);
 
     S_r.change_grad(-1); S_r.shift(h - w,2*w-1);
     BST S3 = S_r;
