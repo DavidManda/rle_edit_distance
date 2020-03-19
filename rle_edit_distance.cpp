@@ -363,7 +363,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
         std::cout<<"here\n";
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
-        OUT[i][j] = combine(OUT_LEFT, OUT_TOP);
+        OUT[i][j] = combine(OUT_TOP, OUT_LEFT);
       }
       dyn[i][j] = OUT[i][j].get_value_at_coord(w);
     }
