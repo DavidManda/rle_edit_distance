@@ -10,7 +10,7 @@ Segment::Segment(Point _left, Point _right)
 
 Segment::Segment(){}
 
-bool Segment::contains(int x){
+bool Segment::contains(float x){
   return left.x <= x && right.x >= x;
 }
 

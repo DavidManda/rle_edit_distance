@@ -10,7 +10,7 @@ public:
   Segment(Point _left, Point _right);
   Segment();
   float get_val_at_coord(float x);
-  bool contains(int x);
+  bool contains(float x);
   static Point get_intersection(Segment s1, Segment s2);
   bool operator <(const Segment& s);
   bool operator >(const Segment& s);
