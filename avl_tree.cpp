@@ -333,7 +333,7 @@ TreeNode *TreeNode::find(Segment segm)
     return this;
   }
   TreeNode *next_node;
-  if (this->segm > segm)
+  if (this->segm >= segm)
   {
     next_node = this->left;
   }
@@ -402,7 +402,7 @@ void _find_predec_succ(TreeNode *root, Segment segm, TreeNode *&predec, TreeNode
   }
 
   // If key is smaller than root's key, go to left subtree
-  if (root->segm > segm)
+  if (root->segm >= segm)
   {
     succ = root;
     _find_predec_succ(root->left, segm, predec, succ);
