@@ -605,7 +605,7 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
   }
   // right left
   if(balance < -1 && root->right->get_balance() > 0){
-    root->right = TreeNode::rotate_left(root->right);
+    root->right = TreeNode::rotate_right(root->right);
     return TreeNode::rotate_left(root);
   }
 
