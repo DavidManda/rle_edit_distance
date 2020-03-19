@@ -1,3 +1,6 @@
 This is the list of changes and additions I made to the algorithm:
 
 - propagating over match block (addition)
+
+Implementation details that are important:
+I need to create new copies of the trees when I make the input borders

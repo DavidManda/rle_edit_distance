@@ -47,6 +47,21 @@ BST join(BST t1, BST t2){
 // split a tree describing interval [x_l, x_r] into two trees describing [x_l, x_m],[x_m, x_r]
 std::pair<BST, BST> split(BST T, float x_m){
   std::pair<BST, BST> sol;
+
+  // check if we are splitting inside the tree
+  Point min = TreeNode::min(T.root)->segm.left;
+  Point max = TreeNode::max(T.root)->segm.right;
+  assert(x_m >= min.x && x_m <= max.x);
+  if(x_m == min.x){
+    sol.first = BST();
+    sol.second = T;
+    return sol;
+  }
+  if(x_m == max.x){
+    sol.first = T;
+    sol.second = BST();
+    return sol;
+  }
   TreeNode* node = T.root->find_node_containing(x_m);
   Segment segm = node->segm;
 
@@ -125,9 +140,11 @@ BST combine(BST t1, BST t2){
   Point max2 = TreeNode::max(t2.root)->segm.right;
   assert(min1.x == min2.x);
   assert(max1.x == max2.x);
-
+  // print_2D(t1);
+  // print_2D(t2);
   BST sol;
   // check if x_m == x_l
+  // std::cout<<min1.to_string()<<' '<<min2.to_string()<<'\n';
   if(min1.y <= min2.y){
     return t1;
   }
@@ -135,7 +152,6 @@ BST combine(BST t1, BST t2){
   if(max1.y > max2.y){
     return t2;
   }
-
   Segment S1, S2;
   bool found_segm = false;
   find_leftmost_smaller(t1.root, t2, S1, found_segm);
@@ -143,9 +159,10 @@ BST combine(BST t1, BST t2){
   find_rightmost_larger(t2.root, t1, S2, found_segm);
 
   float x_m  = Segment::get_intersection(S1, S2).x;
+  // std::cout<<x_m<<'\n';
   std::pair<BST, BST> pair_1 = split(t1, x_m);
   std::pair<BST, BST> pair_2 = split(t2, x_m);
-
+  // print_2D(pair_2.first); print_2D(pair_1.second);
   return join(pair_2.first, pair_1.second);
 }
 
@@ -316,6 +333,7 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j,
     LEFT[i][j] = split(OUT[i][j-1], w).second;
     // correct the index
     LEFT[i][j].shift(-w + 1,0);
+    // print_2D(LEFT[i][j]);
   }
 
   if (TOP[i][j].root == NULL)
@@ -325,7 +343,9 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j,
     int w = s1[j].len + 1;
     int h = s0[i - 1].len + 1;
     // TODO make sure we are splitting at the correct point
+    // print_2D(OUT[i-1][j]);
     TOP[i][j] = split(OUT[i-1][j], w).first;
+    // print_2D(TOP[i][j]);
   }
 }
 
@@ -343,28 +363,41 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
   {
     for (int j = 1; j < N; j++)
     {
-      std::cout<<i<<' '<<j<<'\n';
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       // Retrieve input border for current block
+      std::cout<<i<<' '<<j<<'\n';
       get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1);
+      // std::cout<<"here\n";
       if(s0[i].ch == s1[j].ch)
       {
         BST L = LEFT[i][j];
         BST T = TOP[i][j];
+        if(i == 2 && j == 3){
+          print_2D(L);
+          print_2D(T);
+        }
         // shift top to the right h positions so we can join with left and get OUT
         T.shift(h - 1,0);
         OUT[i][j] = join(L,T);
       }
       else
       {
-        print_2D(LEFT[i][j].root);
-        print_2D(TOP[i][j].root);
+        // if(i == 1 && j == 3){
+        //   // print_2D(LEFT[i][j]);
+        //   // print_2D(TOP[i][j]);
+        // }
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
-        std::cout<<"here\n";
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
+        // if(i == 1 && j == 3){
+        //   // print_2D(OUT_LEFT);
+        //   // print_2D(OUT_TOP);
+        //   // std::cout<<"hererrere\n";
+        // }
         OUT[i][j] = combine(OUT_TOP, OUT_LEFT);
       }
+      // print_2D(OUT[i][j]);
+
       dyn[i][j] = OUT[i][j].get_value_at_coord(w);
     }
   }
