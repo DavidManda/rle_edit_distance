@@ -266,7 +266,7 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
 BST get_OUT_TOP(BST TOP, int h, int w){
   if(h <= w){
     BST S = SWM(TOP,h-1);
-    std::pair<BST, BST> p = split(S,h);
+    std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
     S_l.shift(0,h-1);
