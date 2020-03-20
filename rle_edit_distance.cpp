@@ -224,6 +224,8 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
   if(h <= w){
     BST S = SWM(LEFT, h-1);
     // print_2D(S);
+    // get the value here before S is compromised
+    float s_h = S.get_value_at_coord(h);
     std::pair<BST, BST> p = split(S,h);
     BST S_l = p.first;
     BST S_r = p.second;
@@ -232,7 +234,6 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
     S_l.shift(0,-1);
     BST S1 = S_l;
     
-    float s_h = S.get_value_at_coord(h);
     BST S2 = initialise(w-h); S2.change_grad(1); S2.shift(h,s_h + h - 1);
 
     S_r.shift(w-h,w-1);
@@ -276,14 +277,14 @@ BST get_OUT_TOP(BST TOP, int h, int w){
   }
   else{
     BST S = SWM(TOP,w-1);
+    // get the value here before S is compromised
+    float s_w = S.get_value_at_coord(w);
     std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
 
     S_l.shift(0,h-1);
     BST S1 = S_l;
-
-    float s_w = S.get_value_at_coord(w);
     BST S2 = initialise(h-w); S2.change_grad(-1); S2.shift(w,s_w + h - 1);
 
     S_r.change_grad(-1); S_r.shift(h - w,2*w-1);
@@ -380,18 +381,19 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       }
       else
       {
-        // if(i == 3 && j == 5){
+        // if(i == 3 && j == 1){
         //   print_2D(LEFT[i][j]);
         //   print_2D(TOP[i][j]);
         // }
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
-        // if(i == 3 && j == 5){
+        // std::cout<<"here\n";
+        // if(i == 3 && j == 1){
         //   print_2D(OUT_LEFT);
         //   print_2D(OUT_TOP);
         // }
         OUT[i][j] = combine(OUT_TOP, OUT_LEFT);
-        // if(i == 3 && j == 5){
+        // if(i == 3 && j == 1){
         //   print_2D(OUT[i][j]);
         // }
       }
