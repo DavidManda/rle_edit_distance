@@ -546,19 +546,8 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
   if (root == NULL)
     return root;
   TreeNode::lazy_update(root);
-  // If the key to be deleted is smaller than the root's key,
-  // then it lies in left subtree
-  if (segm <= root->segm)
-    root->left = _delete_node(root->left, segm);
 
-  // If the key to be deleted is greater than the root's key,
-  // then it lies in right subtree
-  else if (segm >= root->segm)
-    root->right = _delete_node(root->right, segm);
-
-  // if key is same as root's key, then This is the node
-  // to be deleted
-  else
+  if(segm == root->segm)
   {
     // node with only one child or no child
     if (root->left == NULL)
@@ -582,6 +571,12 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
     // Delete the inorder successor
     root->right = _delete_node(root->right, temp->segm);
   }
+  else if (segm <= root->segm)
+    root->left = _delete_node(root->left, segm);
+  else
+    root->right = _delete_node(root->right, segm);
+
+  
   // If the tree had only one node
   if(root == NULL)
     return root;
