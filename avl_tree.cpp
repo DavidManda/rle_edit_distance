@@ -619,6 +619,10 @@ TreeNode* TreeNode::delete_node(TreeNode* root, Segment segm){
 
 }
 
+bool should_concat(Segment s1, Segment s2){
+  return s1.get_slope() == s2.get_slope() && s1.right == s2.left;
+}
+
 void BST::delete_node(Segment segm)
 {
   if (this->root == NULL)
@@ -629,7 +633,7 @@ void BST::delete_node(Segment segm)
   TreeNode *succ = this->find_succ(segm);
   this->root = _delete_node(this->root, segm);
 
-  if(pred != NULL && succ != NULL && pred->segm.get_slope() == succ->segm.get_slope()){
+  if(pred != NULL && succ != NULL && should_concat(pred->segm, succ->segm)){
     Segment concat = Segment(pred->segm.left, succ->segm.right);
     this->root = _delete_node(this->root, pred->segm);
     this->root = _delete_node(this->root, succ->segm);
