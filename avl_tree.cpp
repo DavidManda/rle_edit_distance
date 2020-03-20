@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <limits.h>
 #include <cstdlib>
+#include <sstream>
 
 #define COUNT 10
 
@@ -322,7 +323,9 @@ void TreeNode::recompute_height()
 
 std::string TreeNode::to_string()
 {
-  return this->segm.to_string();
+  std::stringstream ss;
+  ss<<this->segm.to_string()<<' '<<'('<<this->dx<<','<<this->dy<<") "<<this->dt<<' '<<this->dg<<' '<<this->t_min;
+  return ss.str();
 }
 
 TreeNode *TreeNode::find(Segment segm)
@@ -624,10 +627,18 @@ void BST::delete_node(Segment segm)
   TreeNode *succ = this->find_succ(segm);
   this->root = _delete_node(this->root, segm);
 
-  if(pred != NULL)
-    this->update_point_type(pred->segm);
-  if(succ != NULL)
-    this->update_point_type(succ->segm);
+  if(pred != NULL && succ != NULL && pred->segm.get_slope() == succ->segm.get_slope()){
+    Segment concat = Segment(pred->segm.left, succ->segm.right);
+    this->root = _delete_node(this->root, pred->segm);
+    this->root = _delete_node(this->root, succ->segm);
+    this->insert(concat);
+  }
+  else{
+    if(pred != NULL)
+      this->update_point_type(pred->segm);
+    if(succ != NULL)
+      this->update_point_type(succ->segm);
+  }
 }
 
 Point_t get_midpoint_type(Segment s_l, Segment s_r){

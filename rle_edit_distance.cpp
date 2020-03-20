@@ -47,7 +47,6 @@ BST join(BST t1, BST t2){
 // split a tree describing interval [x_l, x_r] into two trees describing [x_l, x_m],[x_m, x_r]
 std::pair<BST, BST> split(BST T, float x_m){
   std::pair<BST, BST> sol;
-
   // check if we are splitting inside the tree
   Point min = TreeNode::min(T.root)->segm.left;
   Point max = TreeNode::max(T.root)->segm.right;
@@ -65,11 +64,10 @@ std::pair<BST, BST> split(BST T, float x_m){
   TreeNode* node = T.root->find_node_containing(x_m);
   Segment segm = node->segm;
 
-  T.delete_node(segm);
-
   if(x_m > segm.left.x && x_m < segm.right.x){
     // If x_m is strictly within the segment, we split it and then split the tree on the 
     // right part of the segment
+    T.delete_node(segm);
     float val = segm.get_val_at_coord(x_m);
     Segment s1 = Segment(segm.left, Point(x_m, val));
     Segment s2 = Segment(Point(x_m, val), segm.right);
@@ -79,12 +77,10 @@ std::pair<BST, BST> split(BST T, float x_m){
   }
   else if(x_m == segm.left.x){
     // we keep the segment in the right part of the tree by using it for splitting
-    T.insert(segm);
     sol = BST::split(T.root,segm);
   }
   else{
     // we keep the segment in the left part of the tree by using its successor to split the tree
-    T.insert(segm);
     TreeNode* succ = T.find_succ(segm);
     sol = BST::split(T.root, succ->segm);
   }
@@ -159,10 +155,8 @@ BST combine(BST t1, BST t2){
   find_rightmost_larger(t2.root, t1, S2, found_segm);
 
   float x_m  = Segment::get_intersection(S1, S2).x;
-  // std::cout<<x_m<<'\n';
   std::pair<BST, BST> pair_1 = split(t1, x_m);
   std::pair<BST, BST> pair_2 = split(t2, x_m);
-  // print_2D(pair_2.first); print_2D(pair_1.second);
   return join(pair_2.first, pair_1.second);
 }
 
@@ -198,8 +192,9 @@ BST SWM(BST tree, int h){
     Segment empty_segm = Segment(right_most->segm.right, right_most->segm.right);
     tree.insert(empty_segm);
   }
-
   while(h > 0){
+    // print_2D(tree);
+    // std::cout<<h<<'\n';
     int t_min = tree.root->t_min;
     if(h >= t_min){
       tree.apply_swm(t_min);
@@ -214,6 +209,8 @@ BST SWM(BST tree, int h){
       h = 0;
     }
   }
+
+    // print_2D(tree);
   return tree;
 }
 
@@ -226,6 +223,7 @@ BST initialise(int n){
 BST get_OUT_LEFT(BST LEFT, int h, int w){
   if(h <= w){
     BST S = SWM(LEFT, h-1);
+    // print_2D(S);
     std::pair<BST, BST> p = split(S,h);
     BST S_l = p.first;
     BST S_r = p.second;
@@ -278,8 +276,6 @@ BST get_OUT_TOP(BST TOP, int h, int w){
   }
   else{
     BST S = SWM(TOP,w-1);
-    // std::cout<<"kajgsdkas\n";
-    // print_2D(S);
     std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
@@ -334,7 +330,6 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j,
     LEFT[i][j] = split(aux, w).second;
     // correct the index
     LEFT[i][j].shift(-w + 1,0);
-    // print_2D(LEFT[i][j]);
   }
 
   if (TOP[i][j].root == NULL)
@@ -368,14 +363,14 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       // Retrieve input border for current block
-      // std::cout<<i<<' '<<j<<'\n';
+      std::cout<<i<<' '<<j<<'\n';
       get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1);
       // std::cout<<"here\n";
       if(s0[i].ch == s1[j].ch)
       {
         BST L = LEFT[i][j];
         BST T = TOP[i][j];
-        // if(i == 2 && j == 3){
+        // if(i == 1 && j == 4){
         //   print_2D(L);
         //   print_2D(T);
         // }
@@ -385,18 +380,20 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       }
       else
       {
-        // if(i == 1 && j == 3){
-        //   // print_2D(LEFT[i][j]);
-        //   // print_2D(TOP[i][j]);
+        // if(i == 3 && j == 5){
+        //   print_2D(LEFT[i][j]);
+        //   print_2D(TOP[i][j]);
         // }
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
-        // if(i == 1 && j == 3){
-        //   // print_2D(OUT_LEFT);
-        //   // print_2D(OUT_TOP);
-        //   // std::cout<<"hererrere\n";
+        // if(i == 3 && j == 5){
+        //   print_2D(OUT_LEFT);
+        //   print_2D(OUT_TOP);
         // }
         OUT[i][j] = combine(OUT_TOP, OUT_LEFT);
+        // if(i == 3 && j == 5){
+        //   print_2D(OUT[i][j]);
+        // }
       }
       // print_2D(OUT[i][j]);
 
