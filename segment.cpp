@@ -14,6 +14,11 @@ bool Segment::contains(float x){
   return left.x <= x && right.x >= x;
 }
 
+int Segment::get_slope(){
+  assert(this->left.x != this->right.x);
+  return (this->right.y - this->left.y)/(this->right.x - this->left.x);
+}
+
 float Segment::get_val_at_coord(float x){
   Point p1 = this->left;
   Point p2 = this->right;
