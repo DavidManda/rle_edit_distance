@@ -886,7 +886,7 @@ std::pair<BST, BST> split_(TreeNode* root, Segment segm){
     right.insert(segm);
     return std::pair<BST, BST>(left, right);
   }
-  if(segm < root->segm){
+  if(segm <= root->segm){
     std::pair<BST, BST> aux = split_(root->left, segm);
     if(!aux.first.is_balanced()){
       print_2D(aux.first.root);
