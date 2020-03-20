@@ -246,13 +246,20 @@ void test_combine_1(){
 }
 
 void test_combine(){
-  // test_combine_simple();
+  test_combine_simple();
   test_combine_1();
 }
 
+void test_get_OUT_LEFT(){
+  Segment s1(Point(1.5, 3.5), Point(3,2)), s2(Point(1,3), Point(1.5, 3.5));
+  BST t; t.insert(s1);t.insert(s2);
+  BST out = get_OUT_LEFT(t, 3, 2);
+}
+
 void test_rle_edit_distance(){
-  test_join();
-  test_point_types();
-  test_swm();
-  test_combine();
+  // test_join();
+  // test_point_types();
+  // test_swm();
+  // test_combine();
+  test_get_OUT_LEFT();
 }

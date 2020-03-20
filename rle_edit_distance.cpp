@@ -63,7 +63,6 @@ std::pair<BST, BST> split(BST T, float x_m){
   }
   TreeNode* node = T.root->find_node_containing(x_m);
   Segment segm = node->segm;
-
   if(x_m > segm.left.x && x_m < segm.right.x){
     // If x_m is strictly within the segment, we split it and then split the tree on the 
     // right part of the segment
@@ -136,8 +135,6 @@ BST combine(BST t1, BST t2){
   Point max2 = TreeNode::max(t2.root)->segm.right;
   assert(min1.x == min2.x);
   assert(max1.x == max2.x);
-  // print_2D(t1);
-  // print_2D(t2);
   BST sol;
   // check if x_m == x_l
   // std::cout<<min1.to_string()<<' '<<min2.to_string()<<'\n';
@@ -165,10 +162,12 @@ TreeNode* find_and_remove_collapsed_segm(TreeNode *root){
 
   if(root->left && root->left->t_min == 0){
     root->left =  find_and_remove_collapsed_segm(root->left);
+    root->recompute_tmin();
   }
 
   if(root->right && root->right->t_min == 0){
     root->right = find_and_remove_collapsed_segm(root->right);
+    root->recompute_tmin();
   }
   // if node is collapsed
   if(root->get_t_min() == 0){
@@ -193,8 +192,6 @@ BST SWM(BST tree, int h){
     tree.insert(empty_segm);
   }
   while(h > 0){
-    // print_2D(tree);
-    // std::cout<<h<<'\n';
     int t_min = tree.root->t_min;
     if(h >= t_min){
       tree.apply_swm(t_min);
@@ -366,34 +363,41 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       // Retrieve input border for current block
       std::cout<<i<<' '<<j<<'\n';
       get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1);
+      // print_2D(LEFT[i][j]);print_2D(TOP[i][j]);
       // std::cout<<"here\n";
       if(s0[i].ch == s1[j].ch)
       {
         BST L = LEFT[i][j];
         BST T = TOP[i][j];
-        // if(i == 1 && j == 4){
+        // if(i == 2 && j == 1){
         //   print_2D(L);
-        //   print_2D(T);
         // }
         // shift top to the right h positions so we can join with left and get OUT
         T.shift(h - 1,0);
+        // if(i == 2 && j == 1){
+        //   print_2D(T);
+        // }
+        // std::cout<<"before join\n";
         OUT[i][j] = join(L,T);
+        // if(i == 2 && j == 1){
+        //   print_2D(OUT[i][j]);
+        // }
       }
       else
       {
-        // if(i == 3 && j == 1){
+        // if(i == 3 && j == 3){
         //   print_2D(LEFT[i][j]);
         //   print_2D(TOP[i][j]);
         // }
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
-        BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
         // std::cout<<"here\n";
-        // if(i == 3 && j == 1){
+        BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
+        // if(i == 3 && j == 3){
         //   print_2D(OUT_LEFT);
         //   print_2D(OUT_TOP);
         // }
         OUT[i][j] = combine(OUT_TOP, OUT_LEFT);
-        // if(i == 3 && j == 1){
+        // if(i == 2 && j == 2){
         //   print_2D(OUT[i][j]);
         // }
       }
