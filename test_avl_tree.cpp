@@ -151,7 +151,7 @@ void test_delete_with_lazy(){
   tree.root->shift(2, 1);
   // delete root
   tree.delete_node(Segment(Point(3,2), Point(4, 3)));
-  TreeNode* node1 = tree.find(Segment(Point(2,1), Point(5, 4)));
+  TreeNode* node1 = tree.find(Segment(Point(2,1), Point(3, 2)));
   assert(node1 != NULL);
 }
 
