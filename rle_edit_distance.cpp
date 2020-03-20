@@ -220,7 +220,7 @@ BST SWM(BST tree, int h){
 BST initialise(int n){
   if(n == 0)
     return BST();
-  return BST(new TreeNode(Segment(Point(1,0), Point(1+n,0))));
+  return BST(new TreeNode(Segment(Point(0,0), Point(n,0))));
 }
 
 BST get_OUT_LEFT(BST LEFT, int h, int w){
@@ -235,7 +235,7 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
     BST S1 = S_l;
     
     float s_h = S.get_value_at_coord(h);
-    BST S2 = initialise(w-h); S2.change_grad(1); S2.shift(h-1,s_h + h - 1);
+    BST S2 = initialise(w-h); S2.change_grad(1); S2.shift(h,s_h + h - 1);
 
     S_r.shift(w-h,w-1);
     BST S3 = S_r;
@@ -288,7 +288,7 @@ BST get_OUT_TOP(BST TOP, int h, int w){
     BST S1 = S_l;
 
     float s_w = S.get_value_at_coord(w);
-    BST S2 = initialise(h-w); S2.change_grad(-1); S2.shift(w-1,s_w + h);
+    BST S2 = initialise(h-w); S2.change_grad(-1); S2.shift(w,s_w + h - 1);
 
     S_r.change_grad(-1); S_r.shift(h - w,2*w-1);
     BST S3 = S_r;
