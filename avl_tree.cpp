@@ -324,7 +324,9 @@ void TreeNode::recompute_height()
 std::string TreeNode::to_string()
 {
   std::stringstream ss;
-  ss<<this->segm.to_string()<<' '<<'('<<this->dx<<','<<this->dy<<") "<<this->dt<<' '<<this->dg<<' '<<this->t_min;
+  ss<<this->segm.to_string();
+  // ss<<' '<<'('<<this->dx<<','<<this->dy<<") "<<this->dt<<' '<<this->dg<<' '<<this->t_min;
+  ss<<this->type_l<<' '<<this->type_r;
   return ss.str();
 }
 
@@ -858,6 +860,9 @@ BST BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
     root = new TreeNode(segm, t_l, t_r);
   }
   joined_tree.root = root;
+  joined_tree.update_point_type(root->segm);
+  joined_tree.update_point_type(t_l->segm);
+  joined_tree.update_point_type(t_r->segm);
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
   TreeNode* min = TreeNode::min(joined_tree.root);
