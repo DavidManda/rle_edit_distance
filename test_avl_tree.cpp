@@ -80,7 +80,7 @@ void test_join_avl(){
   }
 }
 
-void test_delete(){
+void test_simple_delete(){
   BST tree;
   for(int i = 0; i <= 100; i++){
     tree.insert(Segment(Point(i,i), Point(i+1, i+1)));
@@ -94,6 +94,23 @@ void test_delete(){
     }
     assert(tree.is_balanced());
   }
+}
+
+void test_delete_with_empty_segm(){
+  Segment s1(Point(1,4), Point(3,4));
+  Segment s2(Point(3,4), Point(4,3));
+  Segment s3(Point(4,3), Point(4,3));
+  Segment s4(Point(4,3), Point(5,4));
+  BST t;
+  t.insert(s2);
+  t.insert(s4);
+  t.insert(s1);
+  t.delete_node(s1);
+}
+
+void test_delete(){
+  test_simple_delete();
+  test_delete_with_empty_segm();
 }
 
 void test_simple_shift(){
