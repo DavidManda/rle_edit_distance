@@ -621,6 +621,8 @@ TreeNode* TreeNode::delete_node(TreeNode* root, Segment segm){
 }
 
 bool should_concat(Segment s1, Segment s2){
+  if(s1.left.x == s1.right.x || s2.left.x == s2.right.x)
+    return false;
   return s1.get_slope() == s2.get_slope() && s1.right == s2.left;
 }
 

@@ -102,10 +102,8 @@ void test_delete_with_empty_segm(){
   Segment s3(Point(4,3), Point(4,3));
   Segment s4(Point(4,3), Point(5,4));
   BST t;
-  t.insert(s2);
-  t.insert(s4);
-  t.insert(s1);
-  t.delete_node(s1);
+  t.insert(s2);t.insert(s1);t.insert(s3);
+  t.delete_node(s2);
 }
 
 void test_delete(){
