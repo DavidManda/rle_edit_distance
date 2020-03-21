@@ -325,8 +325,8 @@ std::string TreeNode::to_string()
 {
   std::stringstream ss;
   ss<<this->segm.to_string();
-  // ss<<' '<<'('<<this->dx<<','<<this->dy<<") "<<this->dt<<' '<<this->dg<<' '<<this->t_min;
-  ss<<this->type_l<<' '<<this->type_r;
+  ss<<' '<<'('<<this->dx<<','<<this->dy<<") "<<this->dt<<' '<<this->dg<<' '<<this->t_min;
+  // ss<<this->type_l<<' '<<this->type_r;
   return ss.str();
 }
 
@@ -425,8 +425,9 @@ BST::BST()
 }
 
 BST::BST(TreeNode* root){
+  TreeNode::lazy_update(root);
   this->root = root;
-  set_endpoints(this->root);
+  this->update_point_type(this->root->segm);
 }
 
 bool is_balanced_(TreeNode* root){
@@ -933,7 +934,6 @@ std::pair<BST, BST> split_(TreeNode* root, Segment segm){
 
 std::pair<BST, BST> BST::split(TreeNode* root, Segment segm){
   std::pair<BST, BST> pair = split_(root, segm);
-
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BSTs
   TreeNode* aux;
