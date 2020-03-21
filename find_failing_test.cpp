@@ -15,21 +15,23 @@ bool check_strings(std::string s0, std::string s1)
 
 int main()
 {
-  int T, N, M;
-    for(int gen0 = (1<<0); (gen0 >> 10) < 1; gen0++){
-        for(int gen1 = (1<<0); (gen1 >> 10) < 1; gen1++){
-            std::string s0 = "*", s1 = "*";
-            for(int i = 0; (1<<i) <= gen0; i++){
-                s1 += ('a' + ((gen0 >> i) & 1));
-            }
-            for(int i = 0; (1<<i) <= gen1; i++){
-                s0 += ('a' + ((gen1 >> i) & 1));
-            }
-            std::cout<<s0<<' '<<s1<<"\n";
-            if(!check_strings(s0,s1)){
-                std::cout<<"Failed on strings:\n"<<s0<<"\n"<<s1<<"\n";
-                return 0;
-            }
-        }
+  int T=0, N, M;
+  for(int gen0 = (1<<0); (gen0 >> 10) < 1; gen0++){
+    for(int gen1 = (1<<0); (gen1 >> 10) < 1; gen1++){
+      T++;
+      std::string s0 = "*", s1 = "*";
+      for(int i = 0; (1<<i) <= gen0; i++){
+        s1 += ('a' + ((gen0 >> i) & 1));
+      }
+      for(int i = 0; (1<<i) <= gen1; i++){
+        s0 += ('a' + ((gen1 >> i) & 1));
+      }
+      std::cout<<s0<<' '<<s1<<' '<<T<<"\n";
+      if(!check_strings(s0,s1)){
+        std::cout<<"Test "<<T<<"failed!\n";
+        std::cout<<"Failed on strings:\n"<<s0<<"\n"<<s1<<"\n";
+        return 0;
+      }
     }
+  }
 }
