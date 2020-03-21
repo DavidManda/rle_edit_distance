@@ -425,9 +425,11 @@ BST::BST()
 }
 
 BST::BST(TreeNode* root){
-  TreeNode::lazy_update(root);
   this->root = root;
-  this->update_point_type(this->root->segm);
+  if(root != NULL){
+    TreeNode::lazy_update(root);
+    this->update_point_type(this->root->segm);
+  }
 }
 
 bool is_balanced_(TreeNode* root){
