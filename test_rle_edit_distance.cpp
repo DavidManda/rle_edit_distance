@@ -215,9 +215,18 @@ void test_swm_collapsing_segm(){
   assert(right->type_r == F_);
 }
 
+void test_swm_empty_segm(){
+  Segment s1(Point(1,2),Point(2,1)), s2(Point(2,1), Point(3,2)), s3(Point(3,2), Point(4,2));
+  BST t;t.insert(s2);t.insert(s1);t.insert(s3);
+  BST t_swm = SWM(t, 3);
+  TreeNode* node = t.root->find_node_containing(4);
+  assert(node != NULL);
+}
+
 void test_swm(){
   test_swm_one_segm();
   test_swm_collapsing_segm();
+  test_swm_empty_segm();
 }
 
 void test_combine_simple(){

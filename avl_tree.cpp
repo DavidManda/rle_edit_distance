@@ -355,6 +355,7 @@ TreeNode *TreeNode::find(Segment segm)
 
 
 TreeNode* TreeNode::find_node_containing(float x){
+  lazy_update(this);
   if(this->segm.contains(x)){
     return this;
   }
