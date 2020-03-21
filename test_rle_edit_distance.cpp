@@ -4,7 +4,6 @@
 void test_join_empty_trees(){
   BST t_l,t_r, t;
   t = join(t_l, t_r);
-
   assert(t.root == NULL);
 }
 
@@ -257,9 +256,9 @@ void test_get_OUT_LEFT(){
 }
 
 void test_rle_edit_distance(){
-  // test_join();
-  // test_point_types();
-  // test_swm();
-  // test_combine();
+  test_join();
+  test_point_types();
+  test_swm();
+  test_combine();
   test_get_OUT_LEFT();
 }
