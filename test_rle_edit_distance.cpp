@@ -223,10 +223,19 @@ void test_swm_empty_segm(){
   assert(node != NULL);
 }
 
+void test_swm_case_1(){
+  Segment s1(Point(1,4), Point(2,3)), s2(Point(2,3), Point(2.5, 3.5)), s3(Point(2.5, 3.5), Point(3,3));
+  BST t; t.insert(s2);t.insert(s1);t.insert(s3);
+  BST t_swm = SWM(t,1);
+  assert(t_swm.root->segm == Segment(Point(1,4), Point(2,3)));
+  assert(t_swm.root->right->segm == Segment(Point(2,3), Point(4,3)));
+}
+
 void test_swm(){
   test_swm_one_segm();
   test_swm_collapsing_segm();
   test_swm_empty_segm();
+  test_swm_case_1();
 }
 
 void test_combine_simple(){

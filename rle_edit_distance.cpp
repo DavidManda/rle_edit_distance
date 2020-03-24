@@ -157,23 +157,18 @@ BST combine(BST t1, BST t2){
   return join(pair_2.first, pair_1.second);
 }
 
-void find_and_remove_collapsed_segm(TreeNode *current, BST& t){
+void get_collapsed_segments(TreeNode *current, std::vector<Segment> &collapsed_segments){
   assert(current != NULL);
   TreeNode::lazy_update(current);
   if(current->left && current->left->t_min == 0){
-    find_and_remove_collapsed_segm(current->left, t);
-    current->recompute_tmin();
+    get_collapsed_segments(current->left, collapsed_segments);
   }
-
   if(current->right && current->right->t_min == 0){
-    find_and_remove_collapsed_segm(current->right, t);
-    current->recompute_tmin();
+    get_collapsed_segments(current->right, collapsed_segments);
   }
   // if node is collapsed
   if(current->get_t_min() == 0){
-    // wrap node in a BST in order to use the BST API which is updates point typess
-    t.delete_node(current->segm);
-    print_2D(t);
+    collapsed_segments.push_back(current->segm);
   }
 }
 
@@ -195,7 +190,12 @@ BST SWM(BST tree, int h){
       tree.apply_swm(t_min);
       h -= t_min;
       while(tree.root->t_min == 0){
-        find_and_remove_collapsed_segm(tree.root, tree);
+        std::vector<Segment> collapsed_segments;
+        get_collapsed_segments(tree.root, collapsed_segments);
+        assert(collapsed_segments.size() <= 2);
+        for(std::vector<Segment>::iterator it = collapsed_segments.begin(); it != collapsed_segments.end(); ++it){
+          tree.delete_node(*it);
+        }
       }
     }
     else
@@ -359,7 +359,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       // Retrieve input border for current block
-      std::cout<<i<<' '<<j<<'\n';
+      // std::cout<<i<<' '<<j<<'\n';
       get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1);
       // print_2D(LEFT[i][j]);print_2D(TOP[i][j]);
       // std::cout<<"here\n";
