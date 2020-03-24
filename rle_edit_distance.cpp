@@ -157,26 +157,24 @@ BST combine(BST t1, BST t2){
   return join(pair_2.first, pair_1.second);
 }
 
-TreeNode* find_and_remove_collapsed_segm(TreeNode *root){
-  assert(root != NULL);
-  TreeNode::lazy_update(root);
-  if(root->left && root->left->t_min == 0){
-    root->left =  find_and_remove_collapsed_segm(root->left);
-    root->recompute_tmin();
+void find_and_remove_collapsed_segm(TreeNode *current, BST& t){
+  assert(current != NULL);
+  TreeNode::lazy_update(current);
+  if(current->left && current->left->t_min == 0){
+    find_and_remove_collapsed_segm(current->left, t);
+    current->recompute_tmin();
   }
 
-  if(root->right && root->right->t_min == 0){
-    root->right = find_and_remove_collapsed_segm(root->right);
-    root->recompute_tmin();
+  if(current->right && current->right->t_min == 0){
+    find_and_remove_collapsed_segm(current->right, t);
+    current->recompute_tmin();
   }
   // if node is collapsed
-  if(root->get_t_min() == 0){
-    // wrap node in a BST in order to use the BST API which is updates point types
-    BST t = BST(root);
-    t.delete_node(root->segm);
-    root = t.root;
+  if(current->get_t_min() == 0){
+    // wrap node in a BST in order to use the BST API which is updates point typess
+    t.delete_node(current->segm);
+    print_2D(t);
   }
-  return root;
 }
 
 BST SWM(BST tree, int h){
@@ -197,7 +195,7 @@ BST SWM(BST tree, int h){
       tree.apply_swm(t_min);
       h -= t_min;
       while(tree.root->t_min == 0){
-        tree.root = find_and_remove_collapsed_segm(tree.root);
+        find_and_remove_collapsed_segm(tree.root, tree);
       }
     }
     else
@@ -369,8 +367,9 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       {
         BST L = LEFT[i][j];
         BST T = TOP[i][j];
-        // if(i == 2 && j == 1){
+        // if(i == 4 && j == 3){
         //   print_2D(L);
+        //   print_2D(T);
         // }
         // shift top to the right h positions so we can join with left and get OUT
         T.shift(h - 1,0);
@@ -385,14 +384,14 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       }
       else
       {
-        // if(i == 3 && j == 3){
-        //   print_2D(LEFT[i][j]);
+        // if(i == 4 && j == 2){
+        //   // print_2D(LEFT[i][j]);
         //   print_2D(TOP[i][j]);
         // }
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
         // std::cout<<"here\n";
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
-        // if(i == 3 && j == 3){
+        // if(i == 4 && j == 2){
         //   print_2D(OUT_LEFT);
         //   print_2D(OUT_TOP);
         // }
