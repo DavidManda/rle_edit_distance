@@ -159,7 +159,7 @@ BST combine(BST t1, BST t2){
 
 TreeNode* find_and_remove_collapsed_segm(TreeNode *root){
   assert(root != NULL);
-
+  TreeNode::lazy_update(root);
   if(root->left && root->left->t_min == 0){
     root->left =  find_and_remove_collapsed_segm(root->left);
     root->recompute_tmin();
