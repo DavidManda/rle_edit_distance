@@ -474,8 +474,8 @@ void BST::insert(Segment segm)
 
   this->root = TreeNode::insert(this->root, segm);
   // update point types
-  TreeNode *pred = BST::find_predec(segm);
-  TreeNode *succ = BST::find_succ(segm);
+  TreeNode *pred = this->find_predec(segm);
+  TreeNode *succ = this->find_succ(segm);
   this->update_point_type(segm);
   if(pred != NULL)
     this->update_point_type(pred->segm);
