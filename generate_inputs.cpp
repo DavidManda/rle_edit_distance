@@ -19,13 +19,13 @@ void gen_random(std::string *s, const int len)
 int main()
 {
   std::ofstream fout("input.in");
-  int nr_tests = 1;
+  int nr_tests = 20000;
   fout << nr_tests << '\n';
   std::string s0, s1;
   for (int i = 0; i < nr_tests; ++i)
   {
-    int N = rand() % 100 + 1;
-    int M = rand() % 100 + 1;
+    int N = rand() % 6 + 1;
+    int M = rand() % 6 + 1;
     gen_random(&s0, N);
     gen_random(&s1, M);
     fout << N << ' ' << M << '\n'

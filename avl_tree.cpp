@@ -447,6 +447,7 @@ bool is_balanced_(TreeNode* root){
   return balance >= -1 && balance <= 1 && is_balanced_(root->left) && is_balanced_(root->right);
 }
 
+// O(n)
 bool BST::is_balanced(){
   return is_balanced_(root);
 }
@@ -937,14 +938,10 @@ std::pair<BST, BST> split_(TreeNode* root, Segment segm){
   }
   if(segm <= root->segm){
     std::pair<BST, BST> aux = split_(root->left, segm);
-    assert(aux.first.is_balanced());
-    assert(aux.second.is_balanced());
     BST right = BST::join(aux.second.root, root->right, root->segm);
     return std::pair<BST, BST>(aux.first, right);
   }
   std::pair<BST, BST> aux = split_(root->right, segm);
-  assert(aux.first.is_balanced());
-  assert(aux.second.is_balanced());
   return std::pair<BST, BST>(BST::join(root->left, aux.first.root, root->segm), aux.second); 
 }
 

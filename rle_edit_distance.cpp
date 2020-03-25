@@ -219,6 +219,7 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
 BST get_OUT_TOP(BST TOP, int h, int w){
   if(h <= w){
     BST S = SWM(TOP,h-1);
+    // print_2D(S);
     std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
@@ -227,6 +228,7 @@ BST get_OUT_TOP(BST TOP, int h, int w){
 
     S_r.change_grad(-1); S_r.shift(0,w+h-1);
     BST S2 = S_r;
+    // print_2D(S1);print_2D(S2);
     return join(S1,S2);
   }
   else{
@@ -316,6 +318,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
     {
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
+      std::cout<<i<<' '<<j<<'\n';
       // Retrieve input border for current block
       get_input_border(LEFT, TOP, OUT, i, j, s0, s1);
       if(s0[i].ch == s1[j].ch)
@@ -325,14 +328,29 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
         // shift top to the right h positions so we can join with left and get OUT
         T.shift(h - 1,0);
         OUT[i][j] = join(L,T);
+        // if(i == 2 && j == 4){
+        //   print_2D(OUT[i][j]);
+        // }
       }
       else
       {
+        if(i == 2 && j == 4){
+          print_2D(LEFT[i][j]);
+          print_2D(TOP[i][j]);
+        }
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
+        // std::cout<<"here\n";
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
+        if(i == 2 && j == 4){
+          print_2D(OUT_LEFT);
+          print_2D(OUT_TOP);
+        }
         OUT[i][j] = combine(OUT_TOP, OUT_LEFT);
+        if(i == 2 && j == 4){
+          print_2D(OUT[i][j]);
+        }
       }
-
+      // print_2D(OUT[i][j]);
       dyn[i][j] = OUT[i][j].get_value_at_coord(w);
     }
   }

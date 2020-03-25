@@ -272,6 +272,15 @@ void test_get_OUT_LEFT(){
   BST t; t.insert(s1);t.insert(s2);
   BST out = get_OUT_LEFT(t, 3, 2);
 }
+
+void test_get_OUT_TOP(){
+  Segment s1(Point(1, 3), Point(2,3)), s2(Point(2,3), Point(3, 4));
+  BST t; t.insert(s2);t.insert(s1);
+  print_2D(t);
+  BST t_out = get_OUT_TOP(t, 2, 3);
+  print_2D(t_out);
+}
+
 void test_rle_split(){
   Segment s1(Point(1,2), Point(2,1)), s2(Point(2,1), Point(6,1)), s3(Point(6,1), Point(8,3));
   BST t; t.insert(s2); t.insert(s1); t.insert(s3);
@@ -287,5 +296,6 @@ void test_rle_edit_distance(){
   test_swm();
   test_combine();
   test_get_OUT_LEFT();
+  test_get_OUT_TOP();
   test_rle_split();
 }

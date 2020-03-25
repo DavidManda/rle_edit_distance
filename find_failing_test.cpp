@@ -26,7 +26,7 @@ int main()
       for(int i = 0; (1<<i) <= gen1; i++){
         s0 += ('a' + ((gen1 >> i) & 1));
       }
-      // std::cout<<s0<<' '<<s1<<' '<<T<<"\n";
+      std::cout<<s0<<' '<<s1<<' '<<T<<"\n";
       if(!check_strings(s0,s1)){
         std::cout<<"Test "<<T<<"failed!\n";
         std::cout<<"Failed on strings:\n"<<s0<<"\n"<<s1<<"\n";
