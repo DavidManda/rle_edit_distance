@@ -268,17 +268,15 @@ void test_combine(){
 }
 
 void test_get_OUT_LEFT(){
-  Segment s1(Point(1.5, 3.5), Point(3,2)), s2(Point(1,3), Point(1.5, 3.5));
-  BST t; t.insert(s1);t.insert(s2);
-  BST out = get_OUT_LEFT(t, 3, 2);
+  Segment s1(Point(1, 3), Point(2,2)), s2(Point(2,2), Point(3, 2)), s3(Point(3,2), Point(4,1)), s4(Point(4,1), Point(5, 2));
+  BST t; t.insert(s3);t.insert(s2);t.insert(s4);t.insert(s1);
+  BST out = get_OUT_LEFT(t, 5, 3);
+  TreeNode *min = TreeNode::min(out.root);
+  assert(min->type_l == _F);
 }
 
 void test_get_OUT_TOP(){
-  Segment s1(Point(1, 3), Point(2,3)), s2(Point(2,3), Point(3, 4));
-  BST t; t.insert(s2);t.insert(s1);
-  print_2D(t);
-  BST t_out = get_OUT_TOP(t, 2, 3);
-  print_2D(t_out);
+  
 }
 
 void test_rle_split(){

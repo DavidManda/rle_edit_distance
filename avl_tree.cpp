@@ -161,9 +161,6 @@ Point_t update_point_type(Point_t type, int dg){
 }
 
 void TreeNode::update_endpoints(){
-  if(this->dt == 0){
-    return;
-  }
   move_point(this->segm.left, this->type_l, this->dt);
   move_point(this->segm.right, this->type_r, this->dt);
   if(this->dg == 0){
