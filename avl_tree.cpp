@@ -638,7 +638,6 @@ void BST::delete_node(Segment segm)
   TreeNode *pred = this->find_predec(segm);
   TreeNode *succ = this->find_succ(segm);
   this->root = _delete_node(this->root, segm);
-
   if(pred != NULL && succ != NULL && should_concat(pred->segm, succ->segm)){
     Segment concat = Segment(pred->segm.left, succ->segm.right);
     this->root = _delete_node(this->root, pred->segm);
@@ -652,10 +651,11 @@ void BST::delete_node(Segment segm)
       this->update_point_type(succ->segm);
   }
 }
-
+// returns incident point of the two segments
 Point_t get_midpoint_type(Segment s_l, Segment s_r){
 
   if(s_l.right.x == s_l.left.x){
+    // std::cout<<s_l.to_string()<<' '<<s_r.to_string()<<'\n';
     assert(s_r.right.x != s_r.left.x);
     int slope_r = (s_r.right.y - s_r.left.y)/(s_r.right.x - s_r.left.x);
     if(slope_r == -1)
@@ -704,7 +704,11 @@ void BST::update_point_type(Segment segm){
   if(succ != NULL){
     Segment s_r = succ->segm;
     Point_t type = get_midpoint_type(s, s_r);
-    if(type != DI){
+    // Here we insert empty segment ONLY if the two segments are actually continuous
+    // it can be the case that they are not when we perform a delete in order to split
+    // that segment in two. After the delete and before the inserts there is a gap in the tree
+    // and we should not insert an empty segment there
+    if(type != DI || s.right.x != s_r.left.x){
       node->type_r = type;
     }
     else
@@ -717,7 +721,11 @@ void BST::update_point_type(Segment segm){
   if(predec != NULL){
     Segment s_l = predec->segm;
     Point_t type = get_midpoint_type(s_l, s);
-    if(type != DI){
+    // Here we insert empty segment ONLY if the two segments are actually continuous
+    // it can be the case that they are not when we perform a delete in order to split
+    // that segment in two. After the delete and before the inserts there is a gap in the tree
+    // and we should not insert an empty segment there
+    if(type != DI || s_l.right.x != s.left.x){
       node->type_l = type;
     }
     else
