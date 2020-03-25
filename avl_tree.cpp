@@ -656,7 +656,12 @@ Point_t get_midpoint_type(Segment s_l, Segment s_r){
 
   if(s_l.right.x == s_l.left.x){
     // std::cout<<s_l.to_string()<<' '<<s_r.to_string()<<'\n';
-    assert(s_r.right.x != s_r.left.x);
+    if(s_r.right.x == s_r.left.x){
+      // it can be the case that multiple neighbouring segments have collapsed and will be deleted
+      // as they are deleted sequentially, there is a point in time where there are two neighbouring
+      // empty segments, but they will be deleted.
+      return NotInitialised;
+    }
     int slope_r = (s_r.right.y - s_r.left.y)/(s_r.right.x - s_r.left.x);
     if(slope_r == -1)
       return FD;
@@ -664,7 +669,12 @@ Point_t get_midpoint_type(Segment s_l, Segment s_r){
   }
 
   if(s_r.right.x == s_r.left.x){
-    assert(s_l.right.x != s_l.left.x);
+    if(s_l.right.x == s_l.left.x){
+      // it can be the case that multiple neighbouring segments have collapsed and will be deleted
+      // as they are deleted sequentially, there is a point in time where there are two neighbouring
+      // empty segments, but they will be deleted.
+      return NotInitialised;
+    }
     int slope_l = (s_l.right.y - s_l.left.y)/(s_l.right.x - s_l.left.x);
     if(slope_l == -1)
       return DF;
