@@ -992,6 +992,44 @@ TreeNode* get_new_copy_(TreeNode* root){
   return sol;
 }
 
+// finds leftmost element in the tree provided that has a smaller y value at the 
+// same coordinatethan the tree on which this method is calles
+void BST::find_leftmost_smaller(TreeNode *node, Segment &s, bool &found_segm){
+
+  if(node == NULL || found_segm)
+    return;
+  
+  TreeNode::lazy_update(node);
+  this->find_leftmost_smaller(node->left, s, found_segm);
+
+  float val = this->get_value_at_coord(node->segm.right.x);
+  if(node->segm.right.y <= val && found_segm == false){
+    s = node->segm;
+    found_segm = true;
+    return;
+  }
+
+  this->find_leftmost_smaller(node->right, s, found_segm);
+}
+
+// finds rightmost element in the tree provided that has a larger y value at the 
+// same coordinatethan the tree on which this method is calles
+void BST::find_rightmost_larger(TreeNode *node, Segment &s, bool &found_segm){
+  if(node == NULL || found_segm)
+    return;
+  
+  TreeNode::lazy_update(node);
+  this->find_rightmost_larger(node->right, s, found_segm);
+  float val = this->get_value_at_coord(node->segm.left.x);
+  if(val > node->segm.left.y && found_segm == false){
+    s = node->segm;
+    found_segm = true;
+    return;
+  }
+
+  this->find_rightmost_larger(node->left, s, found_segm);
+}
+
 BST BST::get_new_copy(BST t){
   BST sol;
   if(t.root == NULL)

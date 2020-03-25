@@ -98,36 +98,6 @@ std::pair<BST, BST> split(BST T, float x_m){
   return sol;
 }
 
-void find_leftmost_smaller(TreeNode *node, BST T, Segment &s, bool &found_segm){
-
-  if(node == NULL || found_segm)
-    return;
-  find_leftmost_smaller(node->left, T, s, found_segm);
-
-  float val = T.get_value_at_coord(node->segm.right.x);
-  if(node->segm.right.y <= val && found_segm == false){
-    s = node->segm;
-    found_segm = true;
-    return;
-  }
-
-  find_leftmost_smaller(node->right, T, s, found_segm);
-}
-
-void find_rightmost_larger(TreeNode *node, BST T, Segment &s, bool &found_segm){
-  if(node == NULL || found_segm)
-    return;
-  find_rightmost_larger(node->right, T, s, found_segm);
-  float val = T.get_value_at_coord(node->segm.left.x);
-  if(val > node->segm.left.y && found_segm == false){
-    s = node->segm;
-    found_segm = true;
-    return;
-  }
-
-  find_rightmost_larger(node->left, T, s, found_segm);
-}
-
 BST combine(BST t1, BST t2){
   Point min1 = TreeNode::min(t1.root)->segm.left;
   Point min2 = TreeNode::min(t2.root)->segm.left;
@@ -147,10 +117,9 @@ BST combine(BST t1, BST t2){
   }
   Segment S1, S2;
   bool found_segm = false;
-  find_leftmost_smaller(t1.root, t2, S1, found_segm);
+  t2.find_leftmost_smaller(t1.root, S1, found_segm);
   found_segm = false;
-  find_rightmost_larger(t2.root, t1, S2, found_segm);
-
+  t1.find_rightmost_larger(t2.root, S2, found_segm);
   float x_m  = Segment::get_intersection(S1, S2).x;
   std::pair<BST, BST> pair_1 = split(t1, x_m);
   std::pair<BST, BST> pair_2 = split(t2, x_m);
@@ -371,36 +340,36 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       {
         BST L = LEFT[i][j];
         BST T = TOP[i][j];
-        // if(i == 3 && j == 2){
+        // if(i == 4 && j == 3){
         //   print_2D(L);
-        //   // print_2D(T);
+        //   print_2D(T);
         // }
         // shift top to the right h positions so we can join with left and get OUT
         T.shift(h - 1,0);
-        // if(i == 3 && j == 2){
+        // if(i == 4 && j == 3){
         //   print_2D(T);
         // }
         // std::cout<<"before join\n";
         OUT[i][j] = join(L,T);
-        // if(i == 3 && j == 2){
+        // if(i == 4 && j == 3){
         //   print_2D(OUT[i][j]);
         // }
       }
       else
       {
-        // if(i == 7 && j == 3){
+        // if(i == 2 && j == 6){
         //   print_2D(LEFT[i][j]);
         //   print_2D(TOP[i][j]);
         // }
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
         // std::cout<<"here\n";
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
-        // if(i == 7 && j == 3){
+        // if(i == 2 && j == 6){
         //   print_2D(OUT_LEFT);
         //   print_2D(OUT_TOP);
         // }
         OUT[i][j] = combine(OUT_TOP, OUT_LEFT);
-        // if(i == 2 && j == 2){
+        // if(i == 5 && j == 3){
         //   print_2D(OUT[i][j]);
         // }
       }
