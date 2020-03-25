@@ -270,7 +270,8 @@ TreeNode* TreeNode::rotate_left(TreeNode* root){
 TreeNode* TreeNode::insert(TreeNode* root, Segment segm)
 {
   if (root == NULL)
-    return(new TreeNode(segm));  
+    return(new TreeNode(segm));
+
   TreeNode::lazy_update(root);
   if (segm <= root->segm)
     root->left = insert(root->left, segm);
@@ -476,6 +477,7 @@ void BST::insert(Segment segm)
   // update point types
   TreeNode *pred = this->find_predec(segm);
   TreeNode *succ = this->find_succ(segm);
+
   this->update_point_type(segm);
   if(pred != NULL)
     this->update_point_type(pred->segm);
@@ -1014,17 +1016,6 @@ void BST::find_rightmost_larger(TreeNode *node, Segment &s, bool &found_segm){
   }
 
   this->find_rightmost_larger(node->left, s, found_segm);
-}
-
-BST BST::get_new_copy(BST t){
-  BST sol;
-  if(t.root == NULL)
-    return sol;
-  sol.root = new TreeNode();
-  *sol.root = *t.root;
-  sol.root->left = get_new_copy_(t.root->left);
-  sol.root->right = get_new_copy_(t.root->right);
-  return sol;
 }
 
 // Function to print binary tree in 2D

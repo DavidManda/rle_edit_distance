@@ -268,8 +268,9 @@ void init_input_border(border_t &LEFT, border_t &TOP, int M, int N, rle_string s
   }
 }
 
-void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j, std::vector<std::vector<int > > dyn, rle_string s0, rle_string s1)
+void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j, rle_string s0, rle_string s1)
 {
+  int M = s0.size(), N = s1.size();
   // LEFT[i][j] might have been initialised (if j == 1) so we don't have to do anything in that case
   if (LEFT[i][j].root == NULL)
   {
@@ -277,11 +278,15 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j,
     // width and height of block to the left
     int w = s1[j - 1].len + 1;
     int h = s0[i].len + 1;
-    BST aux = BST::get_new_copy(OUT[i][j-1]);
-
-    LEFT[i][j] = split(aux, w).second;
+    std::pair<BST, BST> p = split(OUT[i][j-1], w);
+    LEFT[i][j] = p.second;
     // correct the index
     LEFT[i][j].shift(-w + 1,0);
+    // assign the top border of the block underneath now, as we have a tree representing it
+    // this way we don't have to split the same tree twice, which is not allowed
+    if(i + 1 < M){
+      TOP[i+1][j-1] = p.first;
+    }
   }
 
   if (TOP[i][j].root == NULL)
@@ -290,8 +295,8 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j,
     // Width and height of block above
     int w = s1[j].len + 1;
     int h = s0[i - 1].len + 1;
-    BST aux = BST::get_new_copy(OUT[i-1][j]);
-    TOP[i][j] = split(aux, w).first;
+    std::pair<BST, BST> p = split(OUT[i-1][j], w);
+    TOP[i][j] = p.first;
   }
 }
 
@@ -312,7 +317,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       // Retrieve input border for current block
-      get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1);
+      get_input_border(LEFT, TOP, OUT, i, j, s0, s1);
       if(s0[i].ch == s1[j].ch)
       {
         BST L = LEFT[i][j];
