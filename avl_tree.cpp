@@ -186,7 +186,7 @@ void TreeNode::change_grad(int dg){
 
 void TreeNode::apply_swm(int dt){
   this->active = false;
-  // TODO make sure you should update this here or just recompute the value. maybe do both.
+
   this->t_min -= dt;
   if(this->dg == 0){
     this->dt += dt;
@@ -591,7 +591,6 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
     return root;
   root->recompute_tmin();
   root->recompute_height();
-  // print_2D(root);
   int balance = root->get_balance();
   // left left
   if(balance > 1 && root->left->get_balance() >= 0){
@@ -655,7 +654,6 @@ void BST::delete_node(Segment segm)
 Point_t get_midpoint_type(Segment s_l, Segment s_r){
 
   if(s_l.right.x == s_l.left.x){
-    // std::cout<<s_l.to_string()<<' '<<s_r.to_string()<<'\n';
     if(s_r.right.x == s_r.left.x){
       // it can be the case that multiple neighbouring segments have collapsed and will be deleted
       // as they are deleted sequentially, there is a point in time where there are two neighbouring
@@ -937,26 +935,14 @@ std::pair<BST, BST> split_(TreeNode* root, Segment segm){
   }
   if(segm <= root->segm){
     std::pair<BST, BST> aux = split_(root->left, segm);
-    if(!aux.first.is_balanced()){
-      print_2D(aux.first.root);
-      throw;
-    }
-    if(!aux.second.is_balanced()){
-      print_2D(aux.second.root);
-      throw;
-    }
+    assert(aux.first.is_balanced());
+    assert(aux.second.is_balanced());
     BST right = BST::join(aux.second.root, root->right, root->segm);
     return std::pair<BST, BST>(aux.first, right);
   }
   std::pair<BST, BST> aux = split_(root->right, segm);
-  if(!aux.first.is_balanced()){
-    print_2D(aux.first.root);
-    throw;
-  }
-  if(!aux.second.is_balanced()){
-    print_2D(aux.second.root);
-    throw;
-  }
+  assert(aux.first.is_balanced());
+  assert(aux.second.is_balanced());
   return std::pair<BST, BST>(BST::join(root->left, aux.first.root, root->segm), aux.second); 
 }
 

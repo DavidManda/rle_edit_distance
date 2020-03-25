@@ -20,8 +20,11 @@ int main()
     RLE_string_helper rle_helper;
     std::vector<RLE_run> rle_s0 = rle_helper.get_rle_string(s0);
     std::vector<RLE_run> rle_s1 = rle_helper.get_rle_string(s1);
-    int sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1);
+    std::cout<<"here\n";
     int sol = rle_ED::get_naive_edit_dist(M, N, s0, s1);
+    std::cout<<"got naive\n";
+    int sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1);
+    std::cout<<"got rle\n";
 
     if(sol != sol_rle)
     {

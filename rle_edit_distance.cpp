@@ -107,7 +107,6 @@ BST combine(BST t1, BST t2){
   assert(max1.x == max2.x);
   BST sol;
   // check if x_m == x_l
-  // std::cout<<min1.to_string()<<' '<<min2.to_string()<<'\n';
   if(min1.y <= min2.y){
     return t1;
   }
@@ -173,7 +172,6 @@ BST SWM(BST tree, int h){
     }
   }
 
-    // print_2D(tree);
   return tree;
 }
 
@@ -186,7 +184,6 @@ BST initialise(int n){
 BST get_OUT_LEFT(BST LEFT, int h, int w){
   if(h <= w){
     BST S = SWM(LEFT, h-1);
-    // print_2D(S);
     // get the value here before S is compromised
     float s_h = S.get_value_at_coord(h);
     std::pair<BST, BST> p = split(S,h);
@@ -201,16 +198,10 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
 
     S_r.shift(w-h,w-1);
     BST S3 = S_r;
-    // print_2D(S1);
-    // print_2D(S2);
-    // print_2D(S3);
     return join(join(S1,S2),S3);
   }
   else{
-    // std::cout<<"askhgdkjhasg\n";
-    // print_2D(LEFT);
     BST S = SWM(LEFT, w-1);
-    // print_2D(S);
     std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
@@ -228,17 +219,14 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
 BST get_OUT_TOP(BST TOP, int h, int w){
   if(h <= w){
     BST S = SWM(TOP,h-1);
-    // print_2D(S);
     std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
-    // print_2D(S_l);
     S_l.shift(0,h-1);
     BST S1 = S_l;
 
     S_r.change_grad(-1); S_r.shift(0,w+h-1);
     BST S2 = S_r;
-    // print_2D(S1);print_2D(S2);
     return join(S1,S2);
   }
   else{
@@ -255,9 +243,6 @@ BST get_OUT_TOP(BST TOP, int h, int w){
 
     S_r.change_grad(-1); S_r.shift(h - w,2*w-1);
     BST S3 = S_r;
-    // print_2D(S1);
-    // print_2D(S2);
-    // print_2D(S3);
     return join(join(S1,S2),S3);
   }
 }
@@ -293,7 +278,7 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j,
     int w = s1[j - 1].len + 1;
     int h = s0[i].len + 1;
     BST aux = BST::get_new_copy(OUT[i][j-1]);
-    // TODO make sure we are splitting at the correct point
+
     LEFT[i][j] = split(aux, w).second;
     // correct the index
     LEFT[i][j].shift(-w + 1,0);
@@ -305,13 +290,8 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j,
     // Width and height of block above
     int w = s1[j].len + 1;
     int h = s0[i - 1].len + 1;
-    // TODO make sure we are splitting at the correct point
-    // print_2D(OUT[i-1][j]);
     BST aux = BST::get_new_copy(OUT[i-1][j]);
-    // print_2D(aux);
-    // std::cout<<w<<'\n';
     TOP[i][j] = split(aux, w).first;
-    // print_2D(TOP[i][j]);
   }
 }
 
@@ -332,61 +312,25 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       // Retrieve input border for current block
-      // std::cout<<i<<' '<<j<<'\n';
       get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1);
-      // print_2D(LEFT[i][j]);print_2D(TOP[i][j]);
-      // std::cout<<"here\n";
       if(s0[i].ch == s1[j].ch)
       {
         BST L = LEFT[i][j];
         BST T = TOP[i][j];
-        // if(i == 4 && j == 3){
-        //   print_2D(L);
-        //   print_2D(T);
-        // }
         // shift top to the right h positions so we can join with left and get OUT
         T.shift(h - 1,0);
-        // if(i == 4 && j == 3){
-        //   print_2D(T);
-        // }
-        // std::cout<<"before join\n";
         OUT[i][j] = join(L,T);
-        // if(i == 4 && j == 3){
-        //   print_2D(OUT[i][j]);
-        // }
       }
       else
       {
-        // if(i == 2 && j == 6){
-        //   print_2D(LEFT[i][j]);
-        //   print_2D(TOP[i][j]);
-        // }
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
-        // std::cout<<"here\n";
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
-        // if(i == 2 && j == 6){
-        //   print_2D(OUT_LEFT);
-        //   print_2D(OUT_TOP);
-        // }
         OUT[i][j] = combine(OUT_TOP, OUT_LEFT);
-        // if(i == 5 && j == 3){
-        //   print_2D(OUT[i][j]);
-        // }
       }
-      // print_2D(OUT[i][j]);
 
       dyn[i][j] = OUT[i][j].get_value_at_coord(w);
     }
   }
-  // for (int i = 1; i < M; i++)
-  // {
-  //   for (int j = 1; j < N; j++)
-  //   {
-  //     TreeNode::free(LEFT[i][j].root);
-  //     TreeNode::free(TOP[i][j].root);
-  //     TreeNode::free(OUT[i][j].root);
-  //   }
-  // }
   return dyn[M-1][N-1];
 }
 
