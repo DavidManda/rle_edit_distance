@@ -272,11 +272,20 @@ void test_get_OUT_LEFT(){
   BST t; t.insert(s1);t.insert(s2);
   BST out = get_OUT_LEFT(t, 3, 2);
 }
-
+void test_rle_split(){
+  Segment s1(Point(1,2), Point(2,1)), s2(Point(2,1), Point(6,1)), s3(Point(6,1), Point(8,3));
+  BST t; t.insert(s2); t.insert(s1); t.insert(s3);
+  std::pair<BST, BST> p = split(t,5);
+  assert(p.first.root->segm == Segment(Point(1,2), Point(2,1)));
+  assert(p.first.root->right->segm == Segment(Point(2,1), Point(5,1)));
+  assert(p.second.root->segm == Segment(Point(5,1), Point(6,1)));
+  assert(p.second.root->right->segm == Segment(Point(6,1), Point(8,3)));
+}
 void test_rle_edit_distance(){
   test_join();
   test_point_types();
   test_swm();
   test_combine();
   test_get_OUT_LEFT();
+  test_rle_split();
 }
