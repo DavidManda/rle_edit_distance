@@ -14,3 +14,5 @@ On gradient change, the y coordinate of an empty segment should still be modifie
 
  In the cen and chao paper, the translation to graphical representation omits some points and makes sure there
  are no neighbouring segments with the same gradient. We might have to do the same here.
+
+ The number of collapsing segments could be arbitratily large?

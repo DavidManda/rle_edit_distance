@@ -192,7 +192,6 @@ BST SWM(BST tree, int h){
       while(tree.root->t_min == 0){
         std::vector<Segment> collapsed_segments;
         get_collapsed_segments(tree.root, collapsed_segments);
-        assert(collapsed_segments.size() <= 2);
         for(std::vector<Segment>::iterator it = collapsed_segments.begin(); it != collapsed_segments.end(); ++it){
           tree.delete_node(*it);
         }
@@ -260,14 +259,17 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
 BST get_OUT_TOP(BST TOP, int h, int w){
   if(h <= w){
     BST S = SWM(TOP,h-1);
+    // print_2D(S);
     std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
+    // print_2D(S_l);
     S_l.shift(0,h-1);
     BST S1 = S_l;
 
     S_r.change_grad(-1); S_r.shift(0,w+h-1);
     BST S2 = S_r;
+    // print_2D(S1);print_2D(S2);
     return join(S1,S2);
   }
   else{
@@ -337,6 +339,8 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j,
     // TODO make sure we are splitting at the correct point
     // print_2D(OUT[i-1][j]);
     BST aux = BST::get_new_copy(OUT[i-1][j]);
+    // print_2D(aux);
+    // std::cout<<w<<'\n';
     TOP[i][j] = split(aux, w).first;
     // print_2D(TOP[i][j]);
   }
@@ -367,31 +371,31 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       {
         BST L = LEFT[i][j];
         BST T = TOP[i][j];
-        // if(i == 4 && j == 3){
+        // if(i == 3 && j == 2){
         //   print_2D(L);
-        //   print_2D(T);
+        //   // print_2D(T);
         // }
         // shift top to the right h positions so we can join with left and get OUT
         T.shift(h - 1,0);
-        // if(i == 2 && j == 1){
+        // if(i == 3 && j == 2){
         //   print_2D(T);
         // }
         // std::cout<<"before join\n";
         OUT[i][j] = join(L,T);
-        // if(i == 2 && j == 1){
+        // if(i == 3 && j == 2){
         //   print_2D(OUT[i][j]);
         // }
       }
       else
       {
-        // if(i == 4 && j == 2){
-        //   // print_2D(LEFT[i][j]);
+        // if(i == 7 && j == 3){
+        //   print_2D(LEFT[i][j]);
         //   print_2D(TOP[i][j]);
         // }
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
         // std::cout<<"here\n";
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
-        // if(i == 4 && j == 2){
+        // if(i == 7 && j == 3){
         //   print_2D(OUT_LEFT);
         //   print_2D(OUT_TOP);
         // }
