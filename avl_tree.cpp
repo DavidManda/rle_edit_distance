@@ -879,6 +879,7 @@ BST BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
   }
   joined_tree.root = root;
   joined_tree.update_point_type(root->segm);
+  joined_tree.update_point_type(segm);
   TreeNode *pred = joined_tree.find_predec(segm);
   TreeNode *succ = joined_tree.find_succ(segm);
   if(pred != NULL)
