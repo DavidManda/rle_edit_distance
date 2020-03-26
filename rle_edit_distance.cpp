@@ -84,18 +84,11 @@ std::pair<BST, BST> split(BST T, float x_m){
     TreeNode* succ = T.find_succ(segm);
     sol = BST::split(T.root, succ->segm);
   }
-  // update type of points of the new boundry elements
-  // TODO!! this is not OK because it has complexity O(log(n))^2. Fix this
-  TreeNode* aux = sol.first.root;
-  while(aux){
-    sol.first.update_point_type(aux->segm);
-    aux = aux->right;
-  }
-  aux = sol.second.root;
-  while(aux){
-    sol.second.update_point_type(aux->segm);
-    aux = aux->left;
-  }
+  // update type of new endpoints
+  TreeNode* min_right =  TreeNode::min(sol.second.root);
+  TreeNode* max_left =  TreeNode::max(sol.first.root);
+  sol.second.update_point_type(min_right->segm);
+  sol.first.update_point_type(max_left->segm);
   return sol;
 }
 
@@ -347,7 +340,6 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
         aux = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
         missmatch_block_time += aux;
       }
-      // print_2D(OUT[i][j]);
       dyn[i][j] = OUT[i][j].get_value_at_coord(w);
     }
   }
