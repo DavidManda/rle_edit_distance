@@ -270,7 +270,7 @@ void init_input_border(border_t &LEFT, border_t &TOP, int M, int N, rle_string s
   }
 }
 
-void get_input_border(border_t &LEFT, border_t &TOP, border_t OUT, int i, int j, rle_string s0, rle_string s1)
+void get_input_border(border_t &LEFT, border_t &TOP, border_t& OUT, int i, int j, rle_string& s0, rle_string& s1)
 {
   int M = s0.size(), N = s1.size();
   // LEFT[i][j] might have been initialised (if j == 1) so we don't have to do anything in that case
