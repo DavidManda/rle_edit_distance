@@ -6,14 +6,10 @@
 
 typedef std::vector<std::vector<BST> > border_t;
 typedef std::vector<rle::RLE_run> rle_string;
-double join_total_t = 0;
-int join_calls = 0;
 // this function expects two trees that describe intervals [X_l, X_m] and [X_m, X_r]
 // it will return a new balanced tree that is the joining of the two trees
 // t1 and t2 will be compromised and shouldn't be used after calling this function
 inline BST join(BST t1, BST t2){
-  join_calls++;
-  std::clock_t timer = std::clock();
   if(t1.root == NULL){
     return BST(t2.root);
   }
@@ -45,16 +41,11 @@ inline BST join(BST t1, BST t2){
     // point type of the incident segments will be updated in here when aux is inserted
     t_join = BST::join(t1.root,t2.root,aux);
   }
-  join_total_t += ( std::clock() - timer ) / (double) CLOCKS_PER_SEC;
   return t_join;
 }
 
-double split_total_t=0;
-int split_calls = 0;
 // split a tree describing interval [x_l, x_r] into two trees describing [x_l, x_m],[x_m, x_r]
 inline std::pair<BST, BST> split(BST T, float x_m){
-  split_calls++;
-  std::clock_t timer = std::clock();
   std::pair<BST, BST> sol;
   // check if we are splitting inside the tree
   Point min = TreeNode::min(T.root)->segm.left;
@@ -97,7 +88,6 @@ inline std::pair<BST, BST> split(BST T, float x_m){
   TreeNode* max_left =  TreeNode::max(sol.first.root);
   sol.second.update_point_type(min_right->segm);
   sol.first.update_point_type(max_left->segm);
-  split_total_t += ( std::clock() - timer ) / (double) CLOCKS_PER_SEC;
   return sol;
 }
 
@@ -142,9 +132,8 @@ void get_collapsed_segments(TreeNode *current, std::vector<Segment> &collapsed_s
     collapsed_segments.push_back(current->segm);
   }
 }
-double swm_total_time=0;
+
 BST SWM(BST tree, int h){
-  std::clock_t timer = std::clock();
   TreeNode *left_most = TreeNode::min(tree.root);
   TreeNode *right_most = TreeNode::max(tree.root);
   
@@ -175,7 +164,6 @@ BST SWM(BST tree, int h){
       h = 0;
     }
   }
-  swm_total_time += ( std::clock() - timer ) / (double) CLOCKS_PER_SEC;
   return tree;
 }
 
@@ -223,7 +211,6 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
 BST get_OUT_TOP(BST TOP, int h, int w){
   if(h <= w){
     BST S = SWM(TOP,h-1);
-    // print_2D(S);
     std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
@@ -232,7 +219,6 @@ BST get_OUT_TOP(BST TOP, int h, int w){
 
     S_r.change_grad(-1); S_r.shift(0,w+h-1);
     BST S2 = S_r;
-    // print_2D(S1);print_2D(S2);
     return join(S1,S2);
   }
   else{
@@ -274,11 +260,8 @@ void init_input_border(border_t &LEFT, border_t &TOP, int M, int N, rle_string s
   }
 }
 
-double time_inside_get_input=0;
-inline void get_input_border(border_t &LEFT, border_t &TOP, border_t& OUT, int i, int j, rle_string& s0, rle_string& s1)
+void get_input_border(border_t &LEFT, border_t &TOP, border_t& OUT, int i, int j, rle_string& s0, rle_string& s1)
 {
-  std::clock_t start;
-  start = std::clock();
   int M = s0.size(), N = s1.size();
   // LEFT[i][j] might have been initialised (if j == 1) so we don't have to do anything in that case
   if (LEFT[i][j].root == NULL)
@@ -307,15 +290,11 @@ inline void get_input_border(border_t &LEFT, border_t &TOP, border_t& OUT, int i
     std::pair<BST, BST> p = split(OUT[i-1][j], w);
     TOP[i][j] = p.first;
   }
-  time_inside_get_input += ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 }
 int get_rle_edit_dist(rle_string s0, rle_string s1){
-  std::clock_t start;
   const int M = s0.size();
   const int N = s1.size();
 
-  double init_time=0, get_input_time=0, aux=0, match_block_time=0, missmatch_block_time=0, total_time=0;
-  double out_left_t=0, out_top_t=0, combine_t;
   std::vector< std::vector< int > > dyn(M, std::vector<int>(N));
   border_t LEFT(M, std::vector<BST>(N));
   border_t TOP(M, std::vector<BST>(N));
@@ -327,48 +306,25 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
     {
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
-      start = std::clock();
       // Retrieve input border for current block
       get_input_border(LEFT, TOP, OUT, i, j, s0, s1);
-      get_input_time += ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
       if(s0[i].ch == s1[j].ch)
       {
-        start = std::clock();
         BST L = LEFT[i][j];
         BST T = TOP[i][j];
         // shift top to the right h positions so we can join with left and get OUT
         T.shift(h - 1,0);
         OUT[i][j] = join(L,T);
-        match_block_time += ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
       }
       else
       {
-        std::clock_t timer;
-        timer = std::clock();
-        start = std::clock();
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
-        out_left_t += ( std::clock() - timer ) / (double) CLOCKS_PER_SEC;
-        timer = std::clock();
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
-        out_top_t += ( std::clock() - timer ) / (double) CLOCKS_PER_SEC;
-        timer = std::clock();
         OUT[i][j] = combine(OUT_TOP, OUT_LEFT);
-        combine_t += ( std::clock() - timer ) / (double) CLOCKS_PER_SEC;
-        missmatch_block_time += ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
       }
       dyn[i][j] = OUT[i][j].get_value_at_coord(w);
     }
   }
-  std::cout<<"Get input total time: "<<get_input_time<<'\n';
-  std::cout<<"Get input total inside time: "<<time_inside_get_input<<'\n';
-  std::cout<<"Match block total time: "<<match_block_time<<'\n';
-  std::cout<<"Missmatch block total time: "<<missmatch_block_time<<'\n';
-  std::cout<<"Out left total time: "<<out_left_t<<'\n';
-  std::cout<<"Out top total time: "<<out_top_t<<'\n';
-  std::cout<<"Combine total time: "<<combine_t<<'\n';
-  std::cout<<"SWM total time: "<<swm_total_time<<'\n';
-  std::cout<<"Join total time: "<<join_total_t<<" in "<<join_calls<<" calls\n";
-  std::cout<<"Split total time: "<<split_total_t<<" in "<<split_calls<<" calls\n";
   return dyn[M-1][N-1];
 }
 
