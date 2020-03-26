@@ -2,6 +2,7 @@
 #include "avl_tree.hpp"
 #include <assert.h>
 #include <cstdlib>
+#include <ctime>
 
 typedef std::vector<std::vector<BST> > border_t;
 typedef std::vector<rle::RLE_run> rle_string;
@@ -270,9 +271,12 @@ void init_input_border(border_t &LEFT, border_t &TOP, int M, int N, rle_string s
   }
 }
 
+double time_inside_get_input=0;
 void get_input_border(border_t &LEFT, border_t &TOP, border_t& OUT, int i, int j, rle_string& s0, rle_string& s1)
 {
   int M = s0.size(), N = s1.size();
+  std::clock_t start;
+  start = std::clock();
   // LEFT[i][j] might have been initialised (if j == 1) so we don't have to do anything in that case
   if (LEFT[i][j].root == NULL)
   {
@@ -300,17 +304,17 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t& OUT, int i, int j
     std::pair<BST, BST> p = split(OUT[i-1][j], w);
     TOP[i][j] = p.first;
   }
+  time_inside_get_input += ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 }
-
 int get_rle_edit_dist(rle_string s0, rle_string s1){
   const int M = s0.size();
   const int N = s1.size();
+  std::clock_t start;
+  double init_time=0, get_input_time=0, aux=0, match_block_time=0, missmatch_block_time=0;
   std::vector< std::vector< int > > dyn(M, std::vector<int>(N));
   border_t LEFT(M, std::vector<BST>(N));
   border_t TOP(M, std::vector<BST>(N));
   border_t OUT(M, std::vector<BST>(N));
-  // RLE_string_helper rle_helper;
-  // std::cout<<rle_helper.to_string(s0)<<'\n'<<rle_helper.to_string(s1)<<'\n';
   init_input_border(LEFT, TOP, M, N, s0, s1);
   for (int i = 1; i < M; i++)
   {
@@ -318,48 +322,45 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
     {
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
-      std::cout<<i<<' '<<j<<'\n';
+      start = std::clock();
       // Retrieve input border for current block
       get_input_border(LEFT, TOP, OUT, i, j, s0, s1);
+      aux = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+      get_input_time += aux;
       if(s0[i].ch == s1[j].ch)
       {
+        start = std::clock();
         BST L = LEFT[i][j];
         BST T = TOP[i][j];
         // shift top to the right h positions so we can join with left and get OUT
         T.shift(h - 1,0);
         OUT[i][j] = join(L,T);
-        // if(i == 2 && j == 4){
-        //   print_2D(OUT[i][j]);
-        // }
+        aux = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+        match_block_time += aux;
       }
       else
       {
-        if(i == 2 && j == 4){
-          print_2D(LEFT[i][j]);
-          print_2D(TOP[i][j]);
-        }
+        start = std::clock();
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
-        // std::cout<<"here\n";
         BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
-        if(i == 2 && j == 4){
-          print_2D(OUT_LEFT);
-          print_2D(OUT_TOP);
-        }
         OUT[i][j] = combine(OUT_TOP, OUT_LEFT);
-        if(i == 2 && j == 4){
-          print_2D(OUT[i][j]);
-        }
+        aux = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+        missmatch_block_time += aux;
       }
       // print_2D(OUT[i][j]);
       dyn[i][j] = OUT[i][j].get_value_at_coord(w);
     }
   }
+  std::cout<<"Get input total time: "<<get_input_time<<'\n';
+  std::cout<<"Get input total inside time: "<<time_inside_get_input<<'\n';
+  std::cout<<"Match block total time: "<<match_block_time<<'\n';
+  std::cout<<"Missmatch block total time: "<<missmatch_block_time<<'\n';
   return dyn[M-1][N-1];
 }
 
-int get_naive_edit_dist(const int M, const int N, const std::string &s0, const std::string &s1){
+int get_naive_edit_dist(std::string &s0, std::string &s1){
+  const int M = s0.length(), N = s1.length();
   int dyn[M + 1][N + 1];
-
   for (int i = 0; i <= M; i++)
   {
     dyn[i][0] = i;

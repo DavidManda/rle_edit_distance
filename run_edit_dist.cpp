@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <ctime>
 #include "rle_edit_distance.hpp"
 #include "helper.hpp"
 
@@ -21,12 +22,19 @@ int main()
     std::vector<RLE_run> rle_s0 = rle_helper.get_rle_string(s0);
     std::vector<RLE_run> rle_s1 = rle_helper.get_rle_string(s1);
     // std::cout<<"here\n";
-    std::cout<<s0<<' '<<s1<<' '<<test<<'\n';
-    int sol = rle_ED::get_naive_edit_dist(M, N, s0, s1);
-    // std::cout<<"got naive\n";
+    // std::cout<<s0<<' '<<s1<<' '<<test<<'\n';
+    std::cout<<"Uncompressed lengths are: "<<M<<" and "<<N<<'\n';
+    std::cout<<"Compressed lengths are: "<<rle_s0.size()<<" and "<<rle_s1.size()<<'\n';
+    std::clock_t start;
+    double naive_time, rle_time;
+    start = std::clock();
+    int sol = rle_ED::get_naive_edit_dist(s0, s1);
+    naive_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    start = std::clock();
     int sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1);
-    // std::cout<<"got rle\n";
-
+    rle_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    std::cout<<"Naive time is: "<<naive_time<<'\n';
+    std::cout<<"RLE time is: "<<rle_time<<'\n';
     if(sol != sol_rle)
     {
       std::cout<<"Test " << test << "/"<<T<<" failed for strings " + s0 + " and " + s1 + " with sizes of "<< M<<" and "<<N<<"\n";
