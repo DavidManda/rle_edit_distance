@@ -351,7 +351,7 @@ TreeNode *TreeNode::find(Segment segm)
   return next_node->find(segm);
 }
 
-
+// log(n)
 TreeNode* TreeNode::find_node_containing(float x){
   lazy_update(this);
   if(this->segm.contains(x)){
@@ -519,6 +519,7 @@ TreeNode *BST::find_succ(Segment segm)
 // Given a non-empty binary search tree, return the node with minimum
 // key value found in that tree. Note that the entire tree does not
 // need to be searched.
+// log(n)
 TreeNode* TreeNode::min(TreeNode *node)
 {
   if(node == NULL){
@@ -536,6 +537,7 @@ TreeNode* TreeNode::min(TreeNode *node)
   return current;
 }
 
+// log(n)
 TreeNode* TreeNode::max(TreeNode *node){
   TreeNode *current = node;
   lazy_update(current);

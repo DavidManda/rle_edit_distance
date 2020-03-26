@@ -2,6 +2,9 @@
 #include "rle_edit_distance.hpp"
 #include "helper.hpp"
 
+#define MAX_SIZE 20000
+
+std::vector< std::vector<int> > dyn(MAX_SIZE, std::vector<int>(MAX_SIZE));
 bool check_strings(std::string s0, std::string s1)
 {
   int M = s0.size(), N = s1.size();
@@ -9,7 +12,7 @@ bool check_strings(std::string s0, std::string s1)
   std::vector<RLE_run> rle_s0 = rle_helper.get_rle_string(s0);
   std::vector<RLE_run> rle_s1 = rle_helper.get_rle_string(s1);
   int sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1);
-  int sol = rle_ED::get_naive_edit_dist(M, N, s0, s1);
+  int sol = rle_ED::get_naive_edit_dist(s0, s1, dyn);
   return sol == sol_rle;
 }
 
