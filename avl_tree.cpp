@@ -171,17 +171,20 @@ void TreeNode::update_endpoints(){
 }
 
 void TreeNode::shift(int dx, int dy){
+  lazy_update(this);
   this->active = false;
   this->dx += dx;
   this->dy += dy;
 }
 
 void TreeNode::change_grad(int dg){
+  lazy_update(this);
   this->active = false;
   this->dg += dg;
 }
 
 void TreeNode::apply_swm(int dt){
+  lazy_update(this);
   this->active = false;
 
   this->t_min -= dt;
