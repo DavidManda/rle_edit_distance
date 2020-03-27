@@ -1,6 +1,5 @@
 This is the list of changes and additions I made to the algorithm:
 
-- propagating over match block (addition)
-
 Implementation details that are important:
-I need to create new copies of the trees when I make the input borders
+- Lazy update should havppen whenever we perform any other request for shift, gradient or swm
+- When getting the input border we need to make sure we only perform a split once

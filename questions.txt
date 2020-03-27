@@ -1,16 +1,7 @@
 Combine: why do we do inorder traversal as opposed to search for the segment?
 
-Why is tmin access only when the node is inactive? shouldn't it be the other way around?
-
 On gradient change, the y coordinate of an empty segment should still be modified so the functions
  is continous
-
- When do we need to remove the introduced empty segment?
-
- Make sure all operations are correct in Algo 1 and 2
-
- Change gradient should start at coordinate 0 maybe? if it starts at 1, point (1,0) will turn to (1,1), 
- is that OK?
 
  In the cen and chao paper, the translation to graphical representation omits some points and makes sure there
  are no neighbouring segments with the same gradient. We might have to do the same here.
