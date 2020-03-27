@@ -292,11 +292,10 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t& OUT, int i, int j
     TOP[i][j] = p.first;
   }
 }
-int get_rle_edit_dist(rle_string s0, rle_string s1){
+int get_rle_edit_dist(rle_string s0, rle_string s1, std::vector< std::vector< int > > &dyn){
   const int M = s0.size();
   const int N = s1.size();
 
-  std::vector< std::vector< int > > dyn(M, std::vector<int>(N));
   border_t LEFT(M, std::vector<BST>(N));
   border_t TOP(M, std::vector<BST>(N));
   border_t OUT(M, std::vector<BST>(N));

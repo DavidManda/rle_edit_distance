@@ -39,7 +39,7 @@ BST combine(BST t1, BST t2);
 
 BST SWM(BST tree, int h);
 
-int get_rle_edit_dist(rle_string s0, rle_string s1);
+int get_rle_edit_dist(rle_string s0, rle_string s1, std::vector< std::vector< int > > &dyn);
 
 int get_naive_edit_dist(std::string &s0, std::string &s1, std::vector< std::vector<int> > &dyn);
 #endif
