@@ -20,6 +20,7 @@ inline BST join(BST t1, BST t2){
   Segment largest_t1 = TreeNode::max(t1.root)->segm;
   Segment smallest_t2 = TreeNode::min(t2.root)->segm;
   assert(largest_t1.right.x == smallest_t2.left.x);
+  assert(largest_t1.right.y == smallest_t2.left.y);
 
   int slope1 = (largest_t1.right.y - largest_t1.left.y) / 
               (largest_t1.right.x - largest_t1.left.x);
