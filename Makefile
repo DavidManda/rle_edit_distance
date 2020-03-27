@@ -10,3 +10,5 @@ find_test:
 	g++ -std=c++11 find_failing_test.cpp rle_edit_distance.cpp segment.cpp point.cpp avl_tree.cpp helper.cpp rle.cpp -o find_test.o
 gen_input:
 	g++ -std=c++11 generate_inputs.cpp -o gen_input.o
+read_string:
+	g++ -std=c++11 read_string.cpp -o read_string.o
