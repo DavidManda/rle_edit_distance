@@ -54,6 +54,7 @@ public:
   TreeNode *find_predec(Segment segm);
   TreeNode *find_succ(Segment segm);
   bool is_balanced();
+  bool is_continuous();
   void shift(int dx, int dy);
   void change_grad(int dg);
   void apply_swm(int dt);

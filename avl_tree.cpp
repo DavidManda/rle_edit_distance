@@ -444,11 +444,30 @@ bool is_balanced_(TreeNode* root){
   return balance >= -1 && balance <= 1 && is_balanced_(root->left) && is_balanced_(root->right);
 }
 
+bool is_continuous_(TreeNode* root){
+  if(root == NULL)
+    return true;
+
+  TreeNode *pred = NULL, *succ = NULL;
+  bool cont_left = true, cont_right = true;
+  _find_predec_succ(root, root->segm, pred, succ);
+  if(pred != NULL){
+    cont_left = (pred->segm.right.x == root->segm.left.x) && (pred->segm.right.y == root->segm.left.y);
+  }
+  if(succ != NULL){
+    cont_right = (root->segm.right.x == succ->segm.left.x) && (root->segm.right.y == succ->segm.left.y);
+  }
+  return cont_left && cont_right && is_continuous_(root->left) && is_continuous_(root->right);
+}
 // O(n)
 bool BST::is_balanced(){
   return is_balanced_(root);
 }
 
+// O(nlog(n))
+bool BST::is_continuous(){
+  return is_continuous_(this->root);
+}
 void TreeNode::set_right(TreeNode* node){
   this->right = node;
   this->recompute_height();
