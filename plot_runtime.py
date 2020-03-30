@@ -1,24 +1,34 @@
 import matplotlib.pyplot as plt 
 import math
 
-f_rle = open("run_times_rle.out", "r")
-f_naive = open("run_times_naive.out", "r")
-times_rle = f_rle.read()
-times_naive = f_naive.read()
-times_rle = [float(i) for i in times_rle.split(",")]
-times_naive = [float(i) for i in times_naive.split(",")]
-# times_naive_adjusted = [i*(1+math.log((times_naive.index(i)+1)**2, 2)) for i in times_naive]
-# times_rle = [times_rle[i] for i in range(10)]
-# times_naive = [times_naive[i] for i in range(10)]
-# times_naive_adjusted = [times_naive_adjusted[i] for i in range(10)]
-# aux = [i/14 for i in times_rle]
-# mnlogmn = [i*(math.log(i,2))/10000.0 for i in range(1,len(times))]
-# mnlogmn = [i*i/10000.0 for i in range(1,len(times))]
+f = open("run_times.out", "r")
 
-plt.plot(times_rle, label='Compressed')
-plt.plot(times_naive, label='Naive')
+data = f.read().split('\n')
+
+xs = []
+naive_runtimes = []
+rle_runtimes = []
+compression_factor = []
+for i in range(1,len(data)-1):
+  elem = data[i].split(',')
+  M = int(elem[0])
+  N = int(elem[1])
+  compression_fact0 = float(elem[2])
+  compression_fact1 = float(elem[3])
+  naive_runtime = float(elem[4])
+  rle_runtime = float(elem[5])
+  xs.append(M/compression_fact0)
+  compression_factor.append(compression_fact0 * compression_fact1)
+  naive_runtimes.append(naive_runtime)
+  rle_runtimes.append(rle_runtime)
+
+aux = [4*i for i in naive_runtimes]
+plt.plot(xs, rle_runtimes, label='Compressed')
+# plt.plot(xs, naive_runtimes, label='Naive')
+# plt.plot(xs, aux, label='4x naive')
+# plt.plot(xs, compression_factor, label='Compression factor')
 plt.legend()
-plt.title('Runtimes for strings comressable by 10x')
-# plt.plot(times_naive_adjusted, c='y')
-# plt.plot(aux, c='g')
+# plt.title('Runtimes for strings comressable by 10x')
+# # plt.plot(times_naive_adjusted, c='y')
+# # plt.plot(aux, c='g')
 plt.show()

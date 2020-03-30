@@ -29,7 +29,7 @@ for size in range(1,200):
   ret,binary_img2 = cv2.threshold(resize2,127,255,cv2.THRESH_BINARY)
   filename = 'inputs/input{}x{}.in'.format(height, width)
   out = open(filename, 'w')
-  out.write('1\n{} {}\n'.format(height, width))
+  out.write('{} {}\n'.format(height*width, height*width))
   write_img_to_file(binary_img1, out)
   out.write('\n')
   write_img_to_file(binary_img2, out)

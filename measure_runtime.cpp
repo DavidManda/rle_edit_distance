@@ -28,19 +28,24 @@ void modify_runs(std::vector<RLE_run> &s, int max_run_len){
   }
 }
 int main(){
-  std::ofstream fout_rle("run_times_rle.out");
-  std::ofstream fout_naive("run_times_naive.out");
-  for(int size = 1; size <= 1000; size+=10){
-    int M = size, N = size;
+  std::ofstream fout("run_times.out");
+  // std::ofstream fout_naive("run_times_naive.out");
+  fout<<"M, N, compression factor 1, compression factor 2, naive time, rle time\n";
+  // fout_rle<<"M, N, compression factor 1, compression factor 2, time\n";
+  for(int i = 1; i <= 80; i++){
+    // height is i and width is i*2
+    std::ifstream fin("inputs/input"+std::to_string(i)+"x"+std::to_string(i*2) + ".in");
+    int M, N;
+    fin >> M >> N;
     std::string s0 = "*", s1 = "*";
-    s1 += get_str(M, 30);
-    s0 += get_str(N, 30);
+    helper::read_string(fin, M, s0);
+    helper::read_string(fin, N, s1);
 
     RLE_string_helper rle_helper;
     std::vector<RLE_run> rle_s0 = rle_helper.get_rle_string(s0);
     std::vector<RLE_run> rle_s1 = rle_helper.get_rle_string(s1);
-    // modify_runs(rle_s0, 50);
-    // modify_runs(rle_s1, 50);
+    double compression_fact0 = (double)s0.size()/(double)rle_s0.size();
+    double compression_fact1 = (double)s1.size()/(double)rle_s1.size();
     std::clock_t start;
     double naive_time, rle_time;
     start = std::clock();
@@ -49,22 +54,10 @@ int main(){
     start = std::clock();
     int sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1, dyn_rle);
     rle_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    std::cout<<size<<'\n';
+    std::cout<<i<<'\n';
     std::cout<<"Naive time is: "<<naive_time<<'\n';
     std::cout<<"RLE time is: "<<rle_time<<'\n';
-    fout_rle<<rle_time<<',';
-    fout_naive<<naive_time<<',';
-    // s0 = "*"; s1 = "*";
-    // s1 += get_str(M, 100);
-    // s0 += get_str(N, 100);
-    // rle_s0 = rle_helper.get_rle_string(s0);
-    // rle_s1 = rle_helper.get_rle_string(s1);
-    // start = std::clock();
-    // sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1, dyn_rle);
-    // rle_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    // fout_big<<rle_time<<',';
-    // std::cout<<"Size: "<< size<<"\nRLE big time is: "<<rle_time<<'\n';
+    fout<<M<<','<<N<<','<<compression_fact0<<','<<compression_fact1<<','<<naive_time<<','<<rle_time<<'\n';
+    // fout_naive<<M<<','<<N<<','<<compression_fact0<<','<<compression_fact1<<','<<naive_time<<'\n';
   }
-  fout_naive<<'\n';
-  fout_rle<<'\n';
 }
