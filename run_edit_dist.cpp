@@ -43,8 +43,8 @@ int main()
     RLE_string_helper rle_helper;
     std::vector<RLE_run> rle_s0 = rle_helper.get_rle_string(s0);
     std::vector<RLE_run> rle_s1 = rle_helper.get_rle_string(s1);
-    std::cout<<"Uncompressed lengths are: "<<M<<" and "<<N<<'\n';
-    std::cout<<"Compressed lengths are: "<<rle_s0.size()<<" and "<<rle_s1.size()<<'\n';
+    std::cout<<"Uncompressed lengths are: "<<s0.size() - 1<<" and "<<s1.size() - 1<<'\n';
+    std::cout<<"Compressed lengths are: "<<rle_s0.size() - 1<<" and "<<rle_s1.size() - 1<<'\n';
     std::clock_t start;
     double naive_time, rle_time;
     start = std::clock();
