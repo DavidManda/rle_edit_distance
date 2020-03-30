@@ -15,7 +15,7 @@ std::string get_str(int size, int max_run_len){
   for(int i = 0; i < size; i++){
     char ch = 'a' + i%2;
     int run_len = rand() % max_run_len + 1;
-    for(int j = 0; j < max_run_len; j++)
+    for(int j = 0; j < run_len; j++)
       sol += ch;
   }
   return sol;
@@ -33,8 +33,8 @@ int main(){
   for(int size = 1; size <= 1000; size+=10){
     int M = size, N = size;
     std::string s0 = "*", s1 = "*";
-    s1 += get_str(M, 10);
-    s0 += get_str(N, 10);
+    s1 += get_str(M, 30);
+    s0 += get_str(N, 30);
 
     RLE_string_helper rle_helper;
     std::vector<RLE_run> rle_s0 = rle_helper.get_rle_string(s0);
