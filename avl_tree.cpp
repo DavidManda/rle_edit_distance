@@ -594,11 +594,13 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
     if (root->left == NULL)
     {
       TreeNode *temp = root->right;
+      free(root);
       return temp;
     }
     else if (root->right == NULL)
     {
       TreeNode *temp = root->left;
+      free(root);
       return temp;
     }
 
