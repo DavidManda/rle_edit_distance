@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <ctime>
 
-typedef std::vector<std::vector<BST> > border_t;
 typedef std::vector<rle::RLE_run> rle_string;
 // this function expects two trees that describe intervals [X_l, X_m] and [X_m, X_r]
 // it will return a new balanced tree that is the joining of the two trees
@@ -242,13 +241,13 @@ BST get_OUT_TOP(BST TOP, int h, int w){
   }
 }
 
-void init_input_border(border_t &LEFT, border_t &TOP, int M, int N, rle_string s0, rle_string s1)
+void init_input_border(BST LEFT[], BST TOP[], int M, int N, rle_string s0, rle_string s1)
 {
   int char_count = 0;
   for (int i = 1; i < M; i++)
   {
     // LEFT is indexed bottom-to-up
-    LEFT[i][1] = BST(new TreeNode(Segment(Point(1, s0[i].len + char_count), 
+    LEFT[i * N + 1] = BST(new TreeNode(Segment(Point(1, s0[i].len + char_count), 
                                           Point(s0[i].len + 1, char_count))));
     char_count += s0[i].len;
   }
@@ -257,30 +256,30 @@ void init_input_border(border_t &LEFT, border_t &TOP, int M, int N, rle_string s
   for (int j = 1; j < N; j++)
   {
     // top is indexed left-to-right
-    TOP[1][j] = BST(new TreeNode(Segment(Point(1, char_count), 
+    TOP[1 * N + j] = BST(new TreeNode(Segment(Point(1, char_count), 
                                          Point(s1[j].len + 1, s1[j].len + char_count))));
     char_count += s1[j].len;
   }
 }
 
-void get_input_border(border_t &LEFT, border_t &TOP, border_t& OUT, int i, int j, rle_string& s0, rle_string& s1)
+void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string& s0, rle_string& s1)
 {
   int M = s0.size(), N = s1.size();
   // LEFT[i][j] might have been initialised (if j == 1) so we don't have to do anything in that case
-  if (LEFT[i][j].root == NULL)
+  if (LEFT[i * N + j].root == NULL)
   {
     assert(j > 1);
     // width and height of block to the left
     int w = s1[j - 1].len + 1;
     int h = s0[i].len + 1;
-    std::pair<BST, BST> p = split(OUT[i][j-1], w);
-    LEFT[i][j] = p.second;
+    std::pair<BST, BST> p = split(OUT[i * N + j-1], w);
+    LEFT[i * N + j] = p.second;
     // correct the index
-    LEFT[i][j].shift(-w + 1,0);
+    LEFT[i * N + j].shift(-w + 1,0);
     // assign the top border of the block underneath now, as we have a tree representing it
     // this way we don't have to split the same tree twice, which is not allowed
     if(i + 1 < M){
-      TOP[i+1][j-1] = p.first;
+      TOP[(i+1) * N + (j-1)] = p.first;
     }
     else{
       // We won't use this so we should free it
@@ -288,27 +287,33 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t& OUT, int i, int j
     }
   }
 
-  if (TOP[i][j].root == NULL)
+  if (TOP[i * N + j].root == NULL)
   {
     assert(i > 1);
     // Width and height of block above
     int w = s1[j].len + 1;
     int h = s0[i - 1].len + 1;
-    std::pair<BST, BST> p = split(OUT[i-1][j], w);
-    TOP[i][j] = p.first;
+    std::pair<BST, BST> p = split(OUT[(i-1) * N + j], w);
+    TOP[i * N + j] = p.first;
     if(j == N-1){
       // We won't use this so we should free it
       TreeNode::free(p.second.root);
     }
   }
 }
-int get_rle_edit_dist(rle_string s0, rle_string s1, std::vector< std::vector< int > > &dyn){
+int get_rle_edit_dist(rle_string s0, rle_string s1, int dyn[], BST LEFT[], BST TOP[], BST OUT[]){
   const int M = s0.size();
   const int N = s1.size();
 
-  border_t LEFT(M, std::vector<BST>(N));
-  border_t TOP(M, std::vector<BST>(N));
-  border_t OUT(M, std::vector<BST>(N));
+  // reset values
+  for(int i = 0; i < M; i++){
+    for(int j = 0; j < N; j++){
+      dyn[i * N + j] = 0;
+      LEFT[i * N + j] = BST();
+      TOP[i * N + j] = BST();
+      OUT[i * N + j] = BST();
+    }
+  }
   init_input_border(LEFT, TOP, M, N, s0, s1);
   for (int i = 1; i < M; i++)
   {
@@ -320,43 +325,43 @@ int get_rle_edit_dist(rle_string s0, rle_string s1, std::vector< std::vector< in
       get_input_border(LEFT, TOP, OUT, i, j, s0, s1);
       if(s0[i].ch == s1[j].ch)
       {
-        BST L = LEFT[i][j];
-        BST T = TOP[i][j];
+        BST L = LEFT[i * N + j];
+        BST T = TOP[i * N + j];
         // shift top to the right h positions so we can join with left and get OUT
         T.shift(h - 1,0);
-        OUT[i][j] = join(L,T);
+        OUT[i * N + j] = join(L,T);
       }
       else
       {
-        BST OUT_LEFT = get_OUT_LEFT(LEFT[i][j], h, w);
-        BST OUT_TOP = get_OUT_TOP(TOP[i][j], h, w);
-        OUT[i][j] = combine(OUT_TOP, OUT_LEFT);
+        BST OUT_LEFT = get_OUT_LEFT(LEFT[i * N + j], h, w);
+        BST OUT_TOP = get_OUT_TOP(TOP[i * N + j], h, w);
+        OUT[i * N + j] = combine(OUT_TOP, OUT_LEFT);
       }
-      dyn[i][j] = OUT[i][j].get_value_at_coord(w);
+      dyn[i * N + j] = OUT[i * N + j].get_value_at_coord(w);
     }
   }
-  return dyn[M-1][N-1];
+  return dyn[(M-1)*(N) + N-1];
 }
 
-int get_naive_edit_dist(std::string &s0, std::string &s1, std::vector< std::vector<int> > &dyn){
-  const int M = s0.length(), N = s1.length();
-  for (int i = 0; i <= M; i++)
+int get_naive_edit_dist(std::string &s0, std::string &s1, int dyn[]){
+  const int M = s0.length() + 1, N = s1.length() + 1;
+  for (int i = 0; i < M; i++)
   {
-    dyn[i][0] = i;
+    dyn[i * N + 0] = i;
   }
 
-  for (int i = 0; i <= N; i++)
+  for (int i = 0; i < N; i++)
   {
-    dyn[0][i] = i;
+    dyn[0 * N + i] = i;
   }
 
-  for (int i = 1; i <= M; i++)
+  for (int i = 1; i < M; i++)
   {
-    for (int j = 1; j <= N; j++)
+    for (int j = 1; j < N; j++)
     {
-      dyn[i][j] = std::min(dyn[i - 1][j - 1] + (s0[i] != s1[j]),std::min(dyn[i - 1][j] + 1, dyn[i][j - 1] + 1));
+      dyn[i * N + j] = std::min(dyn[(i - 1) * N + (j - 1)] + (s0[i] != s1[j]),std::min(dyn[(i - 1) * N + j] + 1, dyn[i * N + (j - 1)] + 1));
     }
   }
 
-  return dyn[M][N];
+  return dyn[(M - 1) * N + (N-1)];
 }

@@ -4,10 +4,10 @@
 #include "rle_edit_distance.hpp"
 #include "helper.hpp"
 
-#define MAX_SIZE 3000
+#define MAX_SIZE 4000
 
-std::vector< std::vector<int> > dyn(MAX_SIZE, std::vector<int>(MAX_SIZE));
-std::vector< std::vector<int> > dyn_rle(MAX_SIZE, std::vector<int>(MAX_SIZE));
+int dyn_rle[MAX_SIZE * MAX_SIZE], dyn[MAX_SIZE * MAX_SIZE];
+BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
 
 bool test_sol(std::vector< std::vector<int> > &dyn, std::vector< std::vector<int> > &dyn_rle, rle_string s0, rle_string s1){
   int M = s0.size(), N = s1.size();
@@ -52,10 +52,11 @@ int main()
     naive_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     std::cout<<"Naive time is: "<<naive_time<<'\n';
     start = std::clock();
-    int sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1, dyn_rle);
+    int sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1, dyn_rle, LEFT, TOP, OUT);
     rle_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     std::cout<<"RLE time is: "<<rle_time<<'\n';
-    if(!test_sol(dyn, dyn_rle, rle_s0, rle_s1))
+    // if(!test_sol(dyn, dyn_rle, rle_s0, rle_s1))
+    if(sol != sol_rle)
     {
       std::cout<<"Test " << test << "/"<<T<<" failed for strings " + s0 + " and " + s1 + " with sizes of "<< M<<" and "<<N<<"\n";
       std::cout << "Edit distance is: " << sol << '\n';
