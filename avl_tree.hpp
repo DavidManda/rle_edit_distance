@@ -25,7 +25,7 @@ public:
   void set_right(TreeNode* node);
   void set_left(TreeNode* node);
   static TreeNode* insert(TreeNode* root, Segment segm);
-  void update_value(Segment segm);
+  void update_value(TreeNode *node);
   void recompute_height();
   void recompute_tmin();
   int get_balance();
