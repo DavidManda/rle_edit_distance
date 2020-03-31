@@ -116,6 +116,8 @@ BST combine(BST t1, BST t2){
   float x_m  = Segment::get_intersection(S1, S2).x;
   std::pair<BST, BST> pair_1 = split(t1, x_m);
   std::pair<BST, BST> pair_2 = split(t2, x_m);
+  TreeNode::free(pair_1.first.root);
+  TreeNode::free(pair_2.second.root);
   return join(pair_2.first, pair_1.second);
 }
 
@@ -280,6 +282,10 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t& OUT, int i, int j
     if(i + 1 < M){
       TOP[i+1][j-1] = p.first;
     }
+    else{
+      // We won't use this so we should free it
+      TreeNode::free(p.first.root);
+    }
   }
 
   if (TOP[i][j].root == NULL)
@@ -290,6 +296,10 @@ void get_input_border(border_t &LEFT, border_t &TOP, border_t& OUT, int i, int j
     int h = s0[i - 1].len + 1;
     std::pair<BST, BST> p = split(OUT[i-1][j], w);
     TOP[i][j] = p.first;
+    if(j == N-1){
+      // We won't use this so we should free it
+      TreeNode::free(p.second.root);
+    }
   }
 }
 int get_rle_edit_dist(rle_string s0, rle_string s1, std::vector< std::vector< int > > &dyn){
