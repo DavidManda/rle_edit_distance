@@ -4,6 +4,11 @@
 #include <cstdlib>
 #include <ctime>
 
+#define MAX_SIZE 5000
+
+int dyn_rle[MAX_SIZE * MAX_SIZE], dyn[MAX_SIZE * MAX_SIZE];
+BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
+
 typedef std::vector<rle::RLE_run> rle_string;
 // this function expects two trees that describe intervals [X_l, X_m] and [X_m, X_r]
 // it will return a new balanced tree that is the joining of the two trees
@@ -301,7 +306,7 @@ void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string
     }
   }
 }
-int get_rle_edit_dist(rle_string s0, rle_string s1, int dyn[], BST LEFT[], BST TOP[], BST OUT[]){
+int get_rle_edit_dist(rle_string s0, rle_string s1){
   const int M = s0.size();
   const int N = s1.size();
 
@@ -343,7 +348,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1, int dyn[], BST LEFT[], BST T
   return dyn[(M-1)*(N) + N-1];
 }
 
-int get_naive_edit_dist(std::string &s0, std::string &s1, int dyn[]){
+int get_naive_edit_dist(std::string &s0, std::string &s1){
   const int M = s0.length() + 1, N = s1.length() + 1;
   for (int i = 0; i < M; i++)
   {

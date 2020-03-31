@@ -4,11 +4,6 @@
 #include "rle_edit_distance.hpp"
 #include "helper.hpp"
 
-#define MAX_SIZE 4000
-
-int dyn_rle[MAX_SIZE * MAX_SIZE], dyn[MAX_SIZE * MAX_SIZE];
-BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
-
 bool test_sol(std::vector< std::vector<int> > &dyn, std::vector< std::vector<int> > &dyn_rle, rle_string s0, rle_string s1){
   int M = s0.size(), N = s1.size();
   int uncompressed_i = 0, uncompressed_j = 0;
@@ -48,11 +43,11 @@ int main()
     std::clock_t start;
     double naive_time, rle_time;
     start = std::clock();
-    int sol = rle_ED::get_naive_edit_dist(s0, s1, dyn);
+    int sol = rle_ED::get_naive_edit_dist(s0, s1);
     naive_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     std::cout<<"Naive time is: "<<naive_time<<'\n';
     start = std::clock();
-    int sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1, dyn_rle, LEFT, TOP, OUT);
+    int sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1);
     rle_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     std::cout<<"RLE time is: "<<rle_time<<'\n';
     // if(!test_sol(dyn, dyn_rle, rle_s0, rle_s1))

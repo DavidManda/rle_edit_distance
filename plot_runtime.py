@@ -24,8 +24,8 @@ for i in range(1,len(data)-1):
 
 aux = [4*i for i in naive_runtimes]
 plt.plot(xs, rle_runtimes, label='Compressed')
-# plt.plot(xs, naive_runtimes, label='Naive')
-# plt.plot(xs, aux, label='4x naive')
+plt.plot(xs, naive_runtimes, label='Naive')
+plt.plot(xs, aux, label='4x naive')
 # plt.plot(xs, compression_factor, label='Compression factor')
 plt.legend()
 # plt.title('Runtimes for strings comressable by 10x')
