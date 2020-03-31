@@ -32,7 +32,6 @@ void test_join_same_gradient(){
   t_l.insert(s_0011);
   t_r.insert(s_1122);
   t = join(t_l, t_r);
-
   // check that segments were joined as they have the same gradient
   assert(t.root->segm == Segment(Point(0,0), Point(2,2)));
 
@@ -231,11 +230,19 @@ void test_swm_case_1(){
   assert(t_swm.root->right->segm == Segment(Point(2,3), Point(4,3)));
 }
 
+void test_swm_free_node(){
+  Segment s1(Point(1,2), Point(1.5, 2.5)), s2(Point(1.5, 2.5), Point(2,2));
+  BST t; t.insert(s2); t.insert(s1);
+  BST t_swm = SWM(t, 1);
+  // if this doesn't fail then we're fine
+}
+
 void test_swm(){
   test_swm_one_segm();
   test_swm_collapsing_segm();
   test_swm_empty_segm();
   test_swm_case_1();
+  test_swm_free_node();
 }
 
 void test_combine_simple(){
