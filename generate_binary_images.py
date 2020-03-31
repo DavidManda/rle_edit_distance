@@ -5,7 +5,7 @@ import numpy as np
 def write_img_to_file(binary_img, out):
   for i in range(len(binary_img)):
     for j in range(len(binary_img[i])):
-      if binary_img1[i][j] == 0:
+      if binary_img[i][j] == 0:
         out.write('0')
       else:
         out.write('1')
