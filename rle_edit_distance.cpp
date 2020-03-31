@@ -6,7 +6,7 @@
 
 #define MAX_SIZE 5000
 
-int dyn_rle[MAX_SIZE * MAX_SIZE], dyn[MAX_SIZE * MAX_SIZE];
+int dyn[MAX_SIZE * MAX_SIZE];
 BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
 
 typedef std::vector<rle::RLE_run> rle_string;
