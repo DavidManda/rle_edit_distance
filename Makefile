@@ -13,4 +13,4 @@ gen_input:
 read_string:
 	g++ -std=c++11 read_string.cpp -o read_string.o
 measure_runtime:
-	g++ -std=c++11 measure_runtime.cpp rle_edit_distance.cpp segment.cpp point.cpp avl_tree.cpp helper.cpp rle.cpp -o measure_runtime.o
+	g++ -std=c++11 -Ofast measure_runtime.cpp rle_edit_distance.cpp segment.cpp point.cpp avl_tree.cpp helper.cpp rle.cpp -o measure_runtime.o
