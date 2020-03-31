@@ -4,7 +4,7 @@
 #include "rle_edit_distance.hpp"
 #include "helper.hpp"
 
-#define MAX_SIZE 30000
+#define MAX_SIZE 3000
 
 std::vector< std::vector<int> > dyn(MAX_SIZE, std::vector<int>(MAX_SIZE));
 std::vector< std::vector<int> > dyn_rle(MAX_SIZE, std::vector<int>(MAX_SIZE));
