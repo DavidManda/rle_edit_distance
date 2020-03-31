@@ -668,18 +668,26 @@ void BST::delete_node(Segment segm)
   }
   TreeNode *pred = this->find_predec(segm);
   TreeNode *succ = this->find_succ(segm);
+  // Store the values here because the pointers might change or be freed, 
+  // but we still need the segment values to perform updates
+  Segment pred_segm,succ_segm;
+  if(pred != NULL)
+    pred_segm = pred->segm;
+  if(succ != NULL)
+    succ_segm = succ->segm;
   this->root = _delete_node(this->root, segm);
-  if(pred != NULL && succ != NULL && should_concat(pred->segm, succ->segm)){
-    Segment concat = Segment(pred->segm.left, succ->segm.right);
-    this->root = _delete_node(this->root, pred->segm);
-    this->root = _delete_node(this->root, succ->segm);
+
+  if(pred != NULL && succ != NULL && should_concat(pred_segm, succ_segm)){
+    Segment concat = Segment(pred_segm.left, succ_segm.right);
+    this->root = _delete_node(this->root, pred_segm);
+    this->root = _delete_node(this->root, succ_segm);
     this->insert(concat);
   }
   else{
     if(pred != NULL)
-      this->update_point_type(pred->segm);
+      this->update_point_type(pred_segm);
     if(succ != NULL)
-      this->update_point_type(succ->segm);
+      this->update_point_type(succ_segm);
   }
 }
 // returns incident point of the two segments
