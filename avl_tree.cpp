@@ -326,7 +326,7 @@ std::string TreeNode::to_string()
 {
   std::stringstream ss;
   ss<<this->segm.to_string();
-  ss<<' '<<'('<<this->dx<<','<<this->dy<<") "<<this->dt<<' '<<this->dg<<' '<<this->t_min;
+  ss<<' '<<this->active<<' '<<'('<<this->dx<<','<<this->dy<<") "<<this->dt<<' '<<this->dg<<' '<<this->t_min;
   ss<<' '<<this->type_l<<' '<<this->type_r;
   return ss.str();
 }
