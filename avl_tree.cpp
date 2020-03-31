@@ -56,9 +56,17 @@ void TreeNode::recompute_tmin(){
   this->t_min = std::min(this_tmin, std::min(t_left, t_right));
 }
 
-void TreeNode::update_value(Segment segm)
+void TreeNode::update_value(TreeNode *node)
 {
-  this->segm = segm;
+  this->segm = node->segm;
+  this->active = node->active;
+  this->dx = node->dx;
+  this->dy = node->dy;
+  this->dg = node->dg;
+  this->dt = node->dt;
+  this->t_min = node->t_min;
+  this->type_l = node->type_l;
+  this->type_r = node->type_r;
 }
 
 int height(TreeNode* node){
@@ -599,7 +607,7 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
     TreeNode *temp = TreeNode::min(root->right);
     TreeNode::lazy_update(temp);
     // Copy the inorder successor's content to this node
-    root->update_value(temp->segm);
+    root->update_value(temp);
 
     // Delete the inorder successor
     root->right = _delete_node(root->right, temp->segm);
