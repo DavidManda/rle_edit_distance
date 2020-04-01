@@ -594,13 +594,13 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
     if (root->left == NULL)
     {
       TreeNode *temp = root->right;
-      free(root);
+      delete(root);
       return temp;
     }
     else if (root->right == NULL)
     {
       TreeNode *temp = root->left;
-      free(root);
+      delete(root);
       return temp;
     }
 
@@ -1002,7 +1002,7 @@ void TreeNode::free(TreeNode *node){
   }
   TreeNode::free(node->left);
   TreeNode::free(node->right);
-  std::free(node);
+  delete(node);
   node = NULL;
 }
 
