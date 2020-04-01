@@ -106,10 +106,12 @@ BST combine(BST t1, BST t2){
   BST sol;
   // check if x_m == x_l
   if(min1.y <= min2.y){
+    TreeNode::free(t2.root);
     return t1;
   }
   // check if x_m == x_r
   if(max1.y > max2.y){
+    TreeNode::free(t1.root);
     return t2;
   }
   Segment S1, S2;
@@ -120,8 +122,8 @@ BST combine(BST t1, BST t2){
   float x_m  = Segment::get_intersection(S1, S2).x;
   std::pair<BST, BST> pair_1 = split(t1, x_m);
   std::pair<BST, BST> pair_2 = split(t2, x_m);
-  // TreeNode::free(pair_1.first.root);
-  // TreeNode::free(pair_2.second.root);
+  TreeNode::free(pair_1.first.root);
+  TreeNode::free(pair_2.second.root);
   return join(pair_2.first, pair_1.second);
 }
 
