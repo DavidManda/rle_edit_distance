@@ -1,24 +1,29 @@
 #include "avl_tree.hpp"
 #include <assert.h>
 
+void test_split_basics1(){
+  BST tree;
+  Segment s_0011(Point(0,0), Point(1,1));
+  Segment s_1122(Point(1,1), Point(2,2));
+  tree.insert(s_0011);
+  tree.insert(s_1122);
+  std::pair<BST,BST> tree_pair = BST::split(tree.root, s_1122);
+  assert(tree_pair.first.root->segm == s_0011);
+  assert(tree_pair.second.root->segm == s_1122); 
+}
+
 void test_split_basics(){
   TreeNode* node = NULL;
   std::pair<BST,BST> tree_pair = BST::split(node, Segment());
   assert(tree_pair.first.root == NULL);
   assert(tree_pair.second.root == NULL);
-
   BST tree;
   Segment s_0011(Point(0,0), Point(1,1));
   tree.insert(s_0011);
   tree_pair = BST::split(tree.root, s_0011);
   assert(tree_pair.first.root == NULL);
   assert(tree_pair.second.root->segm == s_0011);
-
-  Segment s_1122(Point(1,1), Point(2,2));
-  tree.insert(s_1122);
-  tree_pair = BST::split(tree.root, s_1122);
-  assert(tree_pair.first.root->segm == s_0011);
-  assert(tree_pair.second.root->segm == s_1122); 
+  test_split_basics1();
 }
 
 void test_insert_many(){
