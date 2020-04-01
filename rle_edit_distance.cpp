@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define MAX_SIZE 5000
+#define MAX_SIZE 300
 
 int dyn[MAX_SIZE * MAX_SIZE];
 BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
@@ -288,10 +288,10 @@ void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string
     if(i + 1 < M){
       TOP[(i+1) * N + (j-1)] = p.first;
     }
-    // else{
-    //   // We won't use this so we should free it
-    //   TreeNode::free(p.first.root);
-    // }
+    else{
+      // We won't use this so we should free it
+      TreeNode::free(p.first.root);
+    }
   }
 
   if (TOP[i * N + j].root == NULL)
@@ -302,10 +302,10 @@ void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string
     int h = s0[i - 1].len + 1;
     std::pair<BST, BST> p = split(OUT[(i-1) * N + j], w);
     TOP[i * N + j] = p.first;
-    // if(j == N-1){
-    //   // We won't use this so we should free it
-    //   TreeNode::free(p.second.root);
-    // }
+    if(j == N-1){
+      // We won't use this so we should free it
+      TreeNode::free(p.second.root);
+    }
   }
 }
 int get_rle_edit_dist(rle_string s0, rle_string s1){
@@ -347,6 +347,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       dyn[i * N + j] = OUT[i * N + j].get_value_at_coord(w);
     }
   }
+  TreeNode::free(OUT[(M-1)*(N) + N-1].root);
   return dyn[(M-1)*(N) + N-1];
 }
 
