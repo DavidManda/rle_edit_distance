@@ -973,15 +973,20 @@ std::pair<BST, BST> split_(TreeNode* root, Segment segm){
     BST left = (root->left != NULL) ? BST(root->left) : BST();
     BST right = (root->right != NULL) ? BST(root->right) : BST();
     right.insert(segm);
+    // free root as we will ose pointer to it, it's value was inserted in right
+    delete(root);
     return std::pair<BST, BST>(left, right);
   }
   if(segm <= root->segm){
     std::pair<BST, BST> aux = split_(root->left, segm);
     BST right = BST::join(aux.second.root, root->right, root->segm);
+    delete(root);
     return std::pair<BST, BST>(aux.first, right);
   }
   std::pair<BST, BST> aux = split_(root->right, segm);
-  return std::pair<BST, BST>(BST::join(root->left, aux.first.root, root->segm), aux.second); 
+  BST left = BST::join(root->left, aux.first.root, root->segm);
+  delete(root);
+  return std::pair<BST, BST>(left, aux.second); 
 }
 
 std::pair<BST, BST> BST::split(TreeNode* root, Segment segm){
