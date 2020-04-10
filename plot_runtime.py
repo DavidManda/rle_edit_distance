@@ -6,7 +6,7 @@ f = open("run_times.out", "r")
 data = f.read().split('\n')
 
 results = []
-operation_cost = 1.0/4000000
+operation_cost = 1.0/4200000
 for i in range(1,len(data)-1):
   elem = data[i].split(',')
   result = {}
@@ -24,14 +24,17 @@ for i in range(1,len(data)-1):
 results.sort(key = lambda x : x['compressed_size'])
 
 naive_runtimes = [result['naive_runtime'] for result in results]
+naive_runtimes_penalised = [10 * result['naive_runtime'] * math.log(result['compressed_size']**2,2) for result in results]
 rle_runtimes = [result['rle_runtime'] for result in results]
+sizes = [result['M'] for result in results]
 compressed_sizes = [result['compressed_size'] for result in results]
 N2logN2 = [size**2 * math.log(size**2, 2) * operation_cost for size in compressed_sizes]
 NlogN = [size * math.log(size, 2) * operation_cost for size in compressed_sizes]
-plt.plot(compressed_sizes, rle_runtimes, label='Runtime')
+# plt.plot(sizes, naive_runtimes, label='Naive')
+# plt.plot(sizes, naive_runtimes_penalised, label='Naive multiplied by $log(n^2)$')
+plt.plot(compressed_sizes, rle_runtimes, label='Compressed')
 plt.plot(compressed_sizes, N2logN2, label='Complexity - $N^2log(N^2)$')
 # plt.plot(compressed_sizes, NlogN, label='Complexity - $Nlog(N)$')
-# plt.plot(xs, naive_runtimes, label='Naive')
 # plt.plot(xs, aux, label='4x naive')
 # plt.plot(xs, compression_factor, label='Compression factor')
 plt.xlabel('N')
