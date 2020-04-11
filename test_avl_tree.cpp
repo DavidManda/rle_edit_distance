@@ -131,7 +131,7 @@ void test_delete(){
 
 void test_simple_shift(){
   TreeNode* node = new TreeNode(Segment(Point(0,0), Point(1,1)));
-  node->shift(1,1);
+  node->request_shift(1,1);
   TreeNode* aux = node->find(Segment(Point(1,1), Point(2,2)));
   assert(aux != NULL);
   assert(aux->segm == Segment(Point(1,1), Point(2,2)));
@@ -142,7 +142,7 @@ void test_shift_propagates(){
   for(int i = 0; i <= 50; i++){
     tree.insert(Segment(Point(i,i), Point(i+1, i+1)));
   }
-  tree.root->shift(5, 6);
+  tree.root->request_shift(5, 6);
 
   for(int i = 0; i <= 50; i++){
     TreeNode* node = tree.find(Segment(Point(i+5,i+6), Point(i+1+5, i+1+6)));
@@ -153,7 +153,7 @@ void test_shift_propagates(){
 void test_delete_with_lazy_simple(){
   BST tree;
   tree.insert(Segment(Point(0,0), Point(1, 1)));
-  tree.root->shift(1,2);
+  tree.root->request_shift(1,2);
   tree.delete_node(Segment(Point(1,2), Point(2, 3)));
   assert(tree.root == NULL);
 }
@@ -164,7 +164,7 @@ void test_delete_with_lazy(){
     tree.insert(Segment(Point(i,i), Point(i+1, i+1)));
   }
   // root node must have segment (1,1) - (2,2)
-  tree.root->shift(2, 1);
+  tree.root->request_shift(2, 1);
   // delete root
   tree.delete_node(Segment(Point(3,2), Point(4, 3)));
   TreeNode* node1 = tree.find(Segment(Point(2,1), Point(3, 2)));
@@ -180,8 +180,8 @@ void test_join_with_lazy_update_(int n, int m)
   for(int i = n; i <= m; i++){
     t2.insert(Segment(Point(i,i), Point(i+1, i+1)));
   }
-  t1.root->shift(1,0);
-  t2.root->shift(2,3);
+  t1.root->request_shift(1,0);
+  t2.root->request_shift(2,3);
   t = BST::join(t1.root, t2.root);
   // check that the t1 part of t has the correct shift applied to it
   for(int i = 0; i < n; i++){
@@ -211,7 +211,7 @@ void test_split_with_lazy_update_simple(){
     tree.insert(Segment(Point(i,i), Point(i+1, i+1)));
   }
   // root node must have segment (1,1) - (2,2)
-  tree.root->shift(2, 1);
+  tree.root->request_shift(2, 1);
   std::pair<BST, BST> trees = BST::split(tree.root, Segment(Point(3,2), Point(4,3)));
   TreeNode *node = trees.first.find(Segment(Point(2,1), Point(3,2)));
   assert(node != NULL);
@@ -226,7 +226,7 @@ void test_split_with_lazy_update_(int x){
   for(int i = 0; i <= N; i++){
     tree.insert(Segment(Point(i,i), Point(i+1, i+1)));
   }
-  tree.root->shift(10,10);
+  tree.root->request_shift(10,10);
   std::pair<BST, BST> trees = BST::split(tree.root, Segment(Point(x+10,x+10), Point(x+1+10,x+1+10)));
   for(int i = 0; i < x; i++){
     TreeNode *node = trees.first.find(Segment(Point(i+10,i+10), Point(i+1+10,i+1+10)));
@@ -250,7 +250,7 @@ void test_simple_gradient_change(){
     t.insert(Segment(Point(i,1), Point(i+1, 1)));
   }
   t.root->change_grad(1);
-  t.root->shift(0,2);
+  t.root->request_shift(0,2);
   for(int i = 0; i < 3; i++){
     TreeNode *node = t.find(Segment(Point(i,1 + i + 2), Point(i+1, 1 + (i + 1) + 2)));
     assert(node != NULL);
@@ -263,7 +263,7 @@ void test_gradient_and_shift(){
     tree.insert(Segment(Point(i,0), Point(i+1, 0)));
   }
   tree.root->change_grad(1);
-  tree.root->shift(5, 6);
+  tree.root->request_shift(5, 6);
 
   for(int i = 0; i <= 50; i++){
     TreeNode* node = tree.find(Segment(Point(i+5,i+6), Point(i+1+5, i+1+6)));
@@ -307,7 +307,7 @@ void test_invariant_lr_insert(){
   assert(left_right_paths_have_no_pending_updates(tree.root));
   tree.change_grad(0);
   assert(left_right_paths_have_no_pending_updates(tree.root));
-  tree.shift(0,2);
+  tree.request_shift(0,2);
   assert(left_right_paths_have_no_pending_updates(tree.root));
 }
 
@@ -319,7 +319,7 @@ void test_invariant_lr_split_(int x){
     tree.insert(Segment(Point(i,1), Point(i+1, 1)));
   }
   tree.change_grad(-1);
-  tree.shift(3,4);
+  tree.request_shift(3,4);
   std::pair<BST, BST> trees = BST::split(tree.root, tree.root->left->segm);
   assert(left_right_paths_have_no_pending_updates(trees.first.root));
   assert(left_right_paths_have_no_pending_updates(trees.second.root));

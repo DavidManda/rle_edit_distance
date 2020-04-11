@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define MAX_SIZE 10000
+#define MAX_SIZE 500
 
 int dyn[MAX_SIZE * MAX_SIZE];
 BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
@@ -192,12 +192,12 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
     BST S_r = p.second;
 
     S_l.change_grad(1);
-    S_l.shift(0,-1);
+    S_l.request_shift(0,-1);
     BST S1 = S_l;
     
-    BST S2 = initialise(w-h); S2.change_grad(1); S2.shift(h,s_h + h - 1);
+    BST S2 = initialise(w-h); S2.change_grad(1); S2.request_shift(h,s_h + h - 1);
 
-    S_r.shift(w-h,w-1);
+    S_r.request_shift(w-h,w-1);
     BST S3 = S_r;
     return join(join(S1,S2),S3);
   }
@@ -208,10 +208,10 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
     BST S_r = p.second;
 
     S_l.change_grad(1);
-    S_l.shift(0,-1);
+    S_l.request_shift(0,-1);
     BST S1 = S_l;
 
-    S_r.shift(0,w-1);
+    S_r.request_shift(0,w-1);
     BST S2 = S_r;
     return join(S1,S2);
   }
@@ -223,10 +223,10 @@ BST get_OUT_TOP(BST TOP, int h, int w){
     std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
-    S_l.shift(0,h-1);
+    S_l.request_shift(0,h-1);
     BST S1 = S_l;
 
-    S_r.change_grad(-1); S_r.shift(0,w+h-1);
+    S_r.change_grad(-1); S_r.request_shift(0,w+h-1);
     BST S2 = S_r;
     return join(S1,S2);
   }
@@ -238,11 +238,11 @@ BST get_OUT_TOP(BST TOP, int h, int w){
     BST S_l = p.first;
     BST S_r = p.second;
 
-    S_l.shift(0,h-1);
+    S_l.request_shift(0,h-1);
     BST S1 = S_l;
-    BST S2 = initialise(h-w); S2.change_grad(-1); S2.shift(w,s_w + h - 1);
+    BST S2 = initialise(h-w); S2.change_grad(-1); S2.request_shift(w,s_w + h - 1);
 
-    S_r.change_grad(-1); S_r.shift(h - w,2*w-1);
+    S_r.change_grad(-1); S_r.request_shift(h - w,2*w-1);
     BST S3 = S_r;
     return join(join(S1,S2),S3);
   }
@@ -282,7 +282,7 @@ void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string
     std::pair<BST, BST> p = split(OUT[i * N + j-1], w);
     LEFT[i * N + j] = p.second;
     // correct the index
-    LEFT[i * N + j].shift(-w + 1,0);
+    LEFT[i * N + j].request_shift(-w + 1,0);
     // assign the top border of the block underneath now, as we have a tree representing it
     // this way we don't have to split the same tree twice, which is not allowed
     if(i + 1 < M){
@@ -335,7 +335,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
         BST L = LEFT[i * N + j];
         BST T = TOP[i * N + j];
         // shift top to the right h positions so we can join with left and get OUT
-        T.shift(h - 1,0);
+        T.request_shift(h - 1,0);
         OUT[i * N + j] = join(L,T);
       }
       else

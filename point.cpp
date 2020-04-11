@@ -47,3 +47,10 @@ std::string Point::to_string()
 bool Point::operator ==(const Point& s){
   return x == s.x && y == s.y;
 }
+
+
+Point& Point::operator +=(const Point& p){
+  this->x += p.x;
+  this->y += p.y;
+  return *this;
+}

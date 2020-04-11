@@ -10,8 +10,7 @@
 
 TreeNode::TreeNode(){
   this->active = true;
-  this->dx = 0;
-  this->dy = 0;
+  this->shift = Point(0,0);
   this->dg = 0;
   this->dt = 0;
   this->type_l = NotInitialised;
@@ -60,8 +59,7 @@ void TreeNode::update_value(TreeNode *node)
 {
   this->segm = node->segm;
   this->active = node->active;
-  this->dx = node->dx;
-  this->dy = node->dy;
+  this->shift = node->shift;
   this->dg = node->dg;
   this->dt = node->dt;
   this->t_min = node->t_min;
@@ -178,11 +176,10 @@ void TreeNode::update_endpoints(){
   this->type_r = update_point_type(this->type_r, this->dg);
 }
 
-void TreeNode::shift(int dx, int dy){
+void TreeNode::request_shift(int dx, int dy){
   lazy_update(this);
   this->active = false;
-  this->dx += dx;
-  this->dy += dy;
+  this->shift += Point(dx, dy);
 }
 
 void TreeNode::change_grad(int dg){
@@ -200,7 +197,7 @@ void TreeNode::apply_swm(int dt){
     this->dt += dt;
   }
   else if(this->type_l == IF || this->type_l == FI){
-    this->shift(dt, 0);
+    this->request_shift(dt, 0);
   }
 }
 
@@ -216,26 +213,22 @@ void TreeNode::lazy_update(TreeNode* node){
 
 
   // perform shift
-  node->segm.left.x += node->dx;
-  node->segm.left.y += node->dy;
-
-  node->segm.right.x += node->dx;
-  node->segm.right.y += node->dy;
+  node->segm.left += node->shift;
+  node->segm.right += node->shift;
   
   if(node->left){
     node->left->apply_swm(node->dt);
     node->left->change_grad(node->dg);
-    node->left->shift(node->dx, node->dy);
+    node->left->request_shift(node->shift.x, node->shift.y);
   }
   if(node->right){
     node->right->apply_swm(node->dt);
     node->right->change_grad(node->dg);
-    node->right->shift(node->dx, node->dy);
+    node->right->request_shift(node->shift.x, node->shift.y);
   }
 
   node->active = true;
-  node->dx = 0;
-  node->dy = 0;
+  node->shift = Point(0,0);
   node->dg = 0;
   node->dt = 0;
 }
@@ -334,7 +327,7 @@ std::string TreeNode::to_string()
 {
   std::stringstream ss;
   ss<<this->segm.to_string();
-  ss<<' '<<this->active<<' '<<'('<<this->dx<<','<<this->dy<<") "<<this->dt<<' '<<this->dg<<' '<<this->t_min;
+  ss<<' '<<this->active<<' '<<this->shift.to_string()<<' '<<this->dt<<' '<<this->dg<<' '<<this->t_min;
   ss<<' '<<this->type_l<<' '<<this->type_r;
   return ss.str();
 }
@@ -806,10 +799,10 @@ void BST::update_tmin_on_path_to(Segment segm){
   update_tmin_on_path_to_(this->root, segm);
 }
 
-void BST::shift(int dx, int dy){
+void BST::request_shift(int dx, int dy){
   if(this->root == NULL)
     return;
-  this->root->shift(dx, dy);
+  this->root->request_shift(dx, dy);
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
   TreeNode* min = TreeNode::min(this->root);

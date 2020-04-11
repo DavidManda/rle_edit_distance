@@ -13,7 +13,8 @@ public:
   Point(double _x, double _y);
   Point();
   static int get_manhattan(Point p1, Point p2);
-  bool operator ==(const Point& s);
+  bool operator ==(const Point& p);
+  Point& operator +=(const Point& p);
   std::string to_string();
 };
 

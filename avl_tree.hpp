@@ -7,7 +7,8 @@ class TreeNode
 public:
   Segment segm;
   bool active;
-  int dx, dy, dg, dt, t_min;
+  Point shift;
+  int dg, dt, t_min;
   Point_t type_l, type_r;
   int height;
   TreeNode *left;
@@ -17,7 +18,7 @@ public:
   TreeNode();
   TreeNode(Segment segm, TreeNode* left, TreeNode* right);
   int get_t_min();
-  void shift(int dx, int dy);
+  void request_shift(int dx, int dy);
   void change_grad(int dg);
   void apply_swm(int dt);
   void update_endpoints();
@@ -55,7 +56,7 @@ public:
   TreeNode *find_succ(Segment segm);
   bool is_balanced();
   bool is_continuous();
-  void shift(int dx, int dy);
+  void request_shift(int dx, int dy);
   void change_grad(int dg);
   void apply_swm(int dt);
   void update_point_type(Segment segm);
