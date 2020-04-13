@@ -44,7 +44,7 @@ std::ostream& operator<<(std::ostream& out, const Point_t value){
 std::string Point::to_string()
 {
   std::stringstream ss;
-  ss << "(" << x << ", " << y << ") " << type <<' ';
+  ss << "(" << x << ", " << y << ")";
   return ss.str();
 }
 
