@@ -70,34 +70,6 @@ int height(TreeNode* node){
   return node->height;
 }
 
-void set_endpoints(TreeNode* node){
-  if(node == NULL)
-    return;
-
-  if(node->segm.left.x == node->segm.right.x){
-    node->segm.left.type = _F;
-    node->segm.right.type = F_;
-    return;
-  }
-
-  Segment s = node->segm;
-  int slope = (s.right.y - s.left.y)/(s.right.x - s.left.x);
-  assert(slope == 1 || slope == 0 || slope == -1);
-
-  if(slope == 1){
-    node->segm.left.type = _I;
-    node->segm.right.type = I_;
-  }
-  if(slope == -1){
-    node->segm.left.type = _D;
-    node->segm.right.type = D_;
-  }
-  if(slope == 0){
-    node->segm.left.type = _F;
-    node->segm.right.type = F_;
-  }
-}
-
 void move_point(Point &p, int dt){
   Point_t type = p.type;
   if(type == FI || type == IF || type == I_ || type == F_){
@@ -483,7 +455,6 @@ void BST::insert(Segment segm)
   if (this->root == NULL)
   {
     this->root = new TreeNode(segm);
-    set_endpoints(this->root);
     return;
   }
 
@@ -735,7 +706,7 @@ void BST::update_point_type(Segment segm){
   assert(node != NULL);
   TreeNode *predec = this->find_predec(segm);
   TreeNode *succ = this->find_succ(segm);
-  set_endpoints(node);
+  node->segm.update_endpoints();
   Segment s = node->segm;
   if(succ != NULL){
     Segment s_r = succ->segm;

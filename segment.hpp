@@ -9,6 +9,7 @@ public:
   Point left, right;
   Segment(Point _left, Point _right);
   Segment();
+  void update_endpoints();
   float get_val_at_coord(float x);
   int get_slope();
   bool contains(float x);

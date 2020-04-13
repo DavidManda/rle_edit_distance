@@ -6,6 +6,12 @@ Segment::Segment(Point _left, Point _right)
 {
   left = _left;
   right = _right;
+  update_endpoints();
+}
+
+Segment::Segment() : Segment(Point(0,0), Point(0,0)){}
+
+void Segment::update_endpoints(){
   if(left.x == right.x){
     left.type = _F;
     right.type = F_;
@@ -27,10 +33,7 @@ Segment::Segment(Point _left, Point _right)
       right.type = F_;
     }
   }
-
 }
-
-Segment::Segment() : Segment(Point(0,0), Point(0,0)){}
 
 bool Segment::contains(float x){
   return left.x <= x && right.x >= x;
