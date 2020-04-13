@@ -136,6 +136,10 @@ void test_swm_one_segm(){
   BST t = BST(new TreeNode(flat));
   t = SWM(t, 3);
 
+  // propagate request
+  TreeNode* min = TreeNode::min(t.root);
+  TreeNode* max = TreeNode::max(t.root);
+
   assert(t.root->segm == Segment(Point(0,1), Point(13, 1)));
   assert(t.root->segm.left.type == _F);
   assert(t.root->segm.right.type == F_);
@@ -143,8 +147,8 @@ void test_swm_one_segm(){
   Segment incr(Point(0,0), Point(10,10));
   t = BST(new TreeNode(incr));
   t = SWM(t, 3);
-  TreeNode* min = TreeNode::min(t.root);
-  TreeNode* max = TreeNode::max(t.root);
+  min = TreeNode::min(t.root);
+  max = TreeNode::max(t.root);
   assert(min->segm == Segment(Point(0,0), Point(3,0)));
   assert(max->segm == Segment(Point(3,0), Point(13, 10)));
   assert(min->segm.left.type == _F);
