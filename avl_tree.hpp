@@ -9,7 +9,6 @@ public:
   bool active;
   Point shift;
   int dg, dt, t_min;
-  Point_t type_l, type_r;
   int height;
   TreeNode *left;
   TreeNode *right;

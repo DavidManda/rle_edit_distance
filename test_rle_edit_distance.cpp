@@ -64,15 +64,15 @@ void test_point_types_split(){
   BST t;
   Segment s(Point(0,0), Point(10,10));
   t = BST(new TreeNode(s));
-  assert(t.root->type_l == _I);
-  assert(t.root->type_r == I_);
+  assert(t.root->segm.left.type == _I);
+  assert(t.root->segm.right.type == I_);
   std::pair<BST, BST> pair = split(t, 5);
   BST t_l = pair.first;
   BST t_r = pair.second;
-  assert(t_l.root->type_l = _I);
-  assert(t_l.root->type_r = I_);
-  assert(t_r.root->type_l = _I);
-  assert(t_r.root->type_r = I_);
+  assert(t_l.root->segm.left.type = _I);
+  assert(t_l.root->segm.right.type = I_);
+  assert(t_r.root->segm.left.type = _I);
+  assert(t_r.root->segm.right.type = I_);
 }
 
 void test_point_types_join_same_grad(){
@@ -80,8 +80,8 @@ void test_point_types_join_same_grad(){
   BST t2 = BST(new TreeNode(Segment(Point(10,10),Point(20,20))));
   BST t = join(t1, t2);
   assert(t.root->segm == Segment(Point(0,0),Point(20,20)));
-  assert(t.root->type_l == _I);
-  assert(t.root->type_r == I_);
+  assert(t.root->segm.left.type == _I);
+  assert(t.root->segm.right.type == I_);
 }
 
 void test_point_types_join_diff_grad(){
@@ -90,18 +90,18 @@ void test_point_types_join_diff_grad(){
   BST t = join(t1, t2);
   TreeNode *left = TreeNode::min(t.root);
   TreeNode *right = TreeNode::max(t.root);
-  assert(left->type_l == _I);
-  assert(left->type_r == IF);
-  assert(right->type_l == IF);
-  assert(right->type_r == F_);
+  assert(left->segm.left.type == _I);
+  assert(left->segm.right.type == IF);
+  assert(right->segm.left.type == IF);
+  assert(right->segm.right.type == F_);
   BST t3 = BST(new TreeNode(Segment(Point(20,10),Point(30,0))));
   BST tt = join(t, t3);
-  assert(tt.root->left->type_l == _I);
-  assert(tt.root->left->type_r == IF);
-  assert(tt.root->type_l == IF);
-  assert(tt.root->type_r == FD);
-  assert(tt.root->right->type_l == FD);
-  assert(tt.root->right->type_r == D_);
+  assert(tt.root->left->segm.left.type == _I);
+  assert(tt.root->left->segm.right.type == IF);
+  assert(tt.root->segm.left.type == IF);
+  assert(tt.root->segm.right.type == FD);
+  assert(tt.root->right->segm.left.type == FD);
+  assert(tt.root->right->segm.right.type == D_);
 }
 
 void test_join_with_DI_type(){
@@ -111,12 +111,12 @@ void test_join_with_DI_type(){
   TreeNode *left = t.find(Segment(Point(0,10),Point(10,0)));
   TreeNode *right = t.find(Segment(Point(10,0),Point(20,10)));
   TreeNode *empty_node = t.find(Segment(Point(10,10),Point(10,10)));
-  assert(left->type_l == _D);
-  assert(left->type_r == DF);
-  assert(empty_node->type_l == DF);
-  assert(empty_node->type_r == FI);
-  assert(right->type_l == FI);
-  assert(right->type_r == I_);
+  assert(left->segm.left.type == _D);
+  assert(left->segm.right.type == DF);
+  assert(empty_node->segm.left.type == DF);
+  assert(empty_node->segm.right.type == FI);
+  assert(right->segm.left.type == FI);
+  assert(right->segm.right.type == I_);
 }
 
 void test_point_types_join(){
@@ -137,8 +137,8 @@ void test_swm_one_segm(){
   t = SWM(t, 3);
 
   assert(t.root->segm == Segment(Point(0,1), Point(13, 1)));
-  assert(t.root->type_l == _F);
-  assert(t.root->type_r == F_);
+  assert(t.root->segm.left.type == _F);
+  assert(t.root->segm.right.type == F_);
 
   Segment incr(Point(0,0), Point(10,10));
   t = BST(new TreeNode(incr));
@@ -147,10 +147,10 @@ void test_swm_one_segm(){
   TreeNode* max = TreeNode::max(t.root);
   assert(min->segm == Segment(Point(0,0), Point(3,0)));
   assert(max->segm == Segment(Point(3,0), Point(13, 10)));
-  assert(min->type_l == _F);
-  assert(min->type_r == FI);
-  assert(max->type_l == FI);
-  assert(max->type_r == I_);
+  assert(min->segm.left.type == _F);
+  assert(min->segm.right.type == FI);
+  assert(max->segm.left.type == FI);
+  assert(max->segm.right.type == I_);
 
   Segment decr(Point(0,0), Point(10,-10));
   t = BST(new TreeNode(decr));
@@ -159,10 +159,10 @@ void test_swm_one_segm(){
   max = TreeNode::max(t.root);
   assert(min->segm == Segment(Point(0,0), Point(10,-10)));
   assert(max->segm == Segment(Point(10,-10), Point(13, -10)));
-  assert(min->type_l == _D);
-  assert(min->type_r == DF);
-  assert(max->type_l == DF);
-  assert(max->type_r == F_);
+  assert(min->segm.left.type == _D);
+  assert(min->segm.right.type == DF);
+  assert(max->segm.left.type == DF);
+  assert(max->segm.right.type == F_);
 }
 
 void test_swm_collapsing_segm(){
@@ -178,12 +178,12 @@ void test_swm_collapsing_segm(){
   TreeNode *left = t.root->left;
   TreeNode *right = t.root->right;
 
-  assert(left->type_l == _I);
-  assert(left->type_r == ID);
-  assert(mid->type_l == ID);
-  assert(mid->type_r == DF);
-  assert(right->type_l == DF);
-  assert(right->type_r == F_);
+  assert(left->segm.left.type == _I);
+  assert(left->segm.right.type == ID);
+  assert(mid->segm.left.type == ID);
+  assert(mid->segm.right.type == DF);
+  assert(right->segm.left.type == DF);
+  assert(right->segm.right.type == F_);
   assert(t.root->t_min == 10);
 
   t = SWM(t, 5);
@@ -192,26 +192,26 @@ void test_swm_collapsing_segm(){
   right = t.root->right;
   TreeNode *left_left = left->left;
 
-  assert(left_left->type_l == _F);
-  assert(left_left->type_r == FI);
-  assert(left->type_l == FI);
-  assert(left->type_r == ID);
-  assert(mid->type_l == ID);
-  assert(mid->type_r == DF);
-  assert(right->type_l == DF);
-  assert(right->type_r == F_);
+  assert(left_left->segm.left.type == _F);
+  assert(left_left->segm.right.type == FI);
+  assert(left->segm.left.type == FI);
+  assert(left->segm.right.type == ID);
+  assert(mid->segm.left.type == ID);
+  assert(mid->segm.right.type == DF);
+  assert(right->segm.left.type == DF);
+  assert(right->segm.right.type == F_);
   assert(t.root->t_min == 5);
 
   t = SWM(t, 6);
   mid = t.root;
   left = t.root->left;
   right = t.root->right;
-  assert(left->type_l == _F);
-  assert(left->type_r == FI);
-  assert(mid->type_l == FI);
-  assert(mid->type_r == IF);
-  assert(right->type_l == IF);
-  assert(right->type_r == F_);
+  assert(left->segm.left.type == _F);
+  assert(left->segm.right.type == FI);
+  assert(mid->segm.left.type == FI);
+  assert(mid->segm.right.type == IF);
+  assert(right->segm.left.type == IF);
+  assert(right->segm.right.type == F_);
 }
 
 void test_swm_empty_segm(){
@@ -279,7 +279,7 @@ void test_get_OUT_LEFT(){
   BST t; t.insert(s3);t.insert(s2);t.insert(s4);t.insert(s1);
   BST out = get_OUT_LEFT(t, 5, 3);
   TreeNode *min = TreeNode::min(out.root);
-  assert(min->type_l == _F);
+  assert(min->segm.left.type == _F);
 }
 
 void test_get_OUT_TOP(){

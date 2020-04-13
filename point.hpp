@@ -10,7 +10,9 @@ std::ostream& operator<<(std::ostream& out, const Point_t value);
 class Point{
 public:
   double x, y;
+  Point_t type;
   Point(double _x, double _y);
+  Point(double _x, double _y, Point_t _type);
   Point();
   static int get_manhattan(Point p1, Point p2);
   bool operator ==(const Point& p);

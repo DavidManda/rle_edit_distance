@@ -13,8 +13,6 @@ TreeNode::TreeNode(){
   this->shift = Point(0,0);
   this->dg = 0;
   this->dt = 0;
-  this->type_l = NotInitialised;
-  this->type_r = NotInitialised;
   this->height = 1;
   this->t_min = this->get_t_min();
   this->left = NULL;
@@ -35,9 +33,10 @@ TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right) : TreeNode(seg
 bool has_collapse_time(TreeNode* node){
   if(node == NULL)
     return false;
-  return  (node->type_l == ID && node->type_r == DF) ||
-          (node->type_l == IF && node->type_r == FD) ||
-          (node->type_l == FI && node->type_r == ID);
+  Point left = node->segm.left, right = node->segm.right;
+  return  (left.type == ID && right.type == DF) ||
+          (left.type == IF && right.type == FD) ||
+          (left.type == FI && right.type == ID);
 }
 
 int TreeNode::get_t_min(){
@@ -63,8 +62,6 @@ void TreeNode::update_value(TreeNode *node)
   this->dg = node->dg;
   this->dt = node->dt;
   this->t_min = node->t_min;
-  this->type_l = node->type_l;
-  this->type_r = node->type_r;
 }
 
 int height(TreeNode* node){
@@ -78,8 +75,8 @@ void set_endpoints(TreeNode* node){
     return;
 
   if(node->segm.left.x == node->segm.right.x){
-    node->type_l = _F;
-    node->type_r = F_;
+    node->segm.left.type = _F;
+    node->segm.right.type = F_;
     return;
   }
 
@@ -88,20 +85,21 @@ void set_endpoints(TreeNode* node){
   assert(slope == 1 || slope == 0 || slope == -1);
 
   if(slope == 1){
-    node->type_l = _I;
-    node->type_r = I_;
+    node->segm.left.type = _I;
+    node->segm.right.type = I_;
   }
   if(slope == -1){
-    node->type_l = _D;
-    node->type_r = D_;
+    node->segm.left.type = _D;
+    node->segm.right.type = D_;
   }
   if(slope == 0){
-    node->type_l = _F;
-    node->type_r = F_;
+    node->segm.left.type = _F;
+    node->segm.right.type = F_;
   }
 }
 
-void move_point(Point &p, Point_t type, int dt){
+void move_point(Point &p, int dt){
+  Point_t type = p.type;
   if(type == FI || type == IF || type == I_ || type == F_){
     p.x += 1 * dt;
   }
@@ -167,13 +165,13 @@ Point_t update_point_type(Point_t type, int dg){
 }
 
 void TreeNode::update_endpoints(){
-  move_point(this->segm.left, this->type_l, this->dt);
-  move_point(this->segm.right, this->type_r, this->dt);
+  move_point(this->segm.left, this->dt);
+  move_point(this->segm.right, this->dt);
   if(this->dg == 0){
     return;
   }
-  this->type_l = update_point_type(this->type_l, this->dg);
-  this->type_r = update_point_type(this->type_r, this->dg);
+  this->segm.left.type = update_point_type(this->segm.left.type, this->dg);
+  this->segm.right.type = update_point_type(this->segm.right.type, this->dg);
 }
 
 void TreeNode::request_shift(int dx, int dy){
@@ -324,7 +322,6 @@ std::string TreeNode::to_string()
   std::stringstream ss;
   ss<<this->segm.to_string();
   ss<<' '<<this->active<<' '<<this->shift.to_string()<<' '<<this->dt<<' '<<this->dg<<' '<<this->t_min;
-  ss<<' '<<this->type_l<<' '<<this->type_r;
   return ss.str();
 }
 
@@ -748,7 +745,7 @@ void BST::update_point_type(Segment segm){
     // that segment in two. After the delete and before the inserts there is a gap in the tree
     // and we should not insert an empty segment there
     if(type != DI || s.right.x != s_r.left.x){
-      node->type_r = type;
+      node->segm.right.type = type;
     }
     else
     {
@@ -765,7 +762,7 @@ void BST::update_point_type(Segment segm){
     // that segment in two. After the delete and before the inserts there is a gap in the tree
     // and we should not insert an empty segment there
     if(type != DI || s_l.right.x != s.left.x){
-      node->type_l = type;
+      node->segm.left.type = type;
     }
     else
     {
@@ -776,6 +773,7 @@ void BST::update_point_type(Segment segm){
   this->update_tmin_on_path_to(node->segm);
 }
 
+// O(log(n))
 void update_tmin_on_path_to_(TreeNode* root, Segment segm){
   assert(root != NULL);
   if(root->segm == segm){

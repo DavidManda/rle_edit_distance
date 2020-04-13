@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define MAX_SIZE 500
+#define MAX_SIZE 400
 
 int dyn[MAX_SIZE * MAX_SIZE];
 BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
@@ -146,11 +146,11 @@ BST SWM(BST tree, int h){
   TreeNode *left_most = TreeNode::min(tree.root);
   TreeNode *right_most = TreeNode::max(tree.root);
   
-  if(left_most->type_l == _I){
+  if(left_most->segm.left.type == _I){
     Segment empty_segm = Segment(left_most->segm.left, left_most->segm.left);
     tree.insert(empty_segm);
   }
-  if(right_most->type_r == D_){
+  if(right_most->segm.right.type == D_){
     Segment empty_segm = Segment(right_most->segm.right, right_most->segm.right);
     tree.insert(empty_segm);
   }

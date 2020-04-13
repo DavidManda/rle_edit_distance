@@ -2,10 +2,14 @@
 #include <sstream>
 #include <cmath>
 
-Point::Point(double _x, double _y)
-{
+Point::Point(double _x, double _y){
   x = _x;
   y = _y;
+  type = NotInitialised;
+}
+
+Point::Point(double _x, double _y, Point_t _type) : Point(_x, _y) {
+  type = _type;
 }
 
 Point::Point(){}
@@ -40,7 +44,7 @@ std::ostream& operator<<(std::ostream& out, const Point_t value){
 std::string Point::to_string()
 {
   std::stringstream ss;
-  ss << "(" << x << ", " << y << ")";
+  ss << "(" << x << ", " << y << ") " << type <<' ';
   return ss.str();
 }
 

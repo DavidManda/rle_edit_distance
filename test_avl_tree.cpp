@@ -372,17 +372,17 @@ void test_endpoints(){
   Segment s(Point(0,0), Point(1,0));
   return;
   t = BST(new TreeNode(s));
-  assert(t.root->type_l == _F);
-  assert(t.root->type_r == F_);
+  assert(t.root->segm.left.type == _F);
+  assert(t.root->segm.right.type == F_);
   s = Segment(Point(0,0), Point(1,1));
   t = BST(new TreeNode(s));
-  assert(t.root->type_l == _I);
-  assert(t.root->type_r == I_);
+  assert(t.root->segm.left.type == _I);
+  assert(t.root->segm.right.type == I_);
 
   s = Segment(Point(2,2), Point(1,1));
   t = BST(new TreeNode(s));
-  assert(t.root->type_l == _D);
-  assert(t.root->type_r == D_);
+  assert(t.root->segm.left.type == _D);
+  assert(t.root->segm.right.type == D_);
 }
 
 void test_find_predec(){
