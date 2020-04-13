@@ -82,18 +82,24 @@ void move_point(Point &p, int dt){
 }
 
 void TreeNode::request_shift(int dx, int dy){
+  if(dx == 0 && dy == 0)
+    return;
   lazy_update(this);
   this->active = false;
   this->shift += Point(dx, dy);
 }
 
 void TreeNode::request_change_grad(int dg){
+  if(dg == 0)
+    return;
   lazy_update(this);
   this->active = false;
   this->dg += dg;
 }
 
 void TreeNode::request_swm(int dt){
+  if(dt == 0)
+    return;
   lazy_update(this);
   this->active = false;
 
