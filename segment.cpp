@@ -6,9 +6,31 @@ Segment::Segment(Point _left, Point _right)
 {
   left = _left;
   right = _right;
+  if(left.x == right.x){
+    left.type = _F;
+    right.type = F_;
+  }
+  else{
+    int slope = (right.y - left.y)/(right.x - left.x);
+    assert(slope == 1 || slope == 0 || slope == -1);
+
+    if(slope == 1){
+      left.type = _I;
+      right.type = I_;
+    }
+    if(slope == -1){
+      left.type = _D;
+      right.type = D_;
+    }
+    if(slope == 0){
+      left.type = _F;
+      right.type = F_;
+    }
+  }
+
 }
 
-Segment::Segment(){}
+Segment::Segment() : Segment(Point(0,0), Point(0,0)){}
 
 bool Segment::contains(float x){
   return left.x <= x && right.x >= x;
