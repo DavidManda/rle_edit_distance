@@ -193,12 +193,8 @@ void TreeNode::apply_swm(int dt){
   this->active = false;
 
   this->t_min -= dt;
-  if(this->dg == 0){
-    this->dt += dt;
-  }
-  else if(this->type_l == IF || this->type_l == FI){
-    this->request_shift(dt, 0);
-  }
+  // this->dg will always be 0 here, since we just performed a lazy update
+  this->dt += dt;
 }
 
 void TreeNode::lazy_update(TreeNode* node){
