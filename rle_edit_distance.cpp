@@ -157,7 +157,7 @@ BST SWM(BST tree, int h){
   while(h > 0){
     int t_min = tree.root->t_min;
     if(h >= t_min){
-      tree.apply_swm(t_min);
+      tree.request_swm(t_min);
       h -= t_min;
       while(tree.root->t_min == 0){
         std::vector<Segment> collapsed_segments;
@@ -169,7 +169,7 @@ BST SWM(BST tree, int h){
     }
     else
     {
-      tree.apply_swm(h);
+      tree.request_swm(h);
       h = 0;
     }
   }
@@ -191,11 +191,11 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
     BST S_l = p.first;
     BST S_r = p.second;
 
-    S_l.change_grad(1);
+    S_l.request_change_grad(1);
     S_l.request_shift(0,-1);
     BST S1 = S_l;
     
-    BST S2 = initialise(w-h); S2.change_grad(1); S2.request_shift(h,s_h + h - 1);
+    BST S2 = initialise(w-h); S2.request_change_grad(1); S2.request_shift(h,s_h + h - 1);
 
     S_r.request_shift(w-h,w-1);
     BST S3 = S_r;
@@ -207,7 +207,7 @@ BST get_OUT_LEFT(BST LEFT, int h, int w){
     BST S_l = p.first;
     BST S_r = p.second;
 
-    S_l.change_grad(1);
+    S_l.request_change_grad(1);
     S_l.request_shift(0,-1);
     BST S1 = S_l;
 
@@ -226,7 +226,7 @@ BST get_OUT_TOP(BST TOP, int h, int w){
     S_l.request_shift(0,h-1);
     BST S1 = S_l;
 
-    S_r.change_grad(-1); S_r.request_shift(0,w+h-1);
+    S_r.request_change_grad(-1); S_r.request_shift(0,w+h-1);
     BST S2 = S_r;
     return join(S1,S2);
   }
@@ -240,9 +240,9 @@ BST get_OUT_TOP(BST TOP, int h, int w){
 
     S_l.request_shift(0,h-1);
     BST S1 = S_l;
-    BST S2 = initialise(h-w); S2.change_grad(-1); S2.request_shift(w,s_w + h - 1);
+    BST S2 = initialise(h-w); S2.request_change_grad(-1); S2.request_shift(w,s_w + h - 1);
 
-    S_r.change_grad(-1); S_r.request_shift(h - w,2*w-1);
+    S_r.request_change_grad(-1); S_r.request_shift(h - w,2*w-1);
     BST S3 = S_r;
     return join(join(S1,S2),S3);
   }

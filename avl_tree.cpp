@@ -152,13 +152,13 @@ void TreeNode::request_shift(int dx, int dy){
   this->shift += Point(dx, dy);
 }
 
-void TreeNode::change_grad(int dg){
+void TreeNode::request_change_grad(int dg){
   lazy_update(this);
   this->active = false;
   this->dg += dg;
 }
 
-void TreeNode::apply_swm(int dt){
+void TreeNode::request_swm(int dt){
   lazy_update(this);
   this->active = false;
 
@@ -183,13 +183,13 @@ void TreeNode::lazy_update(TreeNode* node){
   node->segm.right += node->shift;
   
   if(node->left){
-    node->left->apply_swm(node->dt);
-    node->left->change_grad(node->dg);
+    node->left->request_swm(node->dt);
+    node->left->request_change_grad(node->dg);
     node->left->request_shift(node->shift.x, node->shift.y);
   }
   if(node->right){
-    node->right->apply_swm(node->dt);
-    node->right->change_grad(node->dg);
+    node->right->request_swm(node->dt);
+    node->right->request_change_grad(node->dg);
     node->right->request_shift(node->shift.x, node->shift.y);
   }
 
@@ -774,10 +774,10 @@ void BST::request_shift(int dx, int dy){
   TreeNode* max = TreeNode::max(this->root);
 }
 
-void BST::change_grad(int dg){
+void BST::request_change_grad(int dg){
   if(this->root == NULL)
     return;
-  this->root->change_grad(dg);
+  this->root->request_change_grad(dg);
 
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
@@ -785,8 +785,8 @@ void BST::change_grad(int dg){
   TreeNode* max = TreeNode::max(this->root);
 }
 
-void BST::apply_swm(int dt){
-  this->root->apply_swm(dt);
+void BST::request_swm(int dt){
+  this->root->request_swm(dt);
 
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST

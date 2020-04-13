@@ -18,8 +18,8 @@ public:
   TreeNode(Segment segm, TreeNode* left, TreeNode* right);
   int get_t_min();
   void request_shift(int dx, int dy);
-  void change_grad(int dg);
-  void apply_swm(int dt);
+  void request_change_grad(int dg);
+  void request_swm(int dt);
   void update_endpoints();
   static void lazy_update(TreeNode* node);
   void set_right(TreeNode* node);
@@ -56,8 +56,8 @@ public:
   bool is_balanced();
   bool is_continuous();
   void request_shift(int dx, int dy);
-  void change_grad(int dg);
-  void apply_swm(int dt);
+  void request_change_grad(int dg);
+  void request_swm(int dt);
   void update_point_type(Segment segm);
   void update_tmin_on_path_to(Segment segm);
   float get_value_at_coord(float x);

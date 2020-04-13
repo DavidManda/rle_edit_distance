@@ -249,7 +249,7 @@ void test_simple_gradient_change(){
   for(int i = 0; i<3; i++){
     t.insert(Segment(Point(i,1), Point(i+1, 1)));
   }
-  t.root->change_grad(1);
+  t.root->request_change_grad(1);
   t.root->request_shift(0,2);
   for(int i = 0; i < 3; i++){
     TreeNode *node = t.find(Segment(Point(i,1 + i + 2), Point(i+1, 1 + (i + 1) + 2)));
@@ -262,7 +262,7 @@ void test_gradient_and_shift(){
   for(int i = 0; i <= 100; i++){
     tree.insert(Segment(Point(i,0), Point(i+1, 0)));
   }
-  tree.root->change_grad(1);
+  tree.root->request_change_grad(1);
   tree.root->request_shift(5, 6);
 
   for(int i = 0; i <= 50; i++){
@@ -303,9 +303,9 @@ void test_invariant_lr_insert(){
   for(int i = 0; i <= 100; i++){
     tree.insert(Segment(Point(i,1), Point(i+1, 1)));
   }
-  tree.apply_swm(3);
+  tree.request_swm(3);
   assert(left_right_paths_have_no_pending_updates(tree.root));
-  tree.change_grad(0);
+  tree.request_change_grad(0);
   assert(left_right_paths_have_no_pending_updates(tree.root));
   tree.request_shift(0,2);
   assert(left_right_paths_have_no_pending_updates(tree.root));
@@ -318,7 +318,7 @@ void test_invariant_lr_split_(int x){
   for(int i = 0; i <= N; i++){
     tree.insert(Segment(Point(i,1), Point(i+1, 1)));
   }
-  tree.change_grad(-1);
+  tree.request_change_grad(-1);
   tree.request_shift(3,4);
   std::pair<BST, BST> trees = BST::split(tree.root, tree.root->left->segm);
   assert(left_right_paths_have_no_pending_updates(trees.first.root));
