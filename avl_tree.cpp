@@ -81,62 +81,6 @@ void move_point(Point &p, int dt){
   }
 }
 
-Point_t update_point_type(Point_t type, int dg){
-  assert(type != ID && type != DI);
-  assert(!((type == _D || type == D_ || type == FD || type == DF) && dg == -1));
-  assert(!((type == _I || type == I_ || type == FI || type == IF) && dg == 1));
-
-  if(type == _I && dg == -1){
-    return _F;
-  }
-
-  if(type == I_ && dg == -1){
-    return F_;
-  }
-
-  if(type == _F && dg == -1){
-    return _D;
-  }
-
-  if(type == F_ && dg == -1){
-    return D_;
-  }
-
-  if(type == IF && dg == -1){
-    return FD;
-  }
-
-  if(type == FI && dg == -1){
-    return DF;
-  }
-  
-  if(type == _D && dg == 1){
-    return _F;
-  }
-
-  if(type == D_ && dg == 1){
-    return F_;
-  }
-
-  if(type == _F && dg == 1){
-    return _I;
-  }
-
-  if(type == F_ && dg == 1){
-    return I_;
-  }
-
-  if(type == DF && dg == 1){
-    return FI;
-  }
-
-  if(type == FD && dg == 1){
-    return IF;
-  }
-  return type;
-}
-
-
 void TreeNode::request_shift(int dx, int dy){
   lazy_update(this);
   this->active = false;
@@ -167,12 +111,7 @@ void TreeNode::apply_change_grad(){
   if(this->dg == 0){
     return;
   }
-  // TODO
-  this->segm.left.type = update_point_type(this->segm.left.type, this->dg);
-  this->segm.right.type = update_point_type(this->segm.right.type, this->dg);
-
-  this->segm.left.y += this->segm.left.x * this->dg;
-  this->segm.right.y += this->segm.right.x * this->dg;
+  this->segm.change_gradient(this->dg);
 }
 
 void TreeNode::apply_swm(){

@@ -35,6 +35,69 @@ void Segment::update_endpoints(){
   }
 }
 
+Point_t Segment::get_new_point_type(int dg, Point_t type){
+  assert(type != ID && type != DI);
+  assert(!((type == _D || type == D_ || type == FD || type == DF) && dg == -1));
+  assert(!((type == _I || type == I_ || type == FI || type == IF) && dg == 1));
+
+  if(type == _I && dg == -1){
+    return _F;
+  }
+
+  if(type == I_ && dg == -1){
+    return F_;
+  }
+
+  if(type == _F && dg == -1){
+    return _D;
+  }
+
+  if(type == F_ && dg == -1){
+    return D_;
+  }
+
+  if(type == IF && dg == -1){
+    return FD;
+  }
+
+  if(type == FI && dg == -1){
+    return DF;
+  }
+  
+  if(type == _D && dg == 1){
+    return _F;
+  }
+
+  if(type == D_ && dg == 1){
+    return F_;
+  }
+
+  if(type == _F && dg == 1){
+    return _I;
+  }
+
+  if(type == F_ && dg == 1){
+    return I_;
+  }
+
+  if(type == DF && dg == 1){
+    return FI;
+  }
+
+  if(type == FD && dg == 1){
+    return IF;
+  }
+  return type;
+}
+
+void Segment::change_gradient(int dg){
+  left.y += left.x * dg;
+  right.y += right.x * dg;
+
+  left.type = get_new_point_type(dg, left.type);
+  right.type = get_new_point_type(dg, right.type);
+}
+
 bool Segment::contains(float x){
   return left.x <= x && right.x >= x;
 }

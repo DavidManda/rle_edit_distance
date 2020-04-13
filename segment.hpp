@@ -10,6 +10,7 @@ public:
   Segment(Point _left, Point _right);
   Segment();
   void update_endpoints();
+  void change_gradient(int dg);
   float get_val_at_coord(float x);
   int get_slope();
   bool contains(float x);
@@ -20,6 +21,8 @@ public:
   bool operator >=(const Segment& s);
   bool operator ==(const Segment& s);
   std::string to_string();
+private:
+  Point_t get_new_point_type(int dg, Point_t type);
 };
 
 #endif
