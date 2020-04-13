@@ -412,15 +412,8 @@ void BST::insert(Segment segm)
   }
 
   this->root = TreeNode::insert(this->root, segm);
-  // update point types
-  TreeNode *pred = this->find_predec(segm);
-  TreeNode *succ = this->find_succ(segm);
 
   this->update_point_type(segm);
-  if(pred != NULL)
-    this->update_point_type(pred->segm);
-  if(succ != NULL)
-    this->update_point_type(succ->segm);
 }
 
 TreeNode *BST::find(Segment segm)
@@ -670,6 +663,8 @@ void BST::update_point_type(Segment segm){
     // and we should not insert an empty segment there
     if(type != DI || s.right.x != s_r.left.x){
       node->segm.right.type = type;
+      succ->segm.left.type = type;
+      this->update_tmin_on_path_to(succ->segm);
     }
     else
     {
@@ -687,6 +682,8 @@ void BST::update_point_type(Segment segm){
     // and we should not insert an empty segment there
     if(type != DI || s_l.right.x != s.left.x){
       node->segm.left.type = type;
+      predec->segm.right.type = type;
+      this->update_tmin_on_path_to(predec->segm);
     }
     else
     {
@@ -841,12 +838,6 @@ BST BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
   joined_tree.root = root;
   joined_tree.update_point_type(root->segm);
   joined_tree.update_point_type(segm);
-  TreeNode *pred = joined_tree.find_predec(segm);
-  TreeNode *succ = joined_tree.find_succ(segm);
-  if(pred != NULL)
-    joined_tree.update_point_type(pred->segm);
-  if(succ != NULL)
-    joined_tree.update_point_type(succ->segm);
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
   // TreeNode* min = TreeNode::min(joined_tree.root);
