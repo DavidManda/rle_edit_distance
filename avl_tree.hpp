@@ -20,6 +20,9 @@ public:
   void request_shift(int dx, int dy);
   void request_change_grad(int dg);
   void request_swm(int dt);
+  void apply_shift();
+  void apply_change_grad();
+  void apply_swm();
   void update_endpoints();
   static void lazy_update(TreeNode* node);
   void set_right(TreeNode* node);

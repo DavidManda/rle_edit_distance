@@ -136,15 +136,6 @@ Point_t update_point_type(Point_t type, int dg){
   return type;
 }
 
-void TreeNode::update_endpoints(){
-  move_point(this->segm.left, this->dt);
-  move_point(this->segm.right, this->dt);
-  if(this->dg == 0){
-    return;
-  }
-  this->segm.left.type = update_point_type(this->segm.left.type, this->dg);
-  this->segm.right.type = update_point_type(this->segm.right.type, this->dg);
-}
 
 void TreeNode::request_shift(int dx, int dy){
   lazy_update(this);
@@ -167,20 +158,37 @@ void TreeNode::request_swm(int dt){
   this->dt += dt;
 }
 
+void TreeNode::apply_shift(){
+  this->segm.left += this->shift;
+  this->segm.right += this->shift;
+}
+
+void TreeNode::apply_change_grad(){
+  if(this->dg == 0){
+    return;
+  }
+  // TODO
+  this->segm.left.type = update_point_type(this->segm.left.type, this->dg);
+  this->segm.right.type = update_point_type(this->segm.right.type, this->dg);
+
+  this->segm.left.y += this->segm.left.x * this->dg;
+  this->segm.right.y += this->segm.right.x * this->dg;
+}
+
+void TreeNode::apply_swm(){
+  if(this->dt == 0)
+    return;
+  move_point(this->segm.left, this->dt);
+  move_point(this->segm.right, this->dt);
+}
+
 void TreeNode::lazy_update(TreeNode* node){
   if(node == NULL || node->active){
     return;
   }
-  node->update_endpoints();
-
-  // update gradient before performing shift, this is important
-  node->segm.left.y += node->segm.left.x * node->dg;
-  node->segm.right.y += node->segm.right.x * node->dg;
-
-
-  // perform shift
-  node->segm.left += node->shift;
-  node->segm.right += node->shift;
+  node->apply_swm();
+  node->apply_change_grad();
+  node->apply_shift();
   
   if(node->left){
     node->left->request_swm(node->dt);
