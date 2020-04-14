@@ -14,7 +14,7 @@ TreeNode::TreeNode(){
   this->dg = 0;
   this->dt = 0;
   this->height = 1;
-  this->t_min = this->get_t_min();
+  this->t_min = this->get_own_tmin();
   this->left = NULL;
   this->right = NULL;
 }
@@ -27,7 +27,7 @@ TreeNode::TreeNode(Segment segm, TreeNode* left, TreeNode* right) : TreeNode(seg
   this->left = left;
   this->right = right;
   this->recompute_height();
-  this->recompute_tmin();
+  this->recompute_subtree_tmin();
 }
 
 bool has_collapse_time(TreeNode* node){
@@ -39,17 +39,17 @@ bool has_collapse_time(TreeNode* node){
           (left.type == FI && right.type == ID);
 }
 
-int TreeNode::get_t_min(){
+int TreeNode::get_own_tmin(){
   if(has_collapse_time(this)){
     return Point::get_manhattan(this->segm.left, this->segm.right);
   }
   return INT_MAX;
 }
 
-void TreeNode::recompute_tmin(){
+void TreeNode::recompute_subtree_tmin(){
   int t_left = (this->left != NULL) ? this->left->t_min : INT_MAX;
   int t_right = (this->right != NULL) ? this->right->t_min : INT_MAX;
-  int this_tmin = this->get_t_min();
+  int this_tmin = this->get_own_tmin();
 
   this->t_min = std::min(this_tmin, std::min(t_left, t_right));
 }
@@ -102,8 +102,8 @@ void TreeNode::request_swm(int dt){
     return;
   lazy_update(this);
   this->active = false;
-
-  this->t_min -= dt;
+  if(this->t_min != INT_MAX)
+    this->t_min -= dt;
   // this->dg will always be 0 here, since we just performed a lazy update
   this->dt += dt;
 }
@@ -162,9 +162,9 @@ TreeNode* TreeNode::rotate_right(TreeNode* root){
   left->right = root;
   root->left = left_right;
 
-  root->recompute_tmin();
+  root->recompute_subtree_tmin();
   root->recompute_height();
-  left->recompute_tmin();
+  left->recompute_subtree_tmin();
   left->recompute_height();
 
   return left;
@@ -179,9 +179,9 @@ TreeNode* TreeNode::rotate_left(TreeNode* root){
   right->left = root;
   root->right = right_left;
 
-  root->recompute_tmin();
+  root->recompute_subtree_tmin();
   root->recompute_height();
-  right->recompute_tmin();
+  right->recompute_subtree_tmin();
   right->recompute_height();
 
   return right;
@@ -201,7 +201,7 @@ TreeNode* TreeNode::insert(TreeNode* root, Segment segm)
     // node already exists
     return NULL;
   }
-  root->recompute_tmin();
+  root->recompute_subtree_tmin();
   root->recompute_height();
 
   int balance = root->get_balance();
@@ -386,16 +386,17 @@ bool BST::is_balanced(){
 bool BST::is_continuous(){
   return is_continuous_(this->root);
 }
+
 void TreeNode::set_right(TreeNode* node){
   this->right = node;
   this->recompute_height();
-  this->recompute_tmin();
+  this->recompute_subtree_tmin();
 }
 
 void TreeNode::set_left(TreeNode* node){
   this->left = node;
   this->recompute_height();
-  this->recompute_tmin();
+  this->recompute_subtree_tmin();
 }
 
 // inserts node into tree, sets point type and updates t_min
@@ -522,7 +523,7 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
   // If the tree had only one node
   if(root == NULL)
     return root;
-  root->recompute_tmin();
+  root->recompute_subtree_tmin();
   root->recompute_height();
   int balance = root->get_balance();
   // left left
@@ -694,7 +695,7 @@ void BST::update_point_type(Segment segm){
 void update_tmin_on_path_to_(TreeNode* root, Segment segm){
   assert(root != NULL);
   if(root->segm == segm){
-    root->recompute_tmin();
+    root->recompute_subtree_tmin();
   }
   else if(root->segm >= segm){
     update_tmin_on_path_to_(root->left, segm);
@@ -703,7 +704,7 @@ void update_tmin_on_path_to_(TreeNode* root, Segment segm){
   {
     update_tmin_on_path_to_(root->right, segm);
   }
-  root->recompute_tmin();
+  root->recompute_subtree_tmin();
 }
 
 void BST::update_tmin_on_path_to(Segment segm){

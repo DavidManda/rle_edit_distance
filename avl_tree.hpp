@@ -16,7 +16,7 @@ public:
   TreeNode(Segment segm);
   TreeNode();
   TreeNode(Segment segm, TreeNode* left, TreeNode* right);
-  int get_t_min();
+  int get_own_tmin();
   void request_shift(int dx, int dy);
   void request_change_grad(int dg);
   void request_swm(int dt);
@@ -30,7 +30,7 @@ public:
   static TreeNode* insert(TreeNode* root, Segment segm);
   void update_value(TreeNode *node);
   void recompute_height();
-  void recompute_tmin();
+  void recompute_subtree_tmin();
   int get_balance();
   TreeNode* find_node_containing(float x);
   static TreeNode* delete_node(TreeNode *root, Segment segm);

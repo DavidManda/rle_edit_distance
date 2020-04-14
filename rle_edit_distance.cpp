@@ -137,7 +137,7 @@ void get_collapsed_segments(TreeNode *current, std::vector<Segment> &collapsed_s
     get_collapsed_segments(current->right, collapsed_segments);
   }
   // if node is collapsed
-  if(current->get_t_min() == 0){
+  if(current->get_own_tmin() == 0){
     collapsed_segments.push_back(current->segm);
   }
 }
