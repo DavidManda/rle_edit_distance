@@ -810,13 +810,11 @@ BST BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
     return joined_tree;
   }
   if(t_l == NULL){
-    TreeNode::lazy_update(t_r);
     joined_tree.root = t_r;
     joined_tree.insert(segm);
     return joined_tree;
   }
   if(t_r == NULL){
-    TreeNode::lazy_update(t_l);
     joined_tree.root = t_l;
     joined_tree.insert(segm);
     return joined_tree;
