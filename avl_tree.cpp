@@ -831,7 +831,6 @@ BST BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
     root = new TreeNode(segm, t_l, t_r);
   }
   joined_tree.root = root;
-  joined_tree.update_point_type(root->segm);
   joined_tree.update_point_type(segm);
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
