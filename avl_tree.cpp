@@ -918,41 +918,41 @@ TreeNode* get_new_copy_(TreeNode* root){
 }
 
 // finds leftmost element in the tree provided that has a smaller y value at the 
-// same coordinatethan the tree on which this method is calles
-void BST::find_leftmost_smaller(TreeNode *node, Segment &s, bool &found_segm){
+// same coordinate than the tree on which this method is called
+// O(log^2(n))
+void BST::find_leftmost_smaller(TreeNode *node, Segment &s){
 
-  if(node == NULL || found_segm)
+  if(node == NULL)
     return;
   
   TreeNode::lazy_update(node);
-  this->find_leftmost_smaller(node->left, s, found_segm);
 
   float val = this->get_value_at_coord(node->segm.right.x);
-  if(node->segm.right.y <= val && found_segm == false){
-    s = node->segm;
-    found_segm = true;
-    return;
+  if(node->segm.right.y > val){
+    this->find_leftmost_smaller(node->right, s);
   }
-
-  this->find_leftmost_smaller(node->right, s, found_segm);
+  else if(node->segm.right.y <= val){
+    s = node->segm;
+    this->find_leftmost_smaller(node->left, s);
+  }
 }
 
 // finds rightmost element in the tree provided that has a larger y value at the 
 // same coordinatethan the tree on which this method is calles
-void BST::find_rightmost_larger(TreeNode *node, Segment &s, bool &found_segm){
-  if(node == NULL || found_segm)
+// O(log^2(n))
+void BST::find_rightmost_larger(TreeNode *node, Segment &s){
+  if(node == NULL)
     return;
   
   TreeNode::lazy_update(node);
-  this->find_rightmost_larger(node->right, s, found_segm);
   float val = this->get_value_at_coord(node->segm.left.x);
-  if(val > node->segm.left.y && found_segm == false){
-    s = node->segm;
-    found_segm = true;
-    return;
+  if(node->segm.left.y >= val){
+    this->find_rightmost_larger(node->left, s);
   }
-
-  this->find_rightmost_larger(node->left, s, found_segm);
+  else{
+    s = node->segm;
+    this->find_rightmost_larger(node->right, s);
+  }
 }
 
 // Function to print binary tree in 2D

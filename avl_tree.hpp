@@ -64,8 +64,8 @@ public:
   void update_point_type(Segment segm);
   void update_tmin_on_path_to(Segment segm);
   float get_value_at_coord(float x);
-  void find_leftmost_smaller(TreeNode *node, Segment &s, bool &found_segm);
-  void find_rightmost_larger(TreeNode *node, Segment &s, bool &found_segm);
+  void find_leftmost_smaller(TreeNode *node, Segment &s);
+  void find_rightmost_larger(TreeNode *node, Segment &s);
   static BST join(TreeNode *t_l, TreeNode *t_r, Segment segm);
   static BST join(TreeNode *t_l, TreeNode *t_r);
   static BST get_new_copy(BST t);
