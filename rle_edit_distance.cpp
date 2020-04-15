@@ -306,6 +306,10 @@ void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string
     }
   }
 }
+bool match(RLE_run a, RLE_run b){
+  return a.ch == b.ch;
+}
+
 int get_rle_edit_dist(rle_string s0, rle_string s1){
   const int M = s0.size();
   const int N = s1.size();
@@ -328,7 +332,7 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       int w = s1[j].len + 1;
       // Retrieve input border for current block
       get_input_border(LEFT, TOP, OUT, i, j, s0, s1);
-      if(s0[i].ch == s1[j].ch)
+      if(match(s0[i], s1[j]))
       {
         BST L = LEFT[i * N + j];
         BST T = TOP[i * N + j];
