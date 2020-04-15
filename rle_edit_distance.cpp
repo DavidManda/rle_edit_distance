@@ -252,17 +252,17 @@ void init_input_border(BST LEFT[], BST TOP[], int M, int N, rle_string s0, rle_s
   for (int i = 1; i < M; i++)
   {
     // LEFT is indexed bottom-to-up
-    LEFT[i * N + 1] = BST(new TreeNode(Segment(Point(1, s0[i].len + char_count), 
-                                          Point(s0[i].len + 1, char_count))));
+    BST L = initialise(s0[i].len); L.request_change_grad(-1); L.request_shift(1,s0[i].len + char_count);
+    LEFT[i * N + 1] = L;
     char_count += s0[i].len;
   }
 
   char_count = 0;
   for (int j = 1; j < N; j++)
   {
-    // top is indexed left-to-right
-    TOP[1 * N + j] = BST(new TreeNode(Segment(Point(1, char_count), 
-                                         Point(s1[j].len + 1, s1[j].len + char_count))));
+    // TOP is indexed left-to-right
+    BST T = initialise(s1[j].len); T.request_change_grad(1);T.request_shift(1,char_count);
+    TOP[1 * N + j] = T;
     char_count += s1[j].len;
   }
 }
