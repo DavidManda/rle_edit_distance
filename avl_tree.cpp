@@ -917,41 +917,39 @@ TreeNode* get_new_copy_(TreeNode* root){
   return sol;
 }
 
-// finds leftmost element in the tree provided that has a smaller y value at the 
-// same coordinate than the tree on which this method is called
+// Finds leftmost node in the subtree rooted at "root" whose value at the right end
+// of the segment is <= than the value in the tree on which this method is called
 // O(log^2(n))
-void BST::find_leftmost_smaller(TreeNode *node, Segment &s){
-
-  if(node == NULL)
+void BST::find_leftmost_smaller(TreeNode *root, Segment &s){
+  if(root == NULL)
     return;
   
-  TreeNode::lazy_update(node);
-
-  float val = this->get_value_at_coord(node->segm.right.x);
-  if(node->segm.right.y > val){
-    this->find_leftmost_smaller(node->right, s);
+  TreeNode::lazy_update(root);
+  float val = this->get_value_at_coord(root->segm.right.x);
+  if(root->segm.right.y > val){
+    this->find_leftmost_smaller(root->right, s);
   }
-  else if(node->segm.right.y <= val){
-    s = node->segm;
-    this->find_leftmost_smaller(node->left, s);
+  else if(root->segm.right.y <= val){
+    s = root->segm;
+    this->find_leftmost_smaller(root->left, s);
   }
 }
 
-// finds rightmost element in the tree provided that has a larger y value at the 
-// same coordinatethan the tree on which this method is calles
+// Finds rightmost node in the subtree rooted at "root" whose value at the left end
+// of the segment is < than the value in the tree on which this method is called
 // O(log^2(n))
-void BST::find_rightmost_larger(TreeNode *node, Segment &s){
-  if(node == NULL)
+void BST::find_rightmost_smaller(TreeNode *root, Segment &s){
+  if(root == NULL)
     return;
   
-  TreeNode::lazy_update(node);
-  float val = this->get_value_at_coord(node->segm.left.x);
-  if(node->segm.left.y >= val){
-    this->find_rightmost_larger(node->left, s);
+  TreeNode::lazy_update(root);
+  float val = this->get_value_at_coord(root->segm.left.x);
+  if(root->segm.left.y >= val){
+    this->find_rightmost_smaller(root->left, s);
   }
   else{
-    s = node->segm;
-    this->find_rightmost_larger(node->right, s);
+    s = root->segm;
+    this->find_rightmost_smaller(root->right, s);
   }
 }
 
