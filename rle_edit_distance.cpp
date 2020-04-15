@@ -249,20 +249,20 @@ BST get_OUT_TOP(BST TOP, int h, int w){
 void init_input_border(BST LEFT[], BST TOP[], int M, int N, rle_string s0, rle_string s1)
 {
   int char_count = 0;
-  for (int i = 1; i < M; i++)
+  for (int i = 0; i < M; i++)
   {
     // LEFT is indexed bottom-to-up
     BST L = initialise(s0[i].len); L.request_change_grad(-1); L.request_shift(1,s0[i].len + char_count);
-    LEFT[i * N + 1] = L;
+    LEFT[i * N + 0] = L;
     char_count += s0[i].len;
   }
 
   char_count = 0;
-  for (int j = 1; j < N; j++)
+  for (int j = 0; j < N; j++)
   {
     // TOP is indexed left-to-right
     BST T = initialise(s1[j].len); T.request_change_grad(1);T.request_shift(1,char_count);
-    TOP[1 * N + j] = T;
+    TOP[0 * N + j] = T;
     char_count += s1[j].len;
   }
 }
@@ -273,7 +273,7 @@ void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string
   // LEFT[i][j] might have been initialised (if j == 1) so we don't have to do anything in that case
   if (LEFT[i * N + j].root == NULL)
   {
-    assert(j > 1);
+    assert(j > 0);
     // width and height of block to the left
     int w = s1[j - 1].len + 1;
     int h = s0[i].len + 1;
@@ -294,7 +294,7 @@ void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string
 
   if (TOP[i * N + j].root == NULL)
   {
-    assert(i > 1);
+    assert(i > 0);
     // Width and height of block above
     int w = s1[j].len + 1;
     int h = s0[i - 1].len + 1;
@@ -320,9 +320,9 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
     }
   }
   init_input_border(LEFT, TOP, M, N, s0, s1);
-  for (int i = 1; i < M; i++)
+  for (int i = 0; i < M; i++)
   {
-    for (int j = 1; j < N; j++)
+    for (int j = 0; j < N; j++)
     {
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
@@ -349,7 +349,10 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
   return dyn[(M-1)*(N) + N-1];
 }
 
-int get_naive_edit_dist(std::string &s0, std::string &s1){
+int get_naive_edit_dist(std::string s0, std::string s1){
+  // Add a character at the beginning so strings start at index 1
+  s0 = "*" + s0;
+  s1 = "*" + s1;
   const int M = s0.length() + 1, N = s1.length() + 1;
   for (int i = 0; i < M; i++)
   {

@@ -31,15 +31,15 @@ int main()
   int nr_fail = 0;
   for(int test = 0; test < T; test++){
     // Initialise strings with buffer character at the beggining so they start at index 1
-    std::string s0 = "*", s1 = "*";
+    std::string s0, s1;
     fin >> M >> N;
     helper::read_string(fin, M, s0);
     helper::read_string(fin, N, s1);
     RLE_string_helper rle_helper;
     std::vector<RLE_run> rle_s0 = rle_helper.get_rle_string(s0);
     std::vector<RLE_run> rle_s1 = rle_helper.get_rle_string(s1);
-    std::cout<<"Uncompressed lengths are: "<<s0.size() - 1<<" and "<<s1.size() - 1<<'\n';
-    std::cout<<"Compressed lengths are: "<<rle_s0.size() - 1<<" and "<<rle_s1.size() - 1<<'\n';
+    std::cout<<"Uncompressed lengths are: "<<s0.size()<<" and "<<s1.size()<<'\n';
+    std::cout<<"Compressed lengths are: "<<rle_s0.size()<<" and "<<rle_s1.size()<<'\n';
     std::clock_t start;
     double naive_time, rle_time;
     start = std::clock();

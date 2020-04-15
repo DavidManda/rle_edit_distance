@@ -39,7 +39,7 @@ int main()
   for(int gen0 = (1<<0); (gen0 >> 10) < 1; gen0++){
     for(int gen1 = (1<<0); (gen1 >> 10) < 1; gen1++){
       T++;
-      std::string s0 = "*", s1 = "*";
+      std::string s0,s1;
       for(int i = 0; (1<<i) <= gen0; i++){
         s1 += ('a' + ((gen0 >> i) & 1));
       }
