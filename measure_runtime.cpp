@@ -32,7 +32,7 @@ int main(){
     std::ifstream fin("inputs/input"+std::to_string(i)+"x"+std::to_string(i*2) + ".in");
     int M, N;
     fin >> M >> N;
-    std::string s0 = "*", s1 = "*";
+    std::string s0,s1;
     helper::read_string(fin, M, s0);
     helper::read_string(fin, N, s1);
 
