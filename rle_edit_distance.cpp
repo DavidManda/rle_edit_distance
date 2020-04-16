@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define MAX_SIZE 400
+#define MAX_SIZE 5000
 
 int dyn[MAX_SIZE * MAX_SIZE];
 BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
@@ -313,7 +313,8 @@ bool match(RLE_run a, RLE_run b){
 int get_rle_edit_dist(rle_string s0, rle_string s1){
   const int M = s0.size();
   const int N = s1.size();
-
+  // set_lazy_calls();
+  // set_nodes_freed();
   // reset values
   for(int i = 0; i < M; i++){
     for(int j = 0; j < N; j++){
@@ -350,6 +351,8 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
     }
   }
   TreeNode::free(OUT[(M-1)*(N) + N-1].root);
+  // print_nodes_freed();
+  // print_lazy_calls();
   return dyn[(M-1)*(N) + N-1];
 }
 

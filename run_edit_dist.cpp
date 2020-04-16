@@ -40,6 +40,7 @@ int main()
     std::vector<RLE_run> rle_s1 = rle_helper.get_rle_string(s1);
     std::cout<<"Uncompressed lengths are: "<<s0.size()<<" and "<<s1.size()<<'\n';
     std::cout<<"Compressed lengths are: "<<rle_s0.size()<<" and "<<rle_s1.size()<<'\n';
+    std::cout<<"MN*10 is: "<<rle_s0.size()*rle_s1.size()*10<<'\n';
     std::clock_t start;
     double naive_time, rle_time;
     start = std::clock();
