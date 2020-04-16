@@ -869,7 +869,7 @@ std::pair<BST, BST> split_(TreeNode* root, Segment segm){
     BST left = (root->left != NULL) ? BST(root->left) : BST();
     BST right = (root->right != NULL) ? BST(root->right) : BST();
     right.insert(segm);
-    // free root as we will ose pointer to it, it's value was inserted in right
+    // free root as we will lose pointer to it, it's value was inserted in right
     delete(root);
     return std::pair<BST, BST>(left, right);
   }
