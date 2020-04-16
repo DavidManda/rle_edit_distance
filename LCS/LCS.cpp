@@ -161,7 +161,7 @@ void precompute(std::vector<std::map<char, int>> &vec, std::vector<RLE_run> s)
 
 void keep_tree_sorted(binarySearchTree &my_bst, int rank, int val, int x, int y, char ch, std::vector<std::map<char, int>> char_run_sum, std::string type)
 {
-  treeNode *predec = my_bst.find_predec(rank);
+  TreeNode *predec = my_bst.find_predec(rank);
   if (predec)
   {
     int predec_val;
@@ -178,7 +178,7 @@ void keep_tree_sorted(binarySearchTree &my_bst, int rank, int val, int x, int y,
       my_bst.delete_node(rank);
     }
   }
-  treeNode *succ = my_bst.find_succ(rank);
+  TreeNode *succ = my_bst.find_succ(rank);
   int succ_val;
   while (succ)
   {
@@ -240,8 +240,8 @@ int get_rle_lcs_fast(const std::vector<RLE_run> s0, const std::vector<RLE_run> s
       int max_row_rank = TOP[j][ch] - LEFT[i][ch];
       int min_column_rank = LEFT[i - 1][ch] - TOP[j][ch];
       int min_row_rank = TOP[j - 1][ch] - LEFT[i][ch];
-      treeNode *best_col_node = column_paths[ch].find_predec(max_column_rank + 1);
-      treeNode *best_row_node = row_paths[ch].find_predec(max_row_rank + 1);
+      TreeNode *best_col_node = column_paths[ch].find_predec(max_column_rank + 1);
+      TreeNode *best_row_node = row_paths[ch].find_predec(max_row_rank + 1);
       int C = 0;
       if (best_col_node && best_col_node->key >= min_column_rank)
       {
@@ -252,14 +252,8 @@ int get_rle_lcs_fast(const std::vector<RLE_run> s0, const std::vector<RLE_run> s
       {
         R = best_row_node->val + LEFT[i][ch] - LEFT[best_row_node->x - 1][ch];
       }
-      // if(i == 6 && j == 1){
-      //     std::cout<<val<<" "<<best_col_node->x <<" "<<best_col_node->y<<"\n";
-      //     print_2D(column_paths[ch].root);
-      // }
       dyn[i][j] = std::max(dyn[i - 1][j], max(dyn[i][j - 1], C, R));
-      // print_2d_vect(dyn);
     }
   }
-  // print_2d_vect(dyn);
   return dyn[M - 1][N - 1];
 }

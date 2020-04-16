@@ -4,7 +4,7 @@
 
 #define COUNT 10
 
-treeNode::treeNode(int _key, int _val, int _x, int _y)
+TreeNode::TreeNode(int _key, int _val, int _x, int _y)
 {
   key = _key;
   val = _val;
@@ -14,7 +14,7 @@ treeNode::treeNode(int _key, int _val, int _x, int _y)
   right = NULL;
 }
 
-void treeNode::operator=(const treeNode &node)
+void TreeNode::operator=(const TreeNode &node)
 {
   key = node.key;
   val = node.val;
@@ -22,14 +22,14 @@ void treeNode::operator=(const treeNode &node)
   y = node.y;
 }
 
-void treeNode::update_value(int _val, int _x, int _y)
+void TreeNode::update_value(int _val, int _x, int _y)
 {
   this->val = _val;
   this->x = _x;
   this->y = _y;
 }
 
-void treeNode::insert(int _key, int _val, int _x, int _y)
+void TreeNode::insert(int _key, int _val, int _x, int _y)
 {
   if (this->key == _key)
   {
@@ -40,7 +40,7 @@ void treeNode::insert(int _key, int _val, int _x, int _y)
   {
     if (this->left == NULL)
     {
-      this->left = new treeNode(_key, _val, _x, _y);
+      this->left = new TreeNode(_key, _val, _x, _y);
       return;
     }
     this->left->insert(_key, _val, _x, _y);
@@ -49,25 +49,25 @@ void treeNode::insert(int _key, int _val, int _x, int _y)
   {
     if (this->right == NULL)
     {
-      this->right = new treeNode(_key, _val, _x, _y);
+      this->right = new TreeNode(_key, _val, _x, _y);
       return;
     }
     this->right->insert(_key, _val, _x, _y);
   }
 }
 
-std::string treeNode::to_string()
+std::string TreeNode::to_string()
 {
   return "Key: " + std::to_string(this->key) + "\nVal: " + std::to_string(this->val) + "\nX: " + std::to_string(this->x) + "\nY: " + std::to_string(this->y) + "\n";
 }
 
-treeNode *treeNode::find(int _key)
+TreeNode *TreeNode::find(int _key)
 {
   if (this->key == _key)
   {
     return this;
   }
-  treeNode *next_node;
+  TreeNode *next_node;
   if (this->key > _key)
   {
     next_node = this->left;
@@ -83,7 +83,7 @@ treeNode *treeNode::find(int _key)
   return next_node->find(_key);
 }
 
-void _find_predec_succ(treeNode *root, int key, treeNode *&predec, treeNode *&succ)
+void _find_predec_succ(TreeNode *root, int key, TreeNode *&predec, TreeNode *&succ)
 {
   // Base case
   if (root == NULL)
@@ -95,7 +95,7 @@ void _find_predec_succ(treeNode *root, int key, treeNode *&predec, treeNode *&su
     // the maximum value in left subtree is predecessor
     if (root->left != NULL)
     {
-      treeNode *tmp = root->left;
+      TreeNode *tmp = root->left;
       while (tmp->right)
         tmp = tmp->right;
       predec = tmp;
@@ -104,7 +104,7 @@ void _find_predec_succ(treeNode *root, int key, treeNode *&predec, treeNode *&su
     // the minimum value in right subtree is successor
     if (root->right != NULL)
     {
-      treeNode *tmp = root->right;
+      TreeNode *tmp = root->right;
       while (tmp->left)
         tmp = tmp->left;
       succ = tmp;
@@ -134,13 +134,13 @@ void binarySearchTree::insert(int _key, int _val, int _x, int _y)
 {
   if (this->root == NULL)
   {
-    this->root = new treeNode(_key, _val, _x, _y);
+    this->root = new TreeNode(_key, _val, _x, _y);
     return;
   }
   this->root->insert(_key, _val, _x, _y);
 }
 
-treeNode *binarySearchTree::find(int _key)
+TreeNode *binarySearchTree::find(int _key)
 {
   if (this->root == NULL)
   {
@@ -150,19 +150,19 @@ treeNode *binarySearchTree::find(int _key)
 }
 
 // This returns the node with the biggest key that is smaller than _key
-treeNode *binarySearchTree::find_predec(int _key)
+TreeNode *binarySearchTree::find_predec(int _key)
 {
-  treeNode *predec = NULL;
-  treeNode *succ = NULL;
+  TreeNode *predec = NULL;
+  TreeNode *succ = NULL;
   _find_predec_succ(this->root, _key, predec, succ);
 
   return predec;
 }
 
-treeNode *binarySearchTree::find_succ(int _key)
+TreeNode *binarySearchTree::find_succ(int _key)
 {
-  treeNode *succ = NULL;
-  treeNode *predec = NULL;
+  TreeNode *succ = NULL;
+  TreeNode *predec = NULL;
   _find_predec_succ(this->root, _key, predec, succ);
 
   return succ;
@@ -171,9 +171,9 @@ treeNode *binarySearchTree::find_succ(int _key)
 // Given a non-empty binary search tree, return the node with minimum
 // key value found in that tree. Note that the entire tree does not
 // need to be searched.
-treeNode *min_value_node(treeNode *node)
+TreeNode *min_value_node(TreeNode *node)
 {
-  treeNode *current = node;
+  TreeNode *current = node;
 
   /* loop down to find the leftmost leaf */
   while (current && current->left != NULL)
@@ -184,7 +184,7 @@ treeNode *min_value_node(treeNode *node)
 
 // Given a binary search tree and a key, this function deletes the key
 // and returns the new root
-treeNode *_delete_node(treeNode *root, int key)
+TreeNode *_delete_node(TreeNode *root, int key)
 {
 
   // base case
@@ -208,20 +208,20 @@ treeNode *_delete_node(treeNode *root, int key)
     // node with only one child or no child
     if (root->left == NULL)
     {
-      treeNode *temp = root->right;
+      TreeNode *temp = root->right;
       free(root);
       return temp;
     }
     else if (root->right == NULL)
     {
-      treeNode *temp = root->left;
+      TreeNode *temp = root->left;
       free(root);
       return temp;
     }
 
     // node with two children: Get the inorder successor (smallest
     // in the right subtree)
-    treeNode *temp = min_value_node(root->right);
+    TreeNode *temp = min_value_node(root->right);
 
     // Copy the inorder successor's content to this node
     *root = *temp;
@@ -242,7 +242,7 @@ void binarySearchTree::delete_node(int key)
 }
 // Function to print binary tree in 2D
 // It does reverse inorder traversal
-void print_2D_util(treeNode *root, int space)
+void print_2D_util(TreeNode *root, int space)
 {
   // Base case
   if (root == NULL)
@@ -265,20 +265,7 @@ void print_2D_util(treeNode *root, int space)
   print_2D_util(root->left, space);
 }
 
-void print_2D(treeNode *root)
+void print_2D(TreeNode *root)
 {
   print_2D_util(root, 0);
 }
-
-// int main(){
-//     binarySearchTree my_bst;
-//     my_bst.insert(3,3,3,3);
-//     my_bst.insert(1,1,1,1);
-//     my_bst.insert(2,2,2,2);
-//     my_bst.insert(0,0,0,0);
-//     my_bst.insert(4,4,4,4);
-//     my_bst.insert(5,5,5,5);
-//     print_2D(my_bst.root);
-//     std::cout << my_bst.find_succ(3)->key << '\n';
-//     return 0;
-// }

@@ -1,35 +1,35 @@
 #pragma once
 #include <string>
 
-class treeNode
+class TreeNode
 {
 public:
   int key;
   int val;
   int x, y;
-  treeNode *left;
-  treeNode *right;
+  TreeNode *left;
+  TreeNode *right;
 
-  treeNode(int _key, int _val, int _x, int _y);
-  void operator=(const treeNode &node);
+  TreeNode(int _key, int _val, int _x, int _y);
+  void operator=(const TreeNode &node);
   void insert(int _key, int _val, int _x, int _y);
   void update_value(int _val, int _x, int _y);
   std::string to_string();
-  treeNode *find(int _key);
+  TreeNode *find(int _key);
 };
 
 class binarySearchTree
 {
 public:
-  treeNode *root;
+  TreeNode *root;
 
   binarySearchTree();
   void insert(int _key, int _val, int _x, int _y);
   std::string to_string();
-  treeNode *find(int key);
-  treeNode *find_predec(int key);
-  treeNode *find_succ(int key);
+  TreeNode *find(int key);
+  TreeNode *find_predec(int key);
+  TreeNode *find_succ(int key);
   void delete_node(int key);
 };
 
-void print_2D(treeNode *root);
+void print_2D(TreeNode *root);
