@@ -33,7 +33,7 @@ int get_LCS(const int N, const int M, const std::string &s0, const std::string &
   return dyn[N][M];
 }
 
-void forced_path_update(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1, int i, int j, std::vector<std::vector<int>> &dyn)
+void forced_path_update(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1, int i, int j, std::vector< std::vector<int> > &dyn)
 {
   int v_offset = 0, h_offset = 0;
 
@@ -92,7 +92,7 @@ void forced_path_update(const std::vector<RLE_run> s0, const std::vector<RLE_run
   return;
 }
 
-void print_2d_vect(std::vector<std::vector<int>> vect)
+void print_2d_vect(std::vector< std::vector<int> > vect)
 {
   for (int i = 1; i < vect.size(); i++)
   {
@@ -109,7 +109,7 @@ int get_rle_lcs(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1)
 {
   const int N = s0.size();
   const int M = s1.size();
-  std::vector<std::vector<int>> dyn(N, std::vector<int>(M));
+  std::vector< std::vector<int> > dyn(N, std::vector<int>(M));
 
   for (int i = 1; i < N; i++)
   {
@@ -136,7 +136,7 @@ int get_rle_lcs(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1)
   return dyn[N - 1][M - 1];
 }
 
-void precompute(std::vector<std::map<char, int>> &vec, std::vector<RLE_run> s)
+void precompute(std::vector< std::map<char, int> > &vec, std::vector<RLE_run> s)
 {
   std::map<char, int> last_position;
   char ch;
@@ -159,7 +159,7 @@ void precompute(std::vector<std::map<char, int>> &vec, std::vector<RLE_run> s)
   }
 }
 
-void keep_tree_sorted(binarySearchTree &my_bst, int rank, int val, int x, int y, char ch, std::vector<std::map<char, int>> char_run_sum, std::string type)
+void keep_tree_sorted(binarySearchTree &my_bst, int rank, int val, int x, int y, char ch, std::vector< std::map<char, int> > char_run_sum, std::string type)
 {
   TreeNode *predec = my_bst.find_predec(rank);
   if (predec)
@@ -204,9 +204,9 @@ int get_rle_lcs_fast(const std::vector<RLE_run> s0, const std::vector<RLE_run> s
 {
   const int M = s0.size();
   const int N = s1.size();
-  std::vector<std::map<char, int>> TOP(N);
-  std::vector<std::map<char, int>> LEFT(M);
-  std::vector<std::vector<int>> dyn(M, std::vector<int>(N));
+  std::vector< std::map<char, int> > TOP(N);
+  std::vector< std::map<char, int> > LEFT(M);
+  std::vector< std::vector<int> > dyn(M, std::vector<int>(N));
   precompute(TOP, s1);
   precompute(LEFT, s0);
   std::map<char, binarySearchTree> column_paths;
