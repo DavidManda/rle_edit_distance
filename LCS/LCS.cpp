@@ -168,10 +168,11 @@ void precompute(std::vector< std::map<char, int> > &vec, std::vector<RLE_run> s)
   }
 }
 
-void keep_tree_sorted(binarySearchTree &my_bst, int rank, int val, int x, int y, char ch, std::vector< std::map<char, int> > &char_run_sum, std::string type)
+void keep_tree_sorted(binarySearchTree &my_bst, int rank, int min_rank, int max_rank, int val, int x, int y, char ch, std::vector< std::map<char, int> > &char_run_sum, std::string type)
 {
   TreeNode *predec = my_bst.find_predec(rank);
-  if (predec)
+  // if (predec && predec->key > min_rank)
+  if(predec)
   {
     int predec_val;
     if (type == "column")
@@ -189,7 +190,8 @@ void keep_tree_sorted(binarySearchTree &my_bst, int rank, int val, int x, int y,
   }
   TreeNode *succ = my_bst.find_succ(rank);
   int succ_val;
-  while (succ)
+  // while (succ && succ->key <= max_rank)
+  while(succ)
   {
     if (type == "column")
     {
@@ -244,30 +246,100 @@ int get_rle_lcs_fast(const std::vector<RLE_run> &s0, const std::vector<RLE_run> 
       // the column number
       int rank_col = LEFT[i - 1][ch] - TOP[j - 1][ch];
       int rank_row = TOP[j - 1][ch] - LEFT[i - 1][ch];
-      int val = dyn[i - 1][j - 1];
-      column_paths[ch].insert(rank_col, val, i, j);
-      row_paths[ch].insert(rank_row, val, i, j);
-      // print_2D(column_paths.root);
-      keep_tree_sorted(column_paths[ch], rank_col, val, i - 1, j - 1, ch, TOP, "column");
-      keep_tree_sorted(row_paths[ch], rank_row, val, i - 1, j - 1, ch, LEFT, "row");
       int max_column_rank = LEFT[i][ch] - TOP[j][ch];
       int max_row_rank = TOP[j][ch] - LEFT[i][ch];
       int min_column_rank = LEFT[i - 1][ch] - TOP[j][ch];
       int min_row_rank = TOP[j - 1][ch] - LEFT[i][ch];
+      int val = dyn[i - 1][j - 1];
+      // std::cout<<i<<' '<<j<<'\n';
+      // std::cout<<rank_col<<' '<<rank_row<<' '<<val<<' '<<max_column_rank<<'\n';
+      column_paths[ch].insert(rank_col, val, i, j);
+      row_paths[ch].insert(rank_row, val, i, j);
+      keep_tree_sorted(column_paths[ch], rank_col, min_column_rank, max_column_rank, val, i - 1, j - 1, ch, TOP, "column");
+      keep_tree_sorted(row_paths[ch], rank_row, min_row_rank, max_row_rank, val, i - 1, j - 1, ch, LEFT, "row");
+      // print_2D(column_paths[ch].root);print_2D(row_paths[ch].root);
+
       TreeNode *best_col_node = column_paths[ch].find_predec(max_column_rank + 1);
       TreeNode *best_row_node = row_paths[ch].find_predec(max_row_rank + 1);
       int C = 0;
-      if (best_col_node && best_col_node->key >= min_column_rank)
+      if (best_col_node && best_col_node->key > min_column_rank)
       {
         C = best_col_node->val + TOP[j][ch] - TOP[best_col_node->y - 1][ch];
       }
       int R = 0;
-      if (best_row_node && best_row_node->key >= min_row_rank)
+      if (best_row_node && best_row_node->key > min_row_rank)
       {
         R = best_row_node->val + LEFT[i][ch] - LEFT[best_row_node->x - 1][ch];
       }
+      // std::cout<<C<<' '<<R<<'\n';
+      // std::cout<<"//////////////////\n";
       dyn[i][j] = std::max(dyn[i - 1][j], max(dyn[i][j - 1], C, R));
     }
   }
+  for (std::map<char,binarySearchTree>::iterator it=column_paths.begin(); it!=column_paths.end(); ++it){
+    it->second.root = NULL;
+  }
+  for (std::map<char,binarySearchTree>::iterator it=row_paths.begin(); it!=row_paths.end(); ++it){
+    it->second.root = NULL;
+  }
+  // go through row first now
+  for (int j = 1; j < N; j++)
+  {
+    for (int i = 1; i < M; i++)
+    {
+      // mismatch block
+      if (s0[i].ch != s1[j].ch)
+      {
+        dyn[i][j] = max(dyn[i][j], dyn[i - 1][j], dyn[i][j - 1]);
+        continue;
+      }
+      // match block
+      // Step I: Insert new path starting at this block
+      char ch = s0[i].ch;
+      // The rank is the order in which forced paths cross rows and columns respectively
+      // The column rank increases with the row number at which the columns are intersected, i.e.
+      // when LEFT increases, so does the row number. The row rank is the opposite, increasing with
+      // the column number
+      int rank_col = LEFT[i - 1][ch] - TOP[j - 1][ch];
+      int rank_row = TOP[j - 1][ch] - LEFT[i - 1][ch];
+      int max_column_rank = LEFT[i][ch] - TOP[j][ch];
+      int max_row_rank = TOP[j][ch] - LEFT[i][ch];
+      int min_column_rank = LEFT[i - 1][ch] - TOP[j][ch];
+      int min_row_rank = TOP[j - 1][ch] - LEFT[i][ch];
+      int val = dyn[i - 1][j - 1];
+      // std::cout<<i<<' '<<j<<'\n';
+      // std::cout<<rank_col<<' '<<rank_row<<' '<<val<<' '<<max_column_rank<<'\n';
+      column_paths[ch].insert(rank_col, val, i, j);
+      row_paths[ch].insert(rank_row, val, i, j);
+      keep_tree_sorted(column_paths[ch], rank_col, min_column_rank, max_column_rank, val, i - 1, j - 1, ch, TOP, "column");
+      keep_tree_sorted(row_paths[ch], rank_row, min_row_rank, max_row_rank, val, i - 1, j - 1, ch, LEFT, "row");
+      // print_2D(column_paths[ch].root);print_2D(row_paths[ch].root);
+
+      TreeNode *best_col_node = column_paths[ch].find_predec(max_column_rank + 1);
+      TreeNode *best_row_node = row_paths[ch].find_predec(max_row_rank + 1);
+      int C = 0;
+      if (best_col_node && best_col_node->key > min_column_rank)
+      {
+        C = best_col_node->val + TOP[j][ch] - TOP[best_col_node->y - 1][ch];
+      }
+      int R = 0;
+      if (best_row_node && best_row_node->key > min_row_rank)
+      {
+        R = best_row_node->val + LEFT[i][ch] - LEFT[best_row_node->x - 1][ch];
+      }
+      // std::cout<<C<<' '<<R<<'\n';
+      // std::cout<<"//////////////////\n";
+      dyn[i][j] = max(dyn[i][j], dyn[i - 1][j], max(dyn[i][j - 1], C, R));
+    }
+  }
+  // for (int i = 1; i < M; i++)
+  // {
+  //   for (int j = 1; j < N; j++)
+  //   {x
+  //     std::cout << dyn[i][j] << ' ';
+  //   }
+  //   std::cout << '\n';
+  // }
+  // std::cout << '\n';
   return dyn[M - 1][N - 1];
 }

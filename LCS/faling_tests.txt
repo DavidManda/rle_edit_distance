@@ -1,0 +1,15 @@
+1:
+test:
+12 6
+aaababbbaaab
+bbaaab
+
+fails because we are deleting paths too early when keeping them sorted
+
+2:
+test:
+7 5
+babbabb
+babbb
+
+fails because paths are not sorted when we try to keep them in if they don't contribute to the current block
