@@ -2,7 +2,7 @@
 #include "LCS.hpp"
 #include "binary_tree.hpp"
 
-#define MAX_SIZE 500
+#define MAX_SIZE 5000
 int dyn[MAX_SIZE][MAX_SIZE];
 int max(int a, int b, int c)
 {
@@ -168,7 +168,7 @@ void precompute(std::vector< std::map<char, int> > &vec, std::vector<RLE_run> s)
   }
 }
 
-void keep_tree_sorted(binarySearchTree &my_bst, int rank, int val, int x, int y, char ch, std::vector< std::map<char, int> > char_run_sum, std::string type)
+void keep_tree_sorted(binarySearchTree &my_bst, int rank, int val, int x, int y, char ch, std::vector< std::map<char, int> > &char_run_sum, std::string type)
 {
   TreeNode *predec = my_bst.find_predec(rank);
   if (predec)
@@ -209,7 +209,7 @@ void keep_tree_sorted(binarySearchTree &my_bst, int rank, int val, int x, int y,
   }
 }
 
-int get_rle_lcs_fast(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1)
+int get_rle_lcs_fast(const std::vector<RLE_run> &s0, const std::vector<RLE_run> &s1)
 {
   const int M = s0.size();
   const int N = s1.size();
