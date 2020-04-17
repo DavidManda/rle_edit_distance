@@ -5,4 +5,4 @@ gen_input: generate_inputs.cpp
 test: find_failing_test.cpp
 	g++ find_failing_test.cpp edit_distance.cpp helper.cpp point.cpp rle_string.cpp -o find_failing_test.o
 measure_runtime: edit_distance.cpp
-	g++ measure_runtime.cpp edit_distance.cpp helper.cpp point.cpp rle_string.cpp -o measure_runtime.o
+	g++ -std=c++11 -Ofast measure_runtime.cpp edit_distance.cpp helper.cpp point.cpp rle_string.cpp -o measure_runtime.o
