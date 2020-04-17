@@ -12,3 +12,5 @@ binary_tree:
 	g++ -std=c++11 binary_tree.cpp -o binary_tree.o
 measure_runtime: 
 	g++ -Ofast measure_runtime.cpp LCS.cpp binary_tree.cpp rle_string.cpp -o measure_runtime.o
+find_failing_test: 
+	g++ -Ofast find_failing_test.cpp LCS.cpp binary_tree.cpp rle_string.cpp -o find_failing_test.o
