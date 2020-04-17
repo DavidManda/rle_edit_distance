@@ -199,7 +199,7 @@ void keep_tree_sorted(binarySearchTree &my_bst, int rank, int val, int x, int y,
     {
       succ_val = succ->val + char_run_sum[x][ch] - char_run_sum[succ->x - 1][ch];
     }
-    if (succ_val <= val)
+    if (succ_val < val)
     {
       my_bst.delete_node(succ->key);
       succ = my_bst.find_succ(rank);
