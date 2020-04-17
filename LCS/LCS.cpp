@@ -2,7 +2,7 @@
 #include "LCS.hpp"
 #include "binary_tree.hpp"
 
-#define MAX_SIZE 5000
+#define MAX_SIZE 10000
 int dyn[MAX_SIZE][MAX_SIZE];
 int max(int a, int b, int c)
 {

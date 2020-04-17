@@ -9,7 +9,7 @@
 int main(){
   std::ofstream fout("run_times.out");
   fout<<"M, N, compression factor 1, compression factor 2, naive time, rle time\n";
-  for(int i = 1; i <= 40; i++){
+  for(int i = 1; i <= 70; i++){
     // height is i and width is i*2
     std::ifstream fin("../inputs/input"+std::to_string(i)+"x"+std::to_string(i*2) + ".in");
     int M, N;
@@ -32,6 +32,15 @@ int main(){
     start = std::clock();
     sol_rle = LCS::get_rle_lcs_fast(rle_s0, rle_s1);
     rle_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    if (sol_rle != sol)
+    {
+      std::cout << "Failed test " << i << '\n';
+      std::cout << "Expected " << sol << " but received " << sol_rle << '\n';
+      std::cout << "Strings are:\n"
+                << s0.substr(1, s0.length()) << "\n"
+                << s1.substr(1, s1.length()) << '\n';
+      return 0;
+    }
     std::cout<<i<<'\n';
     std::cout<<"Naive time is: "<<naive_time<<'\n';
     std::cout<<"RLE time is: "<<rle_time<<'\n';
