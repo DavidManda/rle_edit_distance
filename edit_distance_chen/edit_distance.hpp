@@ -16,6 +16,6 @@ int get_edit_dist(const int M, const int N, const std::string& s0, const std::st
 // Returns the edit distance for 2 run-lenght encoded strings s0 and s1
 // Expects strings to be indexed at 1
 // The complexity is O(m * n^2), where m and n represent the number of runs in each string
-int get_rle_edit_dist(const rle_string s0, const rle_string s1);
+int get_rle_edit_dist(const rle_string &s0, const rle_string &s1);
 
 #endif

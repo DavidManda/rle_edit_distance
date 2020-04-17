@@ -21,7 +21,7 @@ Point min(Point p1, Point p2)
   return p2;
 }
 
-std::string traj_to_string(std::vector<Point> A)
+std::string traj_to_string(std::vector<Point> &A)
 {
   std::stringstream ss;
   ss<<"[ ";
@@ -118,7 +118,7 @@ void add_point(std::deque<Point>& points, Point p)
   points.push_back(p);
 }
 
-void init_input_border(border_type &LEFT, border_type &TOP, int M, int N, rle_string s0, rle_string s1)
+void init_input_border(border_type &LEFT, border_type &TOP, int M, int N, const rle_string &s0, const rle_string &s1)
 {
   int char_count = 0;
   for (int i = 1; i < M; i++)
@@ -137,7 +137,7 @@ void init_input_border(border_type &LEFT, border_type &TOP, int M, int N, rle_st
   }
 }
 
-void get_input_border(border_type &LEFT, border_type &TOP, border_type OUT, int i, int j, std::vector<std::vector<int > > dyn, rle_string s0, rle_string s1)
+void get_input_border(border_type &LEFT, border_type &TOP, border_type &OUT, int i, int j, std::vector<std::vector<int > > &dyn, rle_string s0, rle_string s1)
 {
   // LEFT[i][j] might have been initialised (if j == 1) so we don't have to do anything in that case
   if (LEFT[i][j].empty())
@@ -184,7 +184,7 @@ void get_input_border(border_type &LEFT, border_type &TOP, border_type OUT, int 
   }
 }
 
-int get_val_at_coord(int coord, std::vector<Point> points)
+int get_val_at_coord(int coord, std::vector<Point>& points)
 {
   int i = 0;
   while(i < points.size() && points[i].x < coord)
@@ -303,7 +303,7 @@ void add_intersection(std::vector<Point>& sol, Point a1, Point a2, Point b1, Poi
   }
 }
 
-std::vector<Point> get_cswm(std::vector<Point> S, int h)
+std::vector<Point> get_cswm(std::vector<Point> &S, int h)
 {
   if (!(h > 0))
   {
@@ -449,7 +449,7 @@ void normalise_trajectories(std::vector<Point>& A, std::vector<Point>& B)
 
 
 // Returns the lower part of two trajectories
-std::vector<Point> get_lower_part(std::vector<Point> A, std::vector<Point> B)
+std::vector<Point> get_lower_part(std::vector<Point> &A, std::vector<Point> &B)
 {
   std::vector<Point> sol;
   if(A.begin()->x != B.begin()->x || A.back().x != B.back().x)
@@ -488,7 +488,8 @@ void split_traj(std::vector<Point> L, std::vector<Point>& L1, std::vector<Point>
     k++;
   }
 }
-void propagate_2(int h, int w, std::vector<Point> LEFT_CSWM, std::vector<Point> TOP_CSWM, std::vector<Point>& LEFT_OUT, std::vector<Point>& TOP_OUT)
+
+void propagate_2(int h, int w, const std::vector<Point> &LEFT_CSWM, const std::vector<Point> &TOP_CSWM, std::vector<Point>& LEFT_OUT, std::vector<Point>& TOP_OUT)
 {
   if(h <= w)
   {
@@ -550,7 +551,7 @@ void propagate_2(int h, int w, std::vector<Point> LEFT_CSWM, std::vector<Point> 
   }
 }
 
-int get_rle_edit_dist(rle_string s0, rle_string s1)
+int get_rle_edit_dist(const rle_string &s0, const rle_string &s1)
 {
   const int M = s0.size();
   const int N = s1.size();
