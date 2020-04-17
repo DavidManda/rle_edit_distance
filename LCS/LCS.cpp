@@ -2,6 +2,8 @@
 #include "LCS.hpp"
 #include "binary_tree.hpp"
 
+#define MAX_SIZE 500
+int dyn[MAX_SIZE][MAX_SIZE];
 int max(int a, int b, int c)
 {
   return std::max(std::max(a, b), c);
@@ -17,79 +19,24 @@ void read_string(std::istream &fin, int len, std::string &s)
   }
 }
 
-int get_LCS(const int N, const int M, const std::string &s0, const std::string &s1)
+int get_LCS(const std::string &s0, const std::string &s1)
 {
-  int dyn[N + 1][M + 1];
-  memset(dyn, 0, sizeof(dyn));
+  const int M = s0.length(), N = s1.length();
 
-  for (int i = 1; i <= N; i++)
+  for(int i = 0; i < M; i++)
+    dyn[i][0] = 0;
+  for(int i = 0; i < N; i++)
+    dyn[0][i] = 0;
+
+  for (int i = 1; i < M; i++)
   {
-    for (int j = 1; j <= M; j++)
+    for (int j = 1; j < N; j++)
     {
       dyn[i][j] = max(dyn[i - 1][j - 1] + (s0[i] == s1[j]), dyn[i - 1][j], dyn[i][j - 1]);
     }
   }
 
-  return dyn[N][M];
-}
-
-void forced_path_update(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1, int i, int j, std::vector< std::vector<int> > &dyn)
-{
-  int v_offset = 0, h_offset = 0;
-
-  if (s0[i].len == s1[j].len)
-    return;
-
-  while (i < s0.size() && j < s1.size())
-  {
-    // proceed vertically
-    if (s0[i].len - v_offset < s1[j].len - h_offset)
-    {
-      // exited through bottom
-      h_offset = s0[i].len - v_offset;
-      v_offset = 0;
-      int next_i = i + 1;
-      while (next_i < s0.size() && s0[next_i].ch != s1[j].ch)
-      {
-        ++next_i;
-      }
-      // reached end of s0
-      if (next_i >= s0.size())
-      {
-        return;
-      }
-      int d = std::min(s0[next_i].len - v_offset, s1[j].len - h_offset);
-      dyn[next_i][j] = std::max(dyn[next_i][j], dyn[i][j] + d);
-      i = next_i;
-    }
-    // proceed horizontally
-    else if (s0[i].len - v_offset > s1[j].len - h_offset)
-    {
-      // exited through right-hand side
-      h_offset = 0;
-      v_offset = s1[j].len - h_offset;
-      int next_j = j + 1;
-      while (next_j < s1.size() && s0[i].ch != s1[next_j].ch)
-      {
-        ++next_j;
-      }
-      // reached end of s1
-      if (next_j >= s1.size())
-      {
-        return;
-      }
-
-      int d = std::min(s0[i].len - v_offset, s1[next_j].len);
-      dyn[i][next_j] = std::max(dyn[i][next_j], dyn[i][j] + d);
-      j = next_j;
-    }
-    else
-    {
-      // exiting though corner
-      return;
-    }
-  }
-  return;
+  return dyn[M-1][N-1];
 }
 
 void print_2d_vect(std::vector< std::vector<int> > vect)
@@ -105,35 +52,97 @@ void print_2d_vect(std::vector< std::vector<int> > vect)
   std::cout << '\n';
 }
 
-int get_rle_lcs(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1)
-{
-  const int N = s0.size();
-  const int M = s1.size();
-  std::vector< std::vector<int> > dyn(N, std::vector<int>(M));
+// this does not wokr but keep it here for now
+void bad_sol(){
+  // void forced_path_update(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1, int i, int j, std::vector< std::vector<int> > &dyn)
+  // {
+  //   int v_offset = 0, h_offset = 0;
 
-  for (int i = 1; i < N; i++)
-  {
-    for (int j = 1; j < M; j++)
-    {
-      // miss match block
-      if (s0[i].ch != s1[j].ch)
-      {
-        dyn[i][j] = std::max(dyn[i - 1][j], dyn[i][j - 1]);
-        continue;
-      }
-      // match block
-      int d = std::min(s0[i].len, s1[j].len);
-      int curr_val = dyn[i][j];
-      // start forced path at i j
-      dyn[i][j] = dyn[i - 1][j - 1] + d;
-      forced_path_update(s0, s1, i, j, dyn);
+  //   if (s0[i].len == s1[j].len)
+  //     return;
 
-      dyn[i][j] = max(curr_val, dyn[i][j], std::max(dyn[i - 1][j], dyn[i][j - 1]));
-      // print_2d_vect(dyn);
-    }
-  }
+  //   while (i < s0.size() && j < s1.size())
+  //   {
+  //     // proceed vertically
+  //     if (s0[i].len - v_offset < s1[j].len - h_offset)
+  //     {
+  //       // exited through bottom
+  //       h_offset = s0[i].len - v_offset;
+  //       v_offset = 0;
+  //       int next_i = i + 1;
+  //       while (next_i < s0.size() && s0[next_i].ch != s1[j].ch)
+  //       {
+  //         ++next_i;
+  //       }
+  //       // reached end of s0
+  //       if (next_i >= s0.size())
+  //       {
+  //         return;
+  //       }
+  //       int d = std::min(s0[next_i].len - v_offset, s1[j].len - h_offset);
+  //       dyn[next_i][j] = std::max(dyn[next_i][j], dyn[i][j] + d);
+  //       i = next_i;
+  //     }
+  //     // proceed horizontally
+  //     else if (s0[i].len - v_offset > s1[j].len - h_offset)
+  //     {
+  //       // exited through right-hand side
+  //       h_offset = 0;
+  //       v_offset = s1[j].len - h_offset;
+  //       int next_j = j + 1;
+  //       while (next_j < s1.size() && s0[i].ch != s1[next_j].ch)
+  //       {
+  //         ++next_j;
+  //       }
+  //       // reached end of s1
+  //       if (next_j >= s1.size())
+  //       {
+  //         return;
+  //       }
 
-  return dyn[N - 1][M - 1];
+  //       int d = std::min(s0[i].len - v_offset, s1[next_j].len);
+  //       dyn[i][next_j] = std::max(dyn[i][next_j], dyn[i][j] + d);
+  //       j = next_j;
+  //     }
+  //     else
+  //     {
+  //       // exiting though corner
+  //       return;
+  //     }
+  //   }
+  //   return;
+  // }
+
+  // int get_rle_lcs(const std::vector<RLE_run> s0, const std::vector<RLE_run> s1)
+  // {
+  //   const int N = s0.size();
+  //   const int M = s1.size();
+  //   std::vector< std::vector<int> > dyn(N, std::vector<int>(M));
+
+  //   for (int i = 1; i < N; i++)
+  //   {
+  //     for (int j = 1; j < M; j++)
+  //     {
+  //       // miss match block
+  //       if (s0[i].ch != s1[j].ch)
+  //       {
+  //         dyn[i][j] = std::max(dyn[i - 1][j], dyn[i][j - 1]);
+  //         continue;
+  //       }
+  //       // match block
+  //       int d = std::min(s0[i].len, s1[j].len);
+  //       int curr_val = dyn[i][j];
+  //       // start forced path at i j
+  //       dyn[i][j] = dyn[i - 1][j - 1] + d;
+  //       forced_path_update(s0, s1, i, j, dyn);
+
+  //       dyn[i][j] = max(curr_val, dyn[i][j], std::max(dyn[i - 1][j], dyn[i][j - 1]));
+  //       // print_2d_vect(dyn);
+  //     }
+  //   }
+
+  //   return dyn[N - 1][M - 1];
+  // }
 }
 
 void precompute(std::vector< std::map<char, int> > &vec, std::vector<RLE_run> s)
@@ -204,9 +213,14 @@ int get_rle_lcs_fast(const std::vector<RLE_run> s0, const std::vector<RLE_run> s
 {
   const int M = s0.size();
   const int N = s1.size();
+
+  for(int i = 0; i < M; i++)
+    dyn[i][0] = 0;
+  for(int i = 0; i < N; i++)
+    dyn[0][i] = 0;
+
   std::vector< std::map<char, int> > TOP(N);
   std::vector< std::map<char, int> > LEFT(M);
-  std::vector< std::vector<int> > dyn(M, std::vector<int>(N));
   precompute(TOP, s1);
   precompute(LEFT, s0);
   std::map<char, binarySearchTree> column_paths;

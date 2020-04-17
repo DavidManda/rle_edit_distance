@@ -17,7 +17,7 @@ int main()
     LCS::read_string(fin, N, s0);
     LCS::read_string(fin, M, s1);
 
-    int sol = get_LCS(N, M, s0, s1);
+    int sol = get_LCS(s0, s1);
 
     RLE_string_helper helper;
     std::vector<RLE_run> rle_s0 = helper.get_rle_string(s0);
