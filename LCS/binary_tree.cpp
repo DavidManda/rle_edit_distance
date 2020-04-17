@@ -1,6 +1,7 @@
 #include "binary_tree.hpp"
 #include <cstddef>
 #include <iostream>
+#include <sstream>
 
 #define COUNT 10
 
@@ -58,7 +59,7 @@ void TreeNode::insert(int _key, int _val, int _x, int _y)
 
 std::string TreeNode::to_string()
 {
-  return "Key: " + std::to_string(this->key) + "\nVal: " + std::to_string(this->val) + "\nX: " + std::to_string(this->x) + "\nY: " + std::to_string(this->y) + "\n";
+  return "Key: " + std::to_string(this->key) + " Val: " + std::to_string(this->val);
 }
 
 TreeNode *TreeNode::find(int _key)
@@ -240,6 +241,12 @@ void binarySearchTree::delete_node(int key)
   }
   this->root = _delete_node(this->root, key);
 }
+
+// std::string TreeNode::to_string(){
+//   std::stringstream ss;
+//   ss<<' '<<this->key<<' '<<this->val;
+//   return ss.str();
+// }
 // Function to print binary tree in 2D
 // It does reverse inorder traversal
 void print_2D_util(TreeNode *root, int space)
@@ -259,7 +266,7 @@ void print_2D_util(TreeNode *root, int space)
   std::cout << "\n";
   for (int i = COUNT; i < space; i++)
     std::cout << " ";
-  std::cout << root->key << "\n";
+  std::cout << root->to_string() << "\n";
 
   // Process left child
   print_2D_util(root->left, space);
@@ -268,4 +275,5 @@ void print_2D_util(TreeNode *root, int space)
 void print_2D(TreeNode *root)
 {
   print_2D_util(root, 0);
+  std::cout<<"----------------------------\n";
 }
