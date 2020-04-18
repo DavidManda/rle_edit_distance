@@ -139,7 +139,7 @@ void TreeNode::lazy_update(TreeNode* node){
   if(node == NULL || node->active){
     return;
   }
-  // lazy_calls++;
+  lazy_calls++;
   node->apply_swm();
   node->apply_change_grad();
   node->apply_shift();
@@ -506,14 +506,14 @@ TreeNode *_delete_node(TreeNode *root, Segment segm)
     if (root->left == NULL)
     {
       TreeNode *temp = root->right;
-      // nodes_freed++;
+      nodes_freed++;
       delete(root);
       return temp;
     }
     else if (root->right == NULL)
     {
       TreeNode *temp = root->left;
-      // nodes_freed++;
+      nodes_freed++;
       delete(root);
       return temp;
     }
@@ -884,20 +884,20 @@ std::pair<BST, BST> split_(TreeNode* root, Segment segm){
     BST right = (root->right != NULL) ? BST(root->right) : BST();
     right.insert(segm);
     // free root as we will lose pointer to it, it's value was inserted in right
-    // nodes_freed++;
+    nodes_freed++;
     delete(root);
     return std::pair<BST, BST>(left, right);
   }
   if(segm <= root->segm){
     std::pair<BST, BST> aux = split_(root->left, segm);
     BST right = BST::join(aux.second.root, root->right, root->segm);
-    // nodes_freed++;
+    nodes_freed++;
     delete(root);
     return std::pair<BST, BST>(aux.first, right);
   }
   std::pair<BST, BST> aux = split_(root->right, segm);
   BST left = BST::join(root->left, aux.first.root, root->segm);
-  // nodes_freed++;
+  nodes_freed++;
   delete(root);
   return std::pair<BST, BST>(left, aux.second); 
 }
@@ -920,7 +920,7 @@ void TreeNode::free(TreeNode *node){
   }
   TreeNode::free(node->left);
   TreeNode::free(node->right);
-  // nodes_freed++;
+  nodes_freed++;
   delete(node);
   node = NULL;
 }
@@ -928,6 +928,7 @@ void TreeNode::free(TreeNode *node){
 void print_nodes_freed(){
   std::cout<<"Nodes freed: "<<nodes_freed<<'\n';
 }
+
 TreeNode* get_new_copy_(TreeNode* root){
   if(root == NULL)
     return NULL;
