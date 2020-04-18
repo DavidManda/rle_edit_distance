@@ -89,7 +89,7 @@ void move_point(Point &p, int dt){
 void TreeNode::request_shift(int dx, int dy){
   if(dx == 0 && dy == 0)
     return;
-  lazy_update(this);
+  // lazy_update(this);
   this->active = false;
   this->shift += Point(dx, dy);
 }
@@ -97,7 +97,7 @@ void TreeNode::request_shift(int dx, int dy){
 void TreeNode::request_change_grad(int dg){
   if(dg == 0)
     return;
-  lazy_update(this);
+  // lazy_update(this);
   this->active = false;
   this->dg += dg;
 }
@@ -105,12 +105,16 @@ void TreeNode::request_change_grad(int dg){
 void TreeNode::request_swm(int dt){
   if(dt == 0)
     return;
-  lazy_update(this);
+  // lazy_update(this);
   this->active = false;
   if(this->t_min != INT_MAX)
     this->t_min -= dt;
-  // this->dg will always be 0 here, since we just performed a lazy update
-  this->dt += dt;
+  if(this->dg == 0){
+    this->dt += dt;
+  }
+  else if(this->segm.left.type == IF || this->segm.left.type == FI){
+    this->request_shift(dt,0);
+  }
 }
 
 void TreeNode::apply_shift(){
