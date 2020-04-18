@@ -8,7 +8,7 @@ public:
   Segment segm;
   bool active;
   Point shift;
-  int dg, dt, t_min;
+  int dg, dt, t_min, update_id;
   int height;
   TreeNode *left;
   TreeNode *right;
@@ -17,9 +17,9 @@ public:
   TreeNode();
   TreeNode(Segment segm, TreeNode* left, TreeNode* right);
   int get_own_tmin();
-  void request_shift(int dx, int dy);
-  void request_change_grad(int dg);
-  void request_swm(int dt);
+  void request_shift(int dx, int dy, int id);
+  void request_change_grad(int dg, int id);
+  void request_swm(int dt, int id);
   void apply_shift();
   void apply_change_grad();
   void apply_swm();
@@ -58,9 +58,9 @@ public:
   TreeNode *find_succ(Segment segm);
   bool is_balanced();
   bool is_continuous();
-  void request_shift(int dx, int dy);
-  void request_change_grad(int dg);
-  void request_swm(int dt);
+  void request_shift(int dx, int dy, int id);
+  void request_change_grad(int dg, int id);
+  void request_swm(int dt, int id);
   void update_point_type(Segment segm);
   void update_tmin_on_path_to(Segment segm);
   float get_value_at_coord(float x);

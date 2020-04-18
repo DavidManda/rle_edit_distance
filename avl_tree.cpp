@@ -18,6 +18,7 @@ TreeNode::TreeNode(){
   this->shift = Point(0,0);
   this->dg = 0;
   this->dt = 0;
+  this->update_id = -100;
   this->height = 1;
   this->t_min = this->get_own_tmin();
   this->left = NULL;
@@ -86,26 +87,35 @@ void move_point(Point &p, int dt){
   }
 }
 
-void TreeNode::request_shift(int dx, int dy){
+void TreeNode::request_shift(int dx, int dy, int id){
   if(dx == 0 && dy == 0)
     return;
-  // lazy_update(this);
+  if(this->update_id != id){
+    lazy_update(this);
+  }
+  this->update_id = id;
   this->active = false;
   this->shift += Point(dx, dy);
 }
 
-void TreeNode::request_change_grad(int dg){
+void TreeNode::request_change_grad(int dg, int id){
   if(dg == 0)
     return;
-  // lazy_update(this);
+  if(this->update_id != id){
+    lazy_update(this);
+  }
+  this->update_id = id;
   this->active = false;
   this->dg += dg;
 }
 
-void TreeNode::request_swm(int dt){
+void TreeNode::request_swm(int dt, int id){
   if(dt == 0)
     return;
-  // lazy_update(this);
+  if(this->update_id != id){
+    lazy_update(this);
+  }
+  this->update_id = id;
   this->active = false;
   if(this->t_min != INT_MAX)
     this->t_min -= dt;
@@ -113,7 +123,7 @@ void TreeNode::request_swm(int dt){
     this->dt += dt;
   }
   else if(this->segm.left.type == IF || this->segm.left.type == FI){
-    this->request_shift(dt,0);
+    this->request_shift(dt,0,id);
   }
 }
 
@@ -149,14 +159,14 @@ void TreeNode::lazy_update(TreeNode* node){
   node->apply_shift();
   
   if(node->left){
-    node->left->request_swm(node->dt);
-    node->left->request_change_grad(node->dg);
-    node->left->request_shift(node->shift.x, node->shift.y);
+    node->left->request_swm(node->dt, node->update_id);
+    node->left->request_change_grad(node->dg, node->update_id);
+    node->left->request_shift(node->shift.x, node->shift.y, node->update_id);
   }
   if(node->right){
-    node->right->request_swm(node->dt);
-    node->right->request_change_grad(node->dg);
-    node->right->request_shift(node->shift.x, node->shift.y);
+    node->right->request_swm(node->dt, node->update_id);
+    node->right->request_change_grad(node->dg, node->update_id);
+    node->right->request_shift(node->shift.x, node->shift.y, node->update_id);
   }
 
   node->active = true;
@@ -729,20 +739,20 @@ void BST::update_tmin_on_path_to(Segment segm){
   update_tmin_on_path_to_(this->root, segm);
 }
 
-void BST::request_shift(int dx, int dy){
+void BST::request_shift(int dx, int dy, int id){
   if(this->root == NULL)
     return;
-  this->root->request_shift(dx, dy);
+  this->root->request_shift(dx, dy, id);
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
   // TreeNode* min = TreeNode::min(this->root);
   // TreeNode* max = TreeNode::max(this->root);
 }
 
-void BST::request_change_grad(int dg){
+void BST::request_change_grad(int dg, int id){
   if(this->root == NULL)
     return;
-  this->root->request_change_grad(dg);
+  this->root->request_change_grad(dg, id);
 
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
@@ -750,8 +760,8 @@ void BST::request_change_grad(int dg){
   // TreeNode* max = TreeNode::max(this->root);
 }
 
-void BST::request_swm(int dt){
-  this->root->request_swm(dt);
+void BST::request_swm(int dt, int id){
+  this->root->request_swm(dt, id);
 
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
