@@ -89,7 +89,6 @@ void move_point(Point &p, int dt){
 void TreeNode::request_shift(int dx, int dy){
   if(dx == 0 && dy == 0)
     return;
-  lazy_update(this);
   this->active = false;
   this->shift += Point(dx, dy);
 }
@@ -97,20 +96,23 @@ void TreeNode::request_shift(int dx, int dy){
 void TreeNode::request_change_grad(int dg){
   if(dg == 0)
     return;
-  lazy_update(this);
   this->active = false;
   this->dg += dg;
+  this->shift += Point(0,dg*this->shift.x);
 }
 
 void TreeNode::request_swm(int dt){
   if(dt == 0)
     return;
-  lazy_update(this);
   this->active = false;
   if(this->t_min != INT_MAX)
     this->t_min -= dt;
-  // this->dg will always be 0 here, since we just performed a lazy update
-  this->dt += dt;
+  if(this->dg == 0){
+    this->dt += dt;
+  }
+  else if(this->segm.left.type == DF || this->segm.left.type == FD){
+    this->request_shift(dt,0);
+  }
 }
 
 void TreeNode::apply_shift(){
@@ -731,8 +733,8 @@ void BST::request_shift(int dx, int dy){
   this->root->request_shift(dx, dy);
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
-  // TreeNode* min = TreeNode::min(this->root);
-  // TreeNode* max = TreeNode::max(this->root);
+  TreeNode* min = TreeNode::min(this->root);
+  TreeNode* max = TreeNode::max(this->root);
 }
 
 void BST::request_change_grad(int dg){
@@ -742,8 +744,8 @@ void BST::request_change_grad(int dg){
 
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
-  // TreeNode* min = TreeNode::min(this->root);
-  // TreeNode* max = TreeNode::max(this->root);
+  TreeNode* min = TreeNode::min(this->root);
+  TreeNode* max = TreeNode::max(this->root);
 }
 
 void BST::request_swm(int dt){
@@ -751,8 +753,8 @@ void BST::request_swm(int dt){
 
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
-  // TreeNode* min = TreeNode::min(this->root);
-  // TreeNode* max = TreeNode::max(this->root);
+  TreeNode* min = TreeNode::min(this->root);
+  TreeNode* max = TreeNode::max(this->root);
 }
 
 TreeNode *join_right(TreeNode *t_l, TreeNode *t_r, Segment segm){
@@ -848,8 +850,8 @@ BST BST::join(TreeNode *t_l, TreeNode *t_r, Segment segm){
   joined_tree.update_point_type(segm);
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BST
-  // TreeNode* min = TreeNode::min(joined_tree.root);
-  // TreeNode* max = TreeNode::max(joined_tree.root);
+  TreeNode* min = TreeNode::min(joined_tree.root);
+  TreeNode* max = TreeNode::max(joined_tree.root);
   return joined_tree;
 }
 
@@ -906,11 +908,11 @@ std::pair<BST, BST> BST::split(TreeNode* root, Segment segm){
   std::pair<BST, BST> pair = split_(root, segm);
   // This ensures the invariant that no deferred changes are stored
   //  on the leftmost and on the rightmost path of the BSTs
-  // TreeNode* aux;
-  // aux = TreeNode::min(pair.first.root);
-  // aux = TreeNode::max(pair.first.root);
-  // aux = TreeNode::min(pair.second.root);
-  // aux = TreeNode::max(pair.second.root);
+  TreeNode* aux;
+  aux = TreeNode::min(pair.first.root);
+  aux = TreeNode::max(pair.first.root);
+  aux = TreeNode::min(pair.second.root);
+  aux = TreeNode::max(pair.second.root);
   return pair;
 }
 
