@@ -74,8 +74,4 @@ public:
   static std::pair<BST, BST> split(TreeNode* root, Segment segm);
   void delete_node(Segment segm);
 };
-void print_lazy_calls();
-void set_lazy_calls();
-void set_nodes_freed();
-void print_nodes_freed();
 void print_2D(BST T);
