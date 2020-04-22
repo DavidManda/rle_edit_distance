@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <ctime>
 
-#define MAX_SIZE 5000
+#define MAX_SIZE 2000
 
 int dyn[MAX_SIZE * MAX_SIZE];
 BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
@@ -140,7 +140,7 @@ void get_collapsed_segments(TreeNode *current, std::vector<Segment> &collapsed_s
   }
 }
 
-BST SWM(BST tree, int h, int update_id){
+BST SWM(BST tree, int h){
   TreeNode *left_most = TreeNode::min(tree.root);
   TreeNode *right_most = TreeNode::max(tree.root);
   
@@ -155,7 +155,7 @@ BST SWM(BST tree, int h, int update_id){
   while(h > 0){
     int t_min = tree.root->t_min;
     if(h >= t_min){
-      tree.request_swm(t_min, update_id);
+      tree.request_swm(t_min);
       h -= t_min;
       while(tree.root->t_min == 0){
         std::vector<Segment> collapsed_segments;
@@ -167,7 +167,7 @@ BST SWM(BST tree, int h, int update_id){
     }
     else
     {
-      tree.request_swm(h, update_id);
+      tree.request_swm(h);
       h = 0;
     }
   }
@@ -180,79 +180,79 @@ BST initialise(int n){
   return BST(new TreeNode(Segment(Point(0,0), Point(n,0))));
 }
 
-BST get_OUT_LEFT(BST LEFT, int h, int w, int update_id){
+BST get_OUT_LEFT(BST LEFT, int h, int w){
   if(h <= w){
-    BST S = SWM(LEFT, h-1, update_id);
+    BST S = SWM(LEFT, h-1);
     // get the value here before S is compromised
     float s_h = S.get_value_at_coord(h);
     std::pair<BST, BST> p = split(S,h);
     BST S_l = p.first;
     BST S_r = p.second;
 
-    S_l.request_change_grad(1, update_id);
-    S_l.request_shift(0,-1, update_id);
+    S_l.request_change_grad(1);
+    S_l.request_shift(0,-1);
     BST S1 = S_l;
     
-    BST S2 = initialise(w-h); S2.request_change_grad(1, update_id); S2.request_shift(h,s_h + h - 1, update_id);
+    BST S2 = initialise(w-h); S2.request_change_grad(1); S2.request_shift(h,s_h + h - 1);
 
-    S_r.request_shift(w-h,w-1, update_id);
+    S_r.request_shift(w-h,w-1);
     BST S3 = S_r;
     return join(join(S1,S2),S3);
   }
   else{
-    BST S = SWM(LEFT, w-1, update_id);
+    BST S = SWM(LEFT, w-1);
     std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
 
-    S_l.request_change_grad(1, update_id);
-    S_l.request_shift(0,-1, update_id);
+    S_l.request_change_grad(1);
+    S_l.request_shift(0,-1);
     BST S1 = S_l;
 
-    S_r.request_shift(0,w-1, update_id);
+    S_r.request_shift(0,w-1);
     BST S2 = S_r;
     return join(S1,S2);
   }
 }
 
-BST get_OUT_TOP(BST TOP, int h, int w, int update_id){
+BST get_OUT_TOP(BST TOP, int h, int w){
   if(h <= w){
-    BST S = SWM(TOP,h-1, update_id);
+    BST S = SWM(TOP,h-1);
     std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
-    S_l.request_shift(0,h-1, update_id);
+    S_l.request_shift(0,h-1);
     BST S1 = S_l;
 
-    S_r.request_change_grad(-1, update_id); S_r.request_shift(0,w+h-1, update_id);
+    S_r.request_change_grad(-1); S_r.request_shift(0,w+h-1);
     BST S2 = S_r;
     return join(S1,S2);
   }
   else{
-    BST S = SWM(TOP,w-1,update_id);
+    BST S = SWM(TOP,w-1);
     // get the value here before S is compromised
     float s_w = S.get_value_at_coord(w);
     std::pair<BST, BST> p = split(S,w);
     BST S_l = p.first;
     BST S_r = p.second;
 
-    S_l.request_shift(0,h-1, update_id);
+    S_l.request_shift(0,h-1);
     BST S1 = S_l;
-    BST S2 = initialise(h-w); S2.request_change_grad(-1,update_id); S2.request_shift(w,s_w + h - 1, update_id);
+    BST S2 = initialise(h-w); S2.request_change_grad(-1); S2.request_shift(w,s_w + h - 1);
 
-    S_r.request_change_grad(-1, update_id); S_r.request_shift(h - w,2*w-1, update_id);
+    S_r.request_change_grad(-1); S_r.request_shift(h - w,2*w-1);
     BST S3 = S_r;
     return join(join(S1,S2),S3);
   }
 }
 
-void init_input_border(BST LEFT[], BST TOP[], int M, int N, rle_string s0, rle_string s1, int update_id)
+void init_input_border(BST LEFT[], BST TOP[], int M, int N, rle_string s0, rle_string s1)
 {
   int char_count = 0;
   for (int i = 0; i < M; i++)
   {
     // LEFT is indexed bottom-to-up
-    BST L = initialise(s0[i].len); L.request_change_grad(-1, update_id); L.request_shift(1,s0[i].len + char_count, update_id);
+    BST L = initialise(s0[i].len); L.request_change_grad(-1); L.request_shift(1,s0[i].len + char_count);
     LEFT[i * N + 0] = L;
     char_count += s0[i].len;
   }
@@ -261,13 +261,13 @@ void init_input_border(BST LEFT[], BST TOP[], int M, int N, rle_string s0, rle_s
   for (int j = 0; j < N; j++)
   {
     // TOP is indexed left-to-right
-    BST T = initialise(s1[j].len); T.request_change_grad(1, update_id);T.request_shift(1,char_count, update_id);
+    BST T = initialise(s1[j].len); T.request_change_grad(1);T.request_shift(1,char_count);
     TOP[0 * N + j] = T;
     char_count += s1[j].len;
   }
 }
 
-void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string& s0, rle_string& s1, int update_id)
+void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string& s0, rle_string& s1)
 {
   int M = s0.size(), N = s1.size();
   // LEFT[i][j] might have been initialised (if j == 1) so we don't have to do anything in that case
@@ -280,7 +280,7 @@ void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string
     std::pair<BST, BST> p = split(OUT[i * N + j-1], w);
     LEFT[i * N + j] = p.second;
     // correct the index
-    LEFT[i * N + j].request_shift(-w + 1,0, update_id);
+    LEFT[i * N + j].request_shift(-w + 1,0);
     // assign the top border of the block underneath now, as we have a tree representing it
     // this way we don't have to split the same tree twice, which is not allowed
     if(i + 1 < M){
@@ -324,30 +324,27 @@ int get_rle_edit_dist(rle_string s0, rle_string s1){
       OUT[i * N + j] = BST();
     }
   }
-  int update_id = 0;
-  init_input_border(LEFT, TOP, M, N, s0, s1, update_id);
+  init_input_border(LEFT, TOP, M, N, s0, s1);
   for (int i = 0; i < M; i++)
   {
     for (int j = 0; j < N; j++)
     {
-      update_id++;
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       // Retrieve input border for current block
-      get_input_border(LEFT, TOP, OUT, i, j, s0, s1, update_id);
-      update_id++;
+      get_input_border(LEFT, TOP, OUT, i, j, s0, s1);
       if(match(s0[i], s1[j]))
       {
         BST L = LEFT[i * N + j];
         BST T = TOP[i * N + j];
         // shift top to the right h positions so we can join with left and get OUT
-        T.request_shift(h - 1,0, update_id);
+        T.request_shift(h - 1,0);
         OUT[i * N + j] = join(L,T);
       }
       else
       {
-        BST OUT_LEFT = get_OUT_LEFT(LEFT[i * N + j], h, w, update_id);
-        BST OUT_TOP = get_OUT_TOP(TOP[i * N + j], h, w, update_id);
+        BST OUT_LEFT = get_OUT_LEFT(LEFT[i * N + j], h, w);
+        BST OUT_TOP = get_OUT_TOP(TOP[i * N + j], h, w);
         OUT[i * N + j] = combine(OUT_TOP, OUT_LEFT);
       }
       dyn[i * N + j] = OUT[i * N + j].get_value_at_coord(w);
