@@ -32,7 +32,7 @@ int main()
   // std::ofstream fout_naive("run_times_naive.out");
   fout << "M, N, compression factor 1, compression factor 2, naive time, rle time\n";
   // fout_rle<<"M, N, compression factor 1, compression factor 2, time\n";
-  for (int i = 50; i <= 7000; i += 50)
+  for (int i = 50; i <= 15000; i += 50)
   {
     // height is i and width is i*2
     // std::ifstream fin("inputs/input" + std::to_string(i) + "x" + std::to_string(i*2) + ".in");
@@ -53,18 +53,18 @@ int main()
     std::clock_t start;
     double naive_time = 0, rle_time = 0;
     int sol = 0, sol_rle = 0;
-    start = std::clock();
-    sol = rle_ED::get_naive_edit_dist(s0, s1);
-    naive_time = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+    // start = std::clock();
+    // sol = rle_ED::get_naive_edit_dist(s0, s1);
+    // naive_time = (std::clock() - start) / (double)CLOCKS_PER_SEC;
     start = std::clock();
     sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1);
     rle_time = (std::clock() - start) / (double)CLOCKS_PER_SEC;
-    if (sol != sol_rle)
-    {
-      std::cout << "Failed!!!\n"
-                << sol_rle << ' ' << sol << '\n';
-      return 0;
-    }
+    // if (sol != sol_rle)
+    // {
+    //   std::cout << "Failed!!!\n"
+    //             << sol_rle << ' ' << sol << '\n';
+    //   return 0;
+    // }
     std::cout << i << '\n';
     std::cout << "Naive time is: " << naive_time << '\n';
     std::cout << "RLE time is: " << rle_time << '\n';

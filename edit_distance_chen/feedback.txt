@@ -1,0 +1,2 @@
+- concept of forced paths is not clear
+- what does value of forced path mean?

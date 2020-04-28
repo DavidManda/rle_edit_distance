@@ -3,8 +3,9 @@
 #include <math.h>
 #include "edit_distance.hpp"
 #include <deque>
+#include <assert.h>
 
-#define MAX_SIZE 3000
+#define MAX_SIZE 5000
 typedef std::vector<Point> border_type;
 typedef std::vector<rle::RLE_run> rle_string;
 
@@ -187,7 +188,28 @@ int get_val_at_coord(int coord, std::vector<Point>& points)
     std::cout<<"gotcha\n";
     return 0;    
   }
-  
+}
+
+int get_val_at_coord(int coord, std::deque<Point>& points)
+{
+  int i = 0;
+  while(i < points.size() && points[i].x < coord)
+  {
+    i++;
+  }
+  if(points[i].x == coord)
+  {
+    return points[i].y;
+  }
+  else
+  {
+    if(points[i].x >= coord && points[i-1].x <= coord)
+    {
+      return get_val_at_coord_(coord, points[i-1], points[i]);
+    }
+    std::cout<<"gotcha\n";
+    return 0;    
+  }
 }
 
 int get_coord_for_val(float val, Point p1, Point p2)
@@ -306,39 +328,25 @@ std::vector<Point> get_cswm(std::vector<Point> &S, int h)
     // on each iteration we compute the lower part of L and the segment defined by [S[i], S[i+1]]
     Point current = S[i], next = S[i + 1];
     int slope = (next.y - current.y)/(next.x - current.x);
-    bool intersection_found = false;
-    bool next_point_encountered = false;
-    for(int k = 0; k < L.size(); k++)
-    {
-      Point p = L[k];
-      // We reached point i+1 and we need to stop
-      if(p.x + (h-1) > next.x)
-        break;
-      int s_val_at_curr_point = current.y + slope * (p.x + (h-1) - current.x);
-      if(p.y <= s_val_at_curr_point)
-      {
-        add_point(S_CSWM, Point(p.x + (h-1), p.y));
-      }
-      else
-      {
-        if(k==0){
-          std::cout<<"something's wrong I can feel it..\n";
-        }
-        add_intersection(S_CSWM, current, next, Point(L[k-1].x + h - 1, L[k-1].y), Point(L[k].x + h - 1, L[k].y));
-        intersection_found = true;
-        break;
-      }
+    assert(current.x == L[0].x + (h-1));
+    int val_at_next;
+    if(L.back().x + (h-1) >= next.x){
+      val_at_next = get_val_at_coord(next.x - (h-1), L);
     }
-    if(intersection_found)
-    {
-      add_point(S_CSWM, next);
-      std::deque<Point> new_L;
-      add_point(new_L, Point(next.x - (h - 1), next.y));
-      add_point(new_L, next);
-      L = new_L;
-    } 
-    else
-    {
+    else{
+      val_at_next = L.back().y;
+    }
+    // Case 1
+    if(val_at_next < next.y){
+      int j = 0;
+      while(j < L.size() && L[j].x + (h-1) <= next.x){
+        add_point(S_CSWM, Point(L[j].x + (h-1), L[j].y));
+        j++;
+      }
+      if(j < L.size() && j > 0 && L[j-1].x < next.x){
+        int val = get_val_at_coord_(next.x - (h-1), L[j-1], L[j]);
+        add_point(S_CSWM, Point(next.x, val));
+      }
       // Truncate the back part that is higher than next point
       if (next.y > L.back().y)
       {
@@ -377,6 +385,29 @@ std::vector<Point> get_cswm(std::vector<Point> &S, int h)
       {
         L.push_front(Point(next.x - h + 1, next.y));
       }
+    }
+    else // Case 2
+    {
+      int j=0;
+      int s_val_at_coord = get_val_at_coord_(L[0].x + (h-1), current, next);
+      while(j < L.size() && L[j].y < s_val_at_coord){
+        add_point(S_CSWM, Point(L[j].x + (h-1), L[j].y));
+        j++;
+        if(j < L.size()){
+          s_val_at_coord = get_val_at_coord_(L[j].x + (h-1), current, next);
+        }
+      }
+      if(j > 0){
+        add_intersection(S_CSWM, current, next, Point(L[j-1].x + (h - 1), L[j-1].y), Point(L[j].x + (h - 1), L[j].y));
+      }
+      else{
+        add_point(S_CSWM, current);
+      }
+      add_point(S_CSWM, next);
+      std::deque<Point> new_L;
+      add_point(new_L, Point(next.x - (h - 1), next.y));
+      add_point(new_L, next);
+      L = new_L;
     }
   }
   for(int i = 0; i < L.size(); i++)
