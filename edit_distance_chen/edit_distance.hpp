@@ -6,7 +6,7 @@
 #include "rle.hpp"
 #include "point.hpp"
 
-typedef std::vector< std::vector< std::vector< Point > > > border_type;
+typedef std::vector< Point > border_type;
 typedef std::vector<rle::RLE_run> rle_string;
 
 // Returns the edit distance for strings s0 and s1

@@ -4,9 +4,17 @@
 #include "edit_distance.hpp"
 #include <deque>
 
-typedef std::vector<std::vector<std::vector<Point> > > border_type;
+#define MAX_SIZE 3000
+typedef std::vector<Point> border_type;
 typedef std::vector<rle::RLE_run> rle_string;
 
+
+int dyn[MAX_SIZE * MAX_SIZE];
+// The following are a graphical representation for the Input (split into LEFT and TOP)
+// and Output border for each block
+border_type LEFT[MAX_SIZE * MAX_SIZE];
+border_type TOP[MAX_SIZE * MAX_SIZE];
+border_type OUT[MAX_SIZE * MAX_SIZE];
 int min(int a, int b, int c)
 {
   return std::min(a, std::min(b, c));
@@ -37,37 +45,12 @@ float get_val_at_coord_(float coord, Point p1, Point p2)
 {
   if(coord < p1.x || coord > p2.x)
   {
-    std::cout<<"Coord should be between the two given points!\n";
+    // std::cout<<"Coord should be between the two given points!\n";
     return 0;
   }
   float slope = (p2.y - p1.y)/(p2.x - p1.x);
   
   return p1.y + slope * (coord - p1.x);
-}
-
-int get_edit_dist(const int M, const int N, const std::string &s0, const std::string &s1)
-{
-  int dyn[M + 1][N + 1];
-
-  for (int i = 0; i <= M; i++)
-  {
-    dyn[i][0] = i;
-  }
-
-  for (int i = 0; i <= N; i++)
-  {
-    dyn[0][i] = i;
-  }
-
-  for (int i = 1; i <= M; i++)
-  {
-    for (int j = 1; j <= N; j++)
-    {
-      dyn[i][j] = min(dyn[i - 1][j - 1] + (s0[i] != s1[j]), dyn[i - 1][j] + 1, dyn[i][j - 1] + 1);
-    }
-  }
-
-  return dyn[M][N];
 }
 
 void add_point(std::vector<Point>& points, Point p)
@@ -118,61 +101,61 @@ void add_point(std::deque<Point>& points, Point p)
   points.push_back(p);
 }
 
-void init_input_border(border_type &LEFT, border_type &TOP, int M, int N, const rle_string &s0, const rle_string &s1)
+void init_input_border(border_type LEFT[], border_type TOP[], int M, int N, const rle_string &s0, const rle_string &s1)
 {
   int char_count = 0;
   for (int i = 1; i < M; i++)
   {
-    LEFT[i][1].push_back(Point(1, s0[i].len + char_count));
-    LEFT[i][1].push_back(Point(s0[i].len + 1, char_count));
+    LEFT[i * N + 1].push_back(Point(1, s0[i].len + char_count));
+    LEFT[i * N + 1].push_back(Point(s0[i].len + 1, char_count));
     char_count += s0[i].len;
   }
 
   char_count = 0;
   for (int j = 1; j < N; j++)
   {
-    TOP[1][j].push_back(Point(1, char_count));
-    TOP[1][j].push_back(Point(s1[j].len + 1, s1[j].len + char_count));
+    TOP[1 * N + j].push_back(Point(1, char_count));
+    TOP[1 * N + j].push_back(Point(s1[j].len + 1, s1[j].len + char_count));
     char_count += s1[j].len;
   }
 }
 
-void get_input_border(border_type &LEFT, border_type &TOP, border_type &OUT, int i, int j, std::vector<std::vector<int > > &dyn, rle_string s0, rle_string s1)
+void get_input_border(border_type LEFT[], border_type TOP[], border_type OUT[], int i, int j, int dyn[], rle_string s0, rle_string s1, int M, int N)
 {
   // LEFT[i][j] might have been initialised (if j == 1) so we don't have to do anything in that case
-  if (LEFT[i][j].empty())
+  if (LEFT[i * N + j].empty())
   {
     // This is the first point
-    add_point(LEFT[i][j], Point(1, dyn[i][j - 1]));
+    add_point(LEFT[i * N + j], Point(1, dyn[i * N + (j - 1)]));
     // width and height of block to the left
     int w = s1[j - 1].len + 1;
     int h = s0[i].len + 1;
-    for (int k = 0; k < OUT[i][j-1].size(); k++)
+    for (int k = 0; k < OUT[i * N + (j-1)].size(); k++)
     {
-      Point p = OUT[i][j - 1][k];
+      Point p = OUT[i * N + (j - 1)][k];
       // These points are part of the left input border
       // The very last point should also be carried over here
       if (p.x > w)
       {
         int index = p.x - w + 1;
         int value = p.y;
-        add_point(LEFT[i][j], Point(index, value));
+        add_point(LEFT[i * N + j], Point(index, value));
       }
     }
   }
 
-  if (TOP[i][j].empty())
+  if (TOP[i * N + j].empty())
   {
     // Width and height of block above
     int w = s1[j].len + 1;
     int h = s0[i - 1].len + 1;
     // The first point should be added here automatically
-    for (int k = 0; k < OUT[i-1][j].size(); k++)
+    for (int k = 0; k < OUT[(i-1) * N + j].size(); k++)
     {
-      Point p = OUT[i-1][j][k];
+      Point p = OUT[(i-1) * N + j][k];
       if(p.x < w)
       {
-        add_point(TOP[i][j], OUT[i - 1][j][k]);
+        add_point(TOP[i * N + j], OUT[(i - 1)*N + j][k]);
       }
       else
       {
@@ -180,7 +163,7 @@ void get_input_border(border_type &LEFT, border_type &TOP, border_type &OUT, int
       }
     }
     // Adding the very last point
-    add_point(TOP[i][j], Point(w, dyn[i - 1][j]));
+    add_point(TOP[i * N + j], Point(w, dyn[(i - 1) * N + j]));
   }
 }
 
@@ -227,7 +210,10 @@ int get_coord_for_val(float val, Point p1, Point p2)
 
 Point get_intersection(Point a1, Point a2, Point b1, Point b2)
 {
-  // TODO make this proper
+  // std::cout<<a1.to_string()<<' ';
+  // std::cout<<a2.to_string()<<' ';
+  // std::cout<<b1.to_string()<<' ';
+  // std::cout<<b2.to_string()<<'\n';
   float s1 = (a2.y - a1.y)/(a2.x - a1.x);
   float s2 = (b2.y - b1.y)/(b2.x - b1.x);
   if(s1 == s2)
@@ -335,6 +321,9 @@ std::vector<Point> get_cswm(std::vector<Point> &S, int h)
       }
       else
       {
+        if(k==0){
+          std::cout<<"something's wrong I can feel it..\n";
+        }
         add_intersection(S_CSWM, current, next, Point(L[k-1].x + h - 1, L[k-1].y), Point(L[k].x + h - 1, L[k].y));
         intersection_found = true;
         break;
@@ -551,52 +540,83 @@ void propagate_2(int h, int w, const std::vector<Point> &LEFT_CSWM, const std::v
   }
 }
 
+void initialise_empty(border_type B[], int M, int N){
+  for(int i = 0; i < M; i++){
+    for(int j = 0; j < N; j++){
+      B[i * N + j] = std::vector<Point>();
+    }
+  }
+}
+
 int get_rle_edit_dist(const rle_string &s0, const rle_string &s1)
 {
   const int M = s0.size();
   const int N = s1.size();
-  std::vector< std::vector< int > > dyn(M, std::vector<int>(N));
-  // The following are a graphical representation for the Input (split into LEFT and TOP)
-  // and Output border for each block
-  border_type LEFT(M, std::vector<std::vector< Point > >(N));
-  border_type TOP(M, std::vector<std::vector< Point > >(N));
-  border_type OUT(M, std::vector<std::vector< Point > >(N));
 
+  initialise_empty(LEFT, M, N);
+  initialise_empty(TOP, M, N);
+  initialise_empty(OUT, M, N);
   // Initialise input border
   init_input_border(LEFT, TOP, M, N, s0, s1);
   for (int i = 1; i < M; i++)
   {
     for (int j = 1; j < N; j++)
     {
+      // std::cout<<i<<' '<<j<<'\n';
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       // Retrieve input border for current block
-      get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1);
+      get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1, M, N);
       if(s0[i].ch == s1[j].ch)
       {
-        for(int k = 0; k < LEFT[i][j].size(); k++)
+        for(int k = 0; k < LEFT[i * N + j].size(); k++)
         {
-          add_point(OUT[i][j], LEFT[i][j][k]);
+          add_point(OUT[i * N + j], LEFT[i * N + j][k]);
         }
-        for(int k = 0; k < TOP[i][j].size(); k++)
+        for(int k = 0; k < TOP[i * N + j].size(); k++)
         {
-          add_point(OUT[i][j], Point(TOP[i][j][k].x + h - 1, TOP[i][j][k].y));
+          add_point(OUT[i * N + j], Point(TOP[i * N + j][k].x + h - 1, TOP[i * N + j][k].y));
         }
       }
       else
       {
         std::vector<Point> LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT;
         int window = std::min(h, w);
-        LEFT_CSWM = get_cswm(LEFT[i][j], window);
-        TOP_CSWM = get_cswm(TOP[i][j], window);
+        LEFT_CSWM = get_cswm(LEFT[i * N + j], window);
+        TOP_CSWM = get_cswm(TOP[i * N + j], window);
         // Propagate 2
         propagate_2(h, w, LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT);
         // Propagate 3
-        OUT[i][j] = get_lower_part(LEFT_OUT, TOP_OUT);        
+        OUT[i * N + j] = get_lower_part(LEFT_OUT, TOP_OUT);        
       }
-      dyn[i][j] = get_val_at_coord(w, OUT[i][j]);
+      dyn[i * N + j] = get_val_at_coord(w, OUT[i * N + j]);
     }
   }
 
-  return dyn[M - 1][N - 1];
+  return dyn[(M - 1)* N  + (N - 1)];
+}
+
+int get_edit_dist(int M, int N, const std::string &s0, const std::string &s1)
+{
+  M += 1;
+  N += 1;
+  for (int i = 0; i < M; i++)
+  {
+    dyn[i * N + 0] = i;
+  }
+
+  for (int i = 0; i < N; i++)
+  {
+    dyn[0 * N + i] = i;
+  }
+
+  for (int i = 1; i < M; i++)
+  {
+    for (int j = 1; j < N; j++)
+    {
+      dyn[i * N + j] = min(dyn[(i - 1) * N + (j - 1)] + (s0[i] != s1[j]), dyn[(i - 1) * N + j] + 1, dyn[i * N + (j - 1)] + 1);
+    }
+  }
+
+  return dyn[(M-1) * N + (N-1)];
 }
