@@ -9,7 +9,7 @@
 int main(){
   std::ofstream fout("run_times.out");
   fout<<"M, N, compression factor 1, compression factor 2, naive time, rle time\n";
-  for(int i = 1; i < 80; i+=1){
+  for(int i = 1; i < 70; i+=1){
     // height is i and width is i*2
     std::ifstream fin("../inputs/input" + std::to_string(i) + "x" + std::to_string(i*2) + ".in");
     int M, N;
