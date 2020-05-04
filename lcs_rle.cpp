@@ -1,16 +1,10 @@
 #include "lcs_rle.hpp"
 
-#define MAX_SIZE 5000
+#define MAX_SIZE 500
 typedef std::vector<rle::RLE_run> rle_string;
 
 int dyn[MAX_SIZE][MAX_SIZE];
 BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
-
-float BST::get_value_at_coord(float x)
-{
-  Segment s = this->root->find_node_containing(x)->segm;
-  return s.get_val_at_coord(x);
-}
 
 BST initialise(int n)
 {
@@ -270,8 +264,10 @@ int get_lcs_rle(rle_string s0, rle_string s1){
   return dyn[M - 1][N - 1];
 }
 
-int get_lce(const std::string &s0, const std::string &s1)
+int get_lcs(std::string &s0, std::string &s1)
 {
+  s0 = "*" + s0;
+  s1 = "*" + s1;
   const int M = s0.length(), N = s1.length();
 
   for(int i = 0; i < M; i++)

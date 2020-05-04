@@ -9,4 +9,5 @@ typedef std::vector<rle::RLE_run> rle_string;
 
 int get_lcs_rle(rle_string s0, rle_string s1);
 
+int get_lcs(std::string &s0, std::string &s1);
 #endif
