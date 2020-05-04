@@ -1,6 +1,6 @@
 #include "lcs_rle.hpp"
 
-#define MAX_SIZE 500
+#define MAX_SIZE 2000
 typedef std::vector<rle::RLE_run> rle_string;
 
 int dyn[MAX_SIZE][MAX_SIZE];
@@ -60,6 +60,8 @@ std::pair<BST, BST> split(BST T, float x_m)
   // update type of new endpoints
   TreeNode *min_right = TreeNode::min(sol.second.root);
   TreeNode *max_left = TreeNode::max(sol.first.root);
+  sol.second.update_point_type(min_right->segm);
+  sol.first.update_point_type(max_left->segm);
   return sol;
 }
 
@@ -122,14 +124,14 @@ BST combine(BST t1, BST t2)
     return t1;
   }
   // check if x_m == x_r
-  if (max1.y < max2.y)
+  if (max1.y <= max2.y)
   {
     TreeNode::free(t1.root);
     return t2;
   }
   Segment S1, S2;
-  t2.find_leftmost_smaller(t1.root, S1);
-  t1.find_rightmost_smaller(t2.root, S2);
+  t2.find_rightmost_smaller(t1.root, S1);
+  t1.find_leftmost_smaller(t2.root, S2);
   float x_m = Segment::get_intersection(S1, S2).x;
   std::pair<BST, BST> pair_1 = split(t1, x_m);
   std::pair<BST, BST> pair_2 = split(t2, x_m);
@@ -139,15 +141,15 @@ BST combine(BST t1, BST t2)
 }
 
 BST get_OUT_LEFT(BST LEFT, int h, int w){
-  BST S1 = initialise(w);
+  BST S1 = initialise(w-1);
   S1.request_shift(1,LEFT.get_value_at_coord(1));
-  BST S2 = LEFT; S2.request_shift(w,0);
+  BST S2 = LEFT; S2.request_shift(w-1,0);
   return join(S1,S2);
 }
 
 BST get_OUT_TOP(BST TOP, int h, int w){
   BST S1 = TOP;
-  BST S2 = initialise(h); S2.request_shift(w, TOP.get_value_at_coord(w));
+  BST S2 = initialise(h-1); S2.request_shift(w, TOP.get_value_at_coord(w));
   return join(S1,S2);
 }
 
@@ -160,10 +162,12 @@ BST get_match_OUT(BST LEFT, BST TOP, int h, int w){
     return join(join(S1,S2),S3);
   }
   else{
-    std::pair<BST, BST> p = split(LEFT, h);
+    std::pair<BST, BST> p = split(LEFT, w);
+    // print_2D(LEFT);
     BST S1 = p.first; S1.request_grad_change(1); S1.request_shift(0,-1);
-    BST S2 = p.second; S2.request_shift(0,w);
+    BST S2 = p.second; S2.request_shift(0,w-1);
     BST S3 = TOP; S3.request_grad_change(-1); S3.request_shift(h-1,w);
+    // print_2D(S1);print_2D(S2);print_2D(S3);
     return join(join(S1,S2),S3);
   }
 }
@@ -246,15 +250,19 @@ int get_lcs_rle(rle_string s0, rle_string s1){
   init_input_border(LEFT, TOP, M, N, s0, s1);
   for(int i = 0; i < M; i++){
     for(int j = 0; j < N; j++){
+      // std::cout<<i<<' '<<j<<'\n';
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       get_input_border(LEFT, TOP, OUT, i, j, s0, s1);
       if(match(s0[i], s1[j])){
+        // print_2D(LEFT[i * N + j]);print_2D(TOP[i * N + j]);
         OUT[i * N + j] = get_match_OUT(LEFT[i * N + j], TOP[i * N + j], h, w);
       }
       else{
+        // print_2D(TOP[i * N + j]);
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i * N + j], h, w);
         BST OUT_TOP = get_OUT_TOP(TOP[i * N + j], h, w);
+        // print_2D(OUT_LEFT);print_2D(OUT_TOP);
         OUT[i * N + j] = combine(OUT_TOP, OUT_LEFT);
       }
       dyn[i][j] = OUT[i * N + j].get_value_at_coord(w);
