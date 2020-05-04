@@ -32,17 +32,23 @@ int main()
   // std::ofstream fout_naive("run_times_naive.out");
   fout << "M, N, compression factor 1, compression factor 2, naive time, rle time\n";
   // fout_rle<<"M, N, compression factor 1, compression factor 2, time\n";
-  for (int i = 50; i <= 15000; i += 50)
+  int fixed_size = 100;
+  std::string s0, s1;
+  int M, N, m, n;
+  for (int i = 50; i < 4000; i += 50)
   {
     // height is i and width is i*2
     // std::ifstream fin("inputs/input" + std::to_string(i) + "x" + std::to_string(i*2) + ".in");
-    std::ifstream fin("inputs/input" + std::to_string(i) + ".in");
-    int M, N;
-    fin >> M >> N;
-    std::string s0, s1;
-    helper::read_string(fin, M, s0);
-    helper::read_string(fin, N, s1);
-
+    // std::ifstream fin("inputs/input" + std::to_string(i) + ".in");
+    // fin >> M >> N;
+    // helper::read_string(fin, M, s0);
+    // helper::read_string(fin, N, s1);
+    m = i;
+    n = fixed_size;
+    s0 = get_str(m, 20);
+    s1 = get_str(n,20);
+    M = s0.length();
+    N = s1.length();
     RLE_string_helper rle_helper;
     std::vector<RLE_run> rle_s0 = rle_helper.get_rle_string(s0);
     std::vector<RLE_run> rle_s1 = rle_helper.get_rle_string(s1);
@@ -56,9 +62,13 @@ int main()
     // start = std::clock();
     // sol = rle_ED::get_naive_edit_dist(s0, s1);
     // naive_time = (std::clock() - start) / (double)CLOCKS_PER_SEC;
-    start = std::clock();
-    sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1);
-    rle_time = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+    rle_time = 0;
+    for(int j = 0; j < 5; j++){
+      start = std::clock();
+      sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1);
+      rle_time += (std::clock() - start) / (double)CLOCKS_PER_SEC;
+    }
+    rle_time /= 5;
     // if (sol != sol_rle)
     // {
     //   std::cout << "Failed!!!\n"

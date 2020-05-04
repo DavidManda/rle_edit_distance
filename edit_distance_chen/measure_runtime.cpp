@@ -9,7 +9,7 @@
 int main(){
   std::ofstream fout("run_times.out");
   fout<<"M, N, compression factor 1, compression factor 2, naive time, rle time\n";
-  for(int i = 1; i < 70; i+=1){
+  for(int i = 1; i < 90; i+=1){
     // height is i and width is i*2
     std::ifstream fin("../inputs/input" + std::to_string(i) + "x" + std::to_string(i*2) + ".in");
     int M, N;
@@ -29,9 +29,13 @@ int main(){
     // start = std::clock();
     // sol = edit_distance::get_edit_dist(M, N, s0, s1);
     // naive_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-    start = std::clock();
-    sol_rle = edit_distance::get_rle_edit_dist(rle_s0, rle_s1);
-    rle_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    rle_time = 0;
+    for(int j = 0; j < 5; j++){
+      start = std::clock();
+      sol_rle = edit_distance::get_rle_edit_dist(rle_s0, rle_s1);
+      rle_time += ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    } 
+    rle_time/=5;
     // if (sol_rle != sol)
     // {
     //   std::cout << "Failed test " << i << '\n';
