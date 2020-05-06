@@ -1,6 +1,6 @@
 #include "lcs_rle.hpp"
 
-#define MAX_SIZE 2000
+#define MAX_SIZE 200
 typedef std::vector<rle::RLE_run> rle_string;
 
 int dyn[MAX_SIZE][MAX_SIZE];
@@ -163,11 +163,9 @@ BST get_match_OUT(BST LEFT, BST TOP, int h, int w){
   }
   else{
     std::pair<BST, BST> p = split(LEFT, w);
-    // print_2D(LEFT);
     BST S1 = p.first; S1.request_grad_change(1); S1.request_shift(0,-1);
     BST S2 = p.second; S2.request_shift(0,w-1);
     BST S3 = TOP; S3.request_grad_change(-1); S3.request_shift(h-1,w);
-    // print_2D(S1);print_2D(S2);print_2D(S3);
     return join(join(S1,S2),S3);
   }
 }
@@ -250,19 +248,15 @@ int get_lcs_rle(rle_string s0, rle_string s1){
   init_input_border(LEFT, TOP, M, N, s0, s1);
   for(int i = 0; i < M; i++){
     for(int j = 0; j < N; j++){
-      // std::cout<<i<<' '<<j<<'\n';
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       get_input_border(LEFT, TOP, OUT, i, j, s0, s1);
       if(match(s0[i], s1[j])){
-        // print_2D(LEFT[i * N + j]);print_2D(TOP[i * N + j]);
         OUT[i * N + j] = get_match_OUT(LEFT[i * N + j], TOP[i * N + j], h, w);
       }
       else{
-        // print_2D(TOP[i * N + j]);
         BST OUT_LEFT = get_OUT_LEFT(LEFT[i * N + j], h, w);
         BST OUT_TOP = get_OUT_TOP(TOP[i * N + j], h, w);
-        // print_2D(OUT_LEFT);print_2D(OUT_TOP);
         OUT[i * N + j] = combine(OUT_TOP, OUT_LEFT);
       }
       dyn[i][j] = OUT[i * N + j].get_value_at_coord(w);

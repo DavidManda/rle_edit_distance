@@ -33,7 +33,6 @@ int main()
     int sol_rle = lcs_rle::get_lcs_rle(rle_s0, rle_s1);
     rle_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     std::cout<<"RLE time is: "<<rle_time<<'\n';
-    // if(!test_sol(dyn, dyn_rle, rle_s0, rle_s1))
     if(sol != sol_rle)
     {
       std::cout<<"Test " << test << "/"<<T<<" failed for strings " + s0 + " and " + s1 + " with sizes of "<< M<<" and "<<N<<"\n";
