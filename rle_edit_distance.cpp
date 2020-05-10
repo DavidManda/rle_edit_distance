@@ -4,10 +4,10 @@
 #include <cstdlib>
 #include <ctime>
 
-#define MAX_SIZE 1000
-
+#define MAX_SIZE 4000
+#define RLE_MAX_SIZE 100
 int dyn[2 * MAX_SIZE];
-BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
+BST LEFT[RLE_MAX_SIZE], TOP[2 * RLE_MAX_SIZE], OUT[2 * RLE_MAX_SIZE];
 
 typedef std::vector<rle::RLE_run> rle_string;
 // this function expects two trees that describe intervals [X_l, X_m] and [X_m, X_r]
@@ -293,7 +293,7 @@ void init_input_border(BST LEFT[], BST TOP[], int M, int N, rle_string s0, rle_s
     BST L = initialise(s0[i].len);
     L.request_grad_change(-1);
     L.request_shift(1, s0[i].len + char_count);
-    LEFT[i * N + 0] = L;
+    LEFT[i] = L;
     char_count += s0[i].len;
   }
 
@@ -309,25 +309,24 @@ void init_input_border(BST LEFT[], BST TOP[], int M, int N, rle_string s0, rle_s
   }
 }
 
-void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string &s0, rle_string &s1)
+void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string &s0, rle_string &s1, int current_row)
 {
   int M = s0.size(), N = s1.size();
-  // LEFT[i][j] might have been initialised (if j == 1) so we don't have to do anything in that case
-  if (LEFT[i * N + j].root == NULL)
+  // LEFT[i][j] might have been initialised (if j == 0) so we don't have to do anything in that case
+  if (j > 0)
   {
-    assert(j > 0);
     // width and height of block to the left
     int w = s1[j - 1].len + 1;
     int h = s0[i].len + 1;
-    std::pair<BST, BST> p = split(OUT[i * N + j - 1], w);
-    LEFT[i * N + j] = p.second;
+    std::pair<BST, BST> p = split(OUT[current_row * N + (j - 1)], w);
+    LEFT[i] = p.second;
     // correct the index
-    LEFT[i * N + j].request_shift(-w + 1, 0);
+    LEFT[i].request_shift(-w + 1, 0);
     // assign the top border of the block underneath now, as we have a tree representing it
     // this way we don't have to split the same tree twice, which is not allowed
     if (i + 1 < M)
     {
-      TOP[(i + 1) * N + (j - 1)] = p.first;
+      TOP[(1-current_row) * N + (j - 1)] = p.first;
     }
     else
     {
@@ -336,14 +335,14 @@ void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string
     }
   }
 
-  if (TOP[i * N + j].root == NULL)
+  if (TOP[current_row * N + j].root == NULL)
   {
     assert(i > 0);
     // Width and height of block above
     int w = s1[j].len + 1;
     int h = s0[i - 1].len + 1;
-    std::pair<BST, BST> p = split(OUT[(i - 1) * N + j], w);
-    TOP[i * N + j] = p.first;
+    std::pair<BST, BST> p = split(OUT[(1 - current_row) * N + j], w);
+    TOP[current_row * N + j] = p.first;
     if (j == N - 1)
     {
       // We won't use this so we should free it
@@ -352,7 +351,7 @@ void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string
   }
 }
 
- bool match(RLE_run a, RLE_run b)
+bool match(RLE_run a, RLE_run b)
 {
   return a.ch == b.ch;
 }
@@ -362,15 +361,12 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
   const int M = s0.size();
   const int N = s1.size();
   // reset values
-  for (int i = 0; i < M; i++)
+  int current_row = 0, prev_row = 1;
+  for (int j = 0; j < N; j++)
   {
-    for (int j = 0; j < N; j++)
-    {
-      dyn[i * N + j] = 0;
-      LEFT[i * N + j] = BST();
-      TOP[i * N + j] = BST();
-      OUT[i * N + j] = BST();
-    }
+    dyn[current_row * N + j] = 0;
+    TOP[0 * N + j] = BST();
+    TOP[1 * N + j] = BST();
   }
   init_input_border(LEFT, TOP, M, N, s0, s1);
   for (int i = 0; i < M; i++)
@@ -380,26 +376,30 @@ int get_rle_edit_dist(rle_string s0, rle_string s1)
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       // Retrieve input border for current block
-      get_input_border(LEFT, TOP, OUT, i, j, s0, s1);
+      get_input_border(LEFT, TOP, OUT, i, j, s0, s1, current_row);
       if (match(s0[i], s1[j]))
       {
-        BST L = LEFT[i * N + j];
-        BST T = TOP[i * N + j];
+        BST L = LEFT[i];
+        BST T = TOP[current_row * N + j];
         // shift top to the right h positions so we can join with left and get OUT
         T.request_shift(h - 1, 0);
-        OUT[i * N + j] = join(L, T);
+        OUT[current_row * N + j] = join(L, T);
       }
       else
       {
-        BST OUT_LEFT = get_OUT_LEFT(LEFT[i * N + j], h, w);
-        BST OUT_TOP = get_OUT_TOP(TOP[i * N + j], h, w);
-        OUT[i * N + j] = combine(OUT_TOP, OUT_LEFT);
+        BST OUT_LEFT = get_OUT_LEFT(LEFT[i], h, w);
+        BST OUT_TOP = get_OUT_TOP(TOP[current_row * N + j], h, w);
+        OUT[current_row * N + j] = combine(OUT_TOP, OUT_LEFT);
       }
-      dyn[i * N + j] = OUT[i * N + j].get_value_at_coord(w);
+      dyn[current_row * N + j] = OUT[current_row * N + j].get_value_at_coord(w);
+      // Reset value in TOP
+      TOP[current_row * N + j] = BST();
     }
+    prev_row = current_row;
+    current_row = 1-current_row;
   }
-  TreeNode::free(OUT[(M - 1) * (N) + N - 1].root);
-  return dyn[(M - 1) * (N) + N - 1];
+  TreeNode::free(OUT[prev_row * N + N - 1].root);
+  return dyn[prev_row * N + N - 1];
 }
 
 int get_naive_edit_dist(std::string s0, std::string s1)
