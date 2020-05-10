@@ -1,0 +1,11 @@
+symmetric is not right - analogous would be better
+base cases for recurrence relations
+check they are right
+explain the sorinting in LCS better
+check quotes
+check \log, \min
+mention I emailed the authors
+
+reference all figures
+discuss figure 6.1
+make naive linear space
