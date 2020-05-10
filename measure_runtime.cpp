@@ -35,21 +35,21 @@ int main()
   int fixed_size = 100;
   std::string s0, s1;
   int M, N, m, n;
-  for (int i = 50; i < 5000; i += 50)
+  for (int i = 1; i < 50; i += 1)
   {
     // height is i and width is i*2
-    // std::ifstream fin("inputs/input" + std::to_string(i) + "x" + std::to_string(i) + ".in");
+    std::ifstream fin("inputs/input" + std::to_string(i) + "x" + std::to_string(i) + ".in");
     // std::ifstream fin("inputs/input" + std::to_string(i) + ".in");
-    // fin >> M >> N;
+    fin >> M >> N;
     s0 = "";s1 = "";
-    // helper::read_string(fin, M, s0);
-    // helper::read_string(fin, N, s1);
-    m = i;
-    n = i;
-    s0 = get_str(m, 20);
-    s1 = get_str(n,20);
-    M = s0.length();
-    N = s1.length();
+    helper::read_string(fin, M, s0);
+    helper::read_string(fin, N, s1);
+    // m = i;
+    // n = i;
+    // s0 = get_str(m, 20);
+    // s1 = get_str(n,20);
+    // M = s0.length();
+    // N = s1.length();
     RLE_string_helper rle_helper;
     std::vector<RLE_run> rle_s0 = rle_helper.get_rle_string(s0);
     std::vector<RLE_run> rle_s1 = rle_helper.get_rle_string(s1);
@@ -60,9 +60,9 @@ int main()
     std::clock_t start;
     double naive_time = 0, rle_time = 0;
     int sol = 0, sol_rle = 0;
-    // start = std::clock();
-    // sol = rle_ED::get_naive_edit_dist(s0, s1);
-    // naive_time = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+    start = std::clock();
+    sol = rle_ED::get_naive_edit_dist(s0, s1);
+    naive_time = (std::clock() - start) / (double)CLOCKS_PER_SEC;
     rle_time = 0;
     int times = 5;
     for(int j = 0; j < times; j++){
@@ -71,12 +71,12 @@ int main()
       rle_time += (std::clock() - start) / (double)CLOCKS_PER_SEC;
     }
     rle_time /= times;
-    // if (sol != sol_rle)
-    // {
-    //   std::cout << "Failed!!!\n"
-    //             << sol_rle << ' ' << sol << '\n';
-    //   return 0;
-    // }
+    if (sol != sol_rle)
+    {
+      std::cout << "Failed!!!\n"
+                << sol_rle << ' ' << sol << '\n';
+      return 0;
+    }
     std::cout << i << '\n';
     std::cout << "Naive time is: " << naive_time << '\n';
     std::cout << "RLE time is: " << rle_time << '\n';
