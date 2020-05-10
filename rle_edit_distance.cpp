@@ -4,9 +4,9 @@
 #include <cstdlib>
 #include <ctime>
 
-#define MAX_SIZE 5000
+#define MAX_SIZE 1000
 
-int dyn[MAX_SIZE * MAX_SIZE];
+int dyn[2 * MAX_SIZE];
 BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
 
 typedef std::vector<rle::RLE_run> rle_string;
@@ -351,7 +351,8 @@ void get_input_border(BST LEFT[], BST TOP[], BST OUT[], int i, int j, rle_string
     }
   }
 }
-bool match(RLE_run a, RLE_run b)
+
+ bool match(RLE_run a, RLE_run b)
 {
   return a.ch == b.ch;
 }
@@ -406,24 +407,23 @@ int get_naive_edit_dist(std::string s0, std::string s1)
   // Add a character at the beginning so strings start at index 1
   s0 = "*" + s0;
   s1 = "*" + s1;
-  const int M = s0.length() + 1, N = s1.length() + 1;
-  for (int i = 0; i < M; i++)
-  {
-    dyn[i * N + 0] = i;
-  }
-
+  const int M = s0.length(), N = s1.length();
+  int current_row = 0,prev_row = 1;
   for (int i = 0; i < N; i++)
   {
-    dyn[0 * N + i] = i;
+    dyn[current_row * N + i] = i;
   }
 
   for (int i = 1; i < M; i++)
   {
+    prev_row = current_row;
+    current_row = 1 - current_row;
+    dyn[current_row * N + 0] = i;
     for (int j = 1; j < N; j++)
     {
-      dyn[i * N + j] = std::min(dyn[(i - 1) * N + (j - 1)] + (s0[i] != s1[j]), std::min(dyn[(i - 1) * N + j] + 1, dyn[i * N + (j - 1)] + 1));
+      dyn[current_row * N + j] = std::min(dyn[prev_row * N + (j - 1)] + (s0[i] != s1[j]), std::min(dyn[prev_row * N + j] + 1, dyn[current_row * N + (j - 1)] + 1));
     }
   }
 
-  return dyn[(M - 1) * N + (N - 1)];
+  return dyn[current_row * N + (N - 1)];
 }
