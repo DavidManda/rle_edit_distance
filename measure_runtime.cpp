@@ -35,16 +35,17 @@ int main()
   int fixed_size = 100;
   std::string s0, s1;
   int M, N, m, n;
-  for (int i = 50; i < 4000; i += 50)
+  for (int i = 50; i < 5000; i += 50)
   {
     // height is i and width is i*2
-    // std::ifstream fin("inputs/input" + std::to_string(i) + "x" + std::to_string(i*2) + ".in");
+    // std::ifstream fin("inputs/input" + std::to_string(i) + "x" + std::to_string(i) + ".in");
     // std::ifstream fin("inputs/input" + std::to_string(i) + ".in");
     // fin >> M >> N;
+    s0 = "";s1 = "";
     // helper::read_string(fin, M, s0);
     // helper::read_string(fin, N, s1);
     m = i;
-    n = fixed_size;
+    n = i;
     s0 = get_str(m, 20);
     s1 = get_str(n,20);
     M = s0.length();
@@ -63,12 +64,13 @@ int main()
     // sol = rle_ED::get_naive_edit_dist(s0, s1);
     // naive_time = (std::clock() - start) / (double)CLOCKS_PER_SEC;
     rle_time = 0;
-    for(int j = 0; j < 5; j++){
+    int times = 5;
+    for(int j = 0; j < times; j++){
       start = std::clock();
       sol_rle = rle_ED::get_rle_edit_dist(rle_s0, rle_s1);
       rle_time += (std::clock() - start) / (double)CLOCKS_PER_SEC;
     }
-    rle_time /= 5;
+    rle_time /= times;
     // if (sol != sol_rle)
     // {
     //   std::cout << "Failed!!!\n"
