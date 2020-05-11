@@ -1,9 +1,9 @@
 #include "lcs_rle.hpp"
 
-#define MAX_SIZE 200
+#define MAX_SIZE 500
 typedef std::vector<rle::RLE_run> rle_string;
 
-int dyn[MAX_SIZE][MAX_SIZE];
+int dyn[2][MAX_SIZE];
 BST LEFT[MAX_SIZE * MAX_SIZE], TOP[MAX_SIZE * MAX_SIZE], OUT[MAX_SIZE * MAX_SIZE];
 
 BST initialise(int n)
@@ -271,19 +271,20 @@ int get_lcs(std::string &s0, std::string &s1)
   s0 = "*" + s0;
   s1 = "*" + s1;
   const int M = s0.length(), N = s1.length();
-
-  for(int i = 0; i < M; i++)
-    dyn[i][0] = 0;
+  int current_row = 0,prev_row = 1;
   for(int i = 0; i < N; i++)
-    dyn[0][i] = 0;
+    dyn[current_row][i] = 0;
 
   for (int i = 1; i < M; i++)
   {
+    prev_row = current_row;
+    current_row = 1 - current_row;
+    dyn[current_row][0] = 0;
     for (int j = 1; j < N; j++)
     {
-      dyn[i][j] = std::max(dyn[i - 1][j - 1] + (s0[i] == s1[j]), std::max(dyn[i - 1][j], dyn[i][j - 1]));
+      dyn[current_row][j] = std::max(dyn[prev_row][j - 1] + (s0[i] == s1[j]), std::max(dyn[prev_row][j], dyn[current_row][j - 1]));
     }
   }
 
-  return dyn[M-1][N-1];
+  return dyn[current_row][N-1];
 }
