@@ -28,8 +28,8 @@ def duplicate_all_elements(l):
 
 img1 = cv2.imread("c3p0.jpg", 0)
 img2 = cv2.imread("r2d2.jpg", 0)
-ret, binary_img1 = cv2.threshold(img1, 100, 255, cv2.THRESH_BINARY)
-ret, binary_img2 = cv2.threshold(img2, 50, 255, cv2.THRESH_BINARY)
+ret, binary_img1 = cv2.threshold(img1, 120, 255, cv2.THRESH_BINARY)
+ret, binary_img2 = cv2.threshold(img2, 60, 255, cv2.THRESH_BINARY)
 # binary_img1 = cv2.resize(binary_img1, (200, 100))
 # binary_img2 = cv2.resize(binary_img2, (200, 100))
 
@@ -51,7 +51,7 @@ ret, binary_img2 = cv2.threshold(img2, 50, 255, cv2.THRESH_BINARY)
 #     out.write("\n")
 #     write_string_to_file(string2, out)
 repeats = 1
-for size in range(1,100):
+for size in range(1,1000,5):
   height = size
   width = size
   dim = (width, height)

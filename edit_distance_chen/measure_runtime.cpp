@@ -23,7 +23,7 @@ int main(){
   fout<<"M, N, compression factor 1, compression factor 2, naive time, rle time\n";
   std::string s0, s1;
   int M, N, m, n;
-  for(int i = 50; i < 5000; i+=50){
+  for (int i = 1; i < 4000; i += 50){
     // height is i and width is i*2
     // std::ifstream fin("../inputs/input" + std::to_string(i) + "x" + std::to_string(i*2) + ".in");
     // int M, N;
@@ -36,15 +36,17 @@ int main(){
     // helper::read_string(fin, N, s1);
     m = i;
     n = i;
-    s0 = get_str(m, 20);
-    s1 = get_str(n,20);
+    s0 = get_str(m,100);
+    s1 = get_str(n,100);
     M = s0.length();
     N = s1.length();
     RLE_string_helper rle_helper;
     std::vector<RLE_run> rle_s0 = rle_helper.get_rle_string(s0);
     std::vector<RLE_run> rle_s1 = rle_helper.get_rle_string(s1);
-    double compression_fact0 = (double)s0.size()/(double)rle_s0.size();
-    double compression_fact1 = (double)s1.size()/(double)rle_s1.size();
+    std::cout << "Sizes are " << M << " and " << N << '\n';
+    std::cout << "Compressed sizes are " << rle_s0.size() << " and " << rle_s1.size() << '\n';
+    double compression_fact0 = (double)s0.size() / (double)rle_s0.size();
+    double compression_fact1 = (double)s1.size() / (double)rle_s1.size();
     std::clock_t start;
     double naive_time=0, rle_time=0;
     int sol = 0, sol_rle = 0;
@@ -53,7 +55,7 @@ int main(){
     // sol = edit_distance::get_edit_dist(M, N, s0, s1);
     // naive_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     rle_time = 0;
-    int times = 1;
+    int times = 3;
     for(int j = 0; j < times; j++){
       start = std::clock();
       sol_rle = edit_distance::get_rle_edit_dist(rle_s0, rle_s1);

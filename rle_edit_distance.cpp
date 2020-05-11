@@ -4,10 +4,9 @@
 #include <cstdlib>
 #include <ctime>
 
-#define MAX_SIZE 4000
-#define RLE_MAX_SIZE 100
+#define MAX_SIZE 2000000
 int dyn[2 * MAX_SIZE];
-BST LEFT[RLE_MAX_SIZE], TOP[2 * RLE_MAX_SIZE], OUT[2 * RLE_MAX_SIZE];
+BST LEFT[MAX_SIZE], TOP[2 * MAX_SIZE], OUT[2 * MAX_SIZE];
 
 typedef std::vector<rle::RLE_run> rle_string;
 // this function expects two trees that describe intervals [X_l, X_m] and [X_m, X_r]
