@@ -5,17 +5,17 @@
 #include <deque>
 #include <assert.h>
 
-#define MAX_SIZE 500
+#define MAX_SIZE 2000000
 typedef std::vector<Point> border_type;
 typedef std::vector<rle::RLE_run> rle_string;
 
 
-int dyn[MAX_SIZE * MAX_SIZE];
+int dyn[2 * MAX_SIZE];
 // The following are a graphical representation for the Input (split into LEFT and TOP)
 // and Output border for each block
-border_type LEFT[MAX_SIZE * MAX_SIZE];
-border_type TOP[MAX_SIZE * MAX_SIZE];
-border_type OUT[MAX_SIZE * MAX_SIZE];
+border_type LEFT[MAX_SIZE];
+border_type TOP[MAX_SIZE];
+border_type OUT[2 * MAX_SIZE];
 int min(int a, int b, int c)
 {
   return std::min(a, std::min(b, c));
@@ -107,56 +107,60 @@ void init_input_border(border_type LEFT[], border_type TOP[], int M, int N, cons
   int char_count = 0;
   for (int i = 1; i < M; i++)
   {
-    LEFT[i * N + 1].push_back(Point(1, s0[i].len + char_count));
-    LEFT[i * N + 1].push_back(Point(s0[i].len + 1, char_count));
+    LEFT[i] = std::vector<Point>();
+    LEFT[i].push_back(Point(1, s0[i].len + char_count));
+    LEFT[i].push_back(Point(s0[i].len + 1, char_count));
     char_count += s0[i].len;
   }
 
   char_count = 0;
   for (int j = 1; j < N; j++)
   {
-    TOP[1 * N + j].push_back(Point(1, char_count));
-    TOP[1 * N + j].push_back(Point(s1[j].len + 1, s1[j].len + char_count));
+    TOP[j] = std::vector<Point>();
+    TOP[j].push_back(Point(1, char_count));
+    TOP[j].push_back(Point(s1[j].len + 1, s1[j].len + char_count));
     char_count += s1[j].len;
   }
 }
 
-void get_input_border(border_type LEFT[], border_type TOP[], border_type OUT[], int i, int j, int dyn[], rle_string s0, rle_string s1, int M, int N)
+void get_input_border(border_type LEFT[], border_type TOP[], border_type OUT[], int i, int j, int dyn[], rle_string s0, rle_string s1, int M, int N, int current_row)
 {
   // LEFT[i][j] might have been initialised (if j == 1) so we don't have to do anything in that case
-  if (LEFT[i * N + j].empty())
+  if (j > 1)
   {
+    LEFT[i] = std::vector<Point>();
     // This is the first point
-    add_point(LEFT[i * N + j], Point(1, dyn[i * N + (j - 1)]));
+    add_point(LEFT[i], Point(1, dyn[current_row * N + (j - 1)]));
     // width and height of block to the left
     int w = s1[j - 1].len + 1;
     int h = s0[i].len + 1;
-    for (int k = 0; k < OUT[i * N + (j-1)].size(); k++)
+    for (int k = 0; k < OUT[current_row * N + (j-1)].size(); k++)
     {
-      Point p = OUT[i * N + (j - 1)][k];
+      Point p = OUT[current_row * N + (j - 1)][k];
       // These points are part of the left input border
       // The very last point should also be carried over here
       if (p.x > w)
       {
         int index = p.x - w + 1;
         int value = p.y;
-        add_point(LEFT[i * N + j], Point(index, value));
+        add_point(LEFT[i], Point(index, value));
       }
     }
   }
 
-  if (TOP[i * N + j].empty())
+  if (i > 1)
   {
+    TOP[j] = std::vector<Point>();
     // Width and height of block above
     int w = s1[j].len + 1;
     int h = s0[i - 1].len + 1;
     // The first point should be added here automatically
-    for (int k = 0; k < OUT[(i-1) * N + j].size(); k++)
+    for (int k = 0; k < OUT[(1-current_row) * N + j].size(); k++)
     {
-      Point p = OUT[(i-1) * N + j][k];
+      Point p = OUT[(1-current_row) * N + j][k];
       if(p.x < w)
       {
-        add_point(TOP[i * N + j], OUT[(i - 1)*N + j][k]);
+        add_point(TOP[j], p);
       }
       else
       {
@@ -164,7 +168,7 @@ void get_input_border(border_type LEFT[], border_type TOP[], border_type OUT[], 
       }
     }
     // Adding the very last point
-    add_point(TOP[i * N + j], Point(w, dyn[(i - 1) * N + j]));
+    add_point(TOP[j], Point(w, dyn[(1-current_row) * N + j]));
   }
 }
 
@@ -584,47 +588,48 @@ int get_rle_edit_dist(const rle_string &s0, const rle_string &s1)
   const int M = s0.size();
   const int N = s1.size();
 
-  initialise_empty(LEFT, M, N);
-  initialise_empty(TOP, M, N);
-  initialise_empty(OUT, M, N);
+  initialise_empty(OUT, 2, N);
   // Initialise input border
   init_input_border(LEFT, TOP, M, N, s0, s1);
+  int current_row = 0,prev_row = 1;
   for (int i = 1; i < M; i++)
   {
+    prev_row = current_row;
+    current_row = 1 - current_row;
     for (int j = 1; j < N; j++)
     {
-      // std::cout<<i<<' '<<j<<'\n';
+      OUT[current_row * N + j] = std::vector<Point>();
       int h = s0[i].len + 1;
       int w = s1[j].len + 1;
       // Retrieve input border for current block
-      get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1, M, N);
+      get_input_border(LEFT, TOP, OUT, i, j, dyn, s0, s1, M, N, current_row);
       if(s0[i].ch == s1[j].ch)
       {
-        for(int k = 0; k < LEFT[i * N + j].size(); k++)
+        for(int k = 0; k < LEFT[i].size(); k++)
         {
-          add_point(OUT[i * N + j], LEFT[i * N + j][k]);
+          add_point(OUT[current_row * N + j], LEFT[i][k]);
         }
-        for(int k = 0; k < TOP[i * N + j].size(); k++)
+        for(int k = 0; k < TOP[j].size(); k++)
         {
-          add_point(OUT[i * N + j], Point(TOP[i * N + j][k].x + h - 1, TOP[i * N + j][k].y));
+          add_point(OUT[current_row * N + j], Point(TOP[j][k].x + h - 1, TOP[j][k].y));
         }
       }
       else
       {
         std::vector<Point> LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT;
         int window = std::min(h, w);
-        LEFT_CSWM = get_cswm(LEFT[i * N + j], window);
-        TOP_CSWM = get_cswm(TOP[i * N + j], window);
+        LEFT_CSWM = get_cswm(LEFT[i], window);
+        TOP_CSWM = get_cswm(TOP[j], window);
         // Propagate 2
         propagate_2(h, w, LEFT_CSWM, TOP_CSWM, LEFT_OUT, TOP_OUT);
         // Propagate 3
-        OUT[i * N + j] = get_lower_part(LEFT_OUT, TOP_OUT);        
+        OUT[current_row * N + j] = get_lower_part(LEFT_OUT, TOP_OUT);        
       }
-      dyn[i * N + j] = get_val_at_coord(w, OUT[i * N + j]);
+      dyn[current_row * N + j] = get_val_at_coord(w, OUT[current_row * N + j]);
     }
   }
 
-  return dyn[(M - 1)* N  + (N - 1)];
+  return dyn[current_row * N  + (N - 1)];
 }
 
 int get_edit_dist(int M, int N, const std::string &s0, const std::string &s1)
