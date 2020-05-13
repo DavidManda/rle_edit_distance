@@ -5,13 +5,14 @@
 #include "edit_distance.hpp"
 #include "helper.hpp"
 #include <sstream>
-std::string get_str(int size, int max_run_len)
+std::string get_str(int size, int run_len)
 {
   std::string sol = "";
+  int lens[] = {run_len, run_len + 1, run_len + 2, run_len + 3};
   for (int i = 0; i < size; i++)
   {
     char ch = 'a' + i % 2;
-    int run_len = rand() % max_run_len + 1;
+    int run_len = lens[rand() % 4];
     for (int j = 0; j < run_len; j++)
       sol += ch;
   }
@@ -23,7 +24,7 @@ int main(){
   fout<<"M, N, compression factor 1, compression factor 2, naive time, rle time\n";
   std::string s0, s1;
   int M, N, m, n;
-  for (int i = 1; i < 4000; i += 50){
+  for (int i = 1; i < 6000; i += 100){
     // height is i and width is i*2
     // std::ifstream fin("../inputs/input" + std::to_string(i) + "x" + std::to_string(i*2) + ".in");
     // int M, N;
@@ -55,7 +56,7 @@ int main(){
     // sol = edit_distance::get_edit_dist(M, N, s0, s1);
     // naive_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     rle_time = 0;
-    int times = 3;
+    int times = 1;
     for(int j = 0; j < times; j++){
       start = std::clock();
       sol_rle = edit_distance::get_rle_edit_dist(rle_s0, rle_s1);
