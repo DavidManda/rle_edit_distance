@@ -5,7 +5,7 @@
 #include <deque>
 #include <assert.h>
 
-#define MAX_SIZE 3700000
+#define MAX_SIZE 37000
 typedef std::vector<Point> border_type;
 typedef std::vector<rle::RLE_run> rle_string;
 

@@ -56,7 +56,7 @@ int main(){
     // sol = edit_distance::get_edit_dist(M, N, s0, s1);
     // naive_time = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
     rle_time = 0;
-    int times = 1;
+    int times = 10;
     for(int j = 0; j < times; j++){
       start = std::clock();
       sol_rle = edit_distance::get_rle_edit_dist(rle_s0, rle_s1);
